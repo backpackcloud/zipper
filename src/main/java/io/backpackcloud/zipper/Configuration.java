@@ -24,9 +24,7 @@
 
 package io.backpackcloud.zipper;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
-import io.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,27 +32,65 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
-@JsonDeserialize(using = ConfigurationDeserializer.class)
+/**
+ * Interface that defines a configuration that can be supplied via different sources.
+ *
+ * @author Marcelo Guimarães
+ */
 public interface Configuration extends Supplier<String> {
 
+  /**
+   * Represents a not supplied configuration.
+   */
   Configuration NOT_SUPPLIED = new NotSuppliedConfiguration();
 
+  /**
+   * Checks if this source has some configuration set.
+   *
+   * @return {@code true} if this source holds any configuration value.
+   */
   boolean isSet();
 
+  /**
+   * Gets the value of this configuration.
+   *
+   * @return the configuration value.
+   */
   String get();
 
+  /**
+   * Gets the value of this configuration as an {@code int}.
+   *
+   * @return an {@code int} value defined by this configuration.
+   */
   default int asInt() {
     return Integer.parseInt(get());
   }
 
+  /**
+   * Gets the value of this configuration as an {@code long}.
+   *
+   * @return a {@code long} value defined by this configuration.
+   */
   default long asLong() {
     return Long.parseLong(get());
   }
 
+  /**
+   * Gets the value of this configuration as an {@code boolean}.
+   *
+   * @return a {@code boolean} value defined by this configuration.
+   */
   default boolean asBoolean() {
     return Boolean.parseBoolean(get());
   }
 
+  /**
+   * Assumes this configuration value is pointing to an external location
+   * and reads the value at that location.
+   *
+   * @return the value stored in the location defined by this configuration.
+   */
   default String read() {
     try {
       return Files.readString(Path.of(get()));
@@ -63,6 +99,12 @@ public interface Configuration extends Supplier<String> {
     }
   }
 
+  /**
+   * Assumes this configuration value is pointing to an external location
+   * and reads the lines at that location.
+   *
+   * @return the lines stored in the location defined by this configuration.
+   */
   default List<String> readLines() {
     try {
       return Files.readAllLines(Path.of(get()));
@@ -71,18 +113,50 @@ public interface Configuration extends Supplier<String> {
     }
   }
 
+  /**
+   * Returns this configuration value if it's {@link #isSet() set}, otherwise
+   * returns the given {@code defaultValue}.
+   *
+   * @param defaultValue the default value to return
+   * @return this configuration value or the default value in case this
+   * configuration is not set.
+   */
   default String or(String defaultValue) {
     return isSet() ? get() : defaultValue;
   }
 
+  /**
+   * Returns this configuration value if it's {@link #isSet() set}, otherwise
+   * returns the given {@code defaultValue}.
+   *
+   * @param defaultValue the default value to return
+   * @return this configuration value or the default value in case this
+   * configuration is not set.
+   */
   default int or(int defaultValue) {
     return isSet() ? asInt() : defaultValue;
   }
 
+  /**
+   * Returns this configuration value if it's {@link #isSet() set}, otherwise
+   * returns the given {@code defaultValue}.
+   *
+   * @param defaultValue the default value to return
+   * @return this configuration value or the default value in case this
+   * configuration is not set.
+   */
   default long or(long defaultValue) {
     return isSet() ? asLong() : defaultValue;
   }
 
+  /**
+   * Returns this configuration value if it's {@link #isSet() set}, otherwise
+   * returns the given {@code defaultValue}.
+   *
+   * @param defaultValue the default value to return
+   * @return this configuration value or the default value in case this
+   * configuration is not set.
+   */
   default boolean or(boolean defaultValue) {
     return isSet() ? asBoolean() : defaultValue;
   }

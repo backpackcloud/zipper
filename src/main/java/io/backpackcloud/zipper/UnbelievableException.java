@@ -26,6 +26,11 @@ package io.backpackcloud.zipper;
 
 import java.util.function.Supplier;
 
+/**
+ * OMG! I can't believe this is happening!
+ *
+ * @author Marcelo Guimarães
+ */
 public class UnbelievableException extends RuntimeException {
 
   public UnbelievableException() {
@@ -47,6 +52,12 @@ public class UnbelievableException extends RuntimeException {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 
+  /**
+   * Creates a supplier that uses the given reason as the exception message.
+   *
+   * @param reason the exception message
+   * @return a supplier that creates a new UnbelievableException with the given reason.
+   */
   public static Supplier<UnbelievableException> because(String reason) {
     return () -> new UnbelievableException(reason);
   }
