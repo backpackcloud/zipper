@@ -24,7 +24,9 @@
 
 package io.backpackcloud.zipper;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
+import io.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,6 +39,7 @@ import java.util.function.Supplier;
  *
  * @author Marcelo Guimarães
  */
+@JsonDeserialize(using = ConfigurationDeserializer.class)
 public interface Configuration extends Supplier<String> {
 
   /**
