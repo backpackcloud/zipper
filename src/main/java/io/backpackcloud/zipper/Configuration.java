@@ -117,6 +117,17 @@ public interface Configuration extends Supplier<String> {
   }
 
   /**
+   * Returns this configuration if it's set or the given default
+   * configuration otherwise.
+   *
+   * @param defaultConfiguration the default configuration to return
+   * @return this configuration or the default one
+   */
+  default Configuration or(Configuration defaultConfiguration) {
+    return isSet() ? this : defaultConfiguration;
+  }
+
+  /**
    * Returns this configuration value if it's {@link #isSet() set}, otherwise
    * returns the given {@code defaultValue}.
    *
@@ -124,7 +135,7 @@ public interface Configuration extends Supplier<String> {
    * @return this configuration value or the default value in case this
    * configuration is not set.
    */
-  default String or(String defaultValue) {
+  default String orElse(String defaultValue) {
     return isSet() ? get() : defaultValue;
   }
 
@@ -136,7 +147,7 @@ public interface Configuration extends Supplier<String> {
    * @return this configuration value or the default value in case this
    * configuration is not set.
    */
-  default int or(int defaultValue) {
+  default int orElse(int defaultValue) {
     return isSet() ? asInt() : defaultValue;
   }
 
@@ -148,7 +159,7 @@ public interface Configuration extends Supplier<String> {
    * @return this configuration value or the default value in case this
    * configuration is not set.
    */
-  default long or(long defaultValue) {
+  default long orElse(long defaultValue) {
     return isSet() ? asLong() : defaultValue;
   }
 
@@ -160,7 +171,7 @@ public interface Configuration extends Supplier<String> {
    * @return this configuration value or the default value in case this
    * configuration is not set.
    */
-  default boolean or(boolean defaultValue) {
+  default boolean orElse(boolean defaultValue) {
     return isSet() ? asBoolean() : defaultValue;
   }
 
