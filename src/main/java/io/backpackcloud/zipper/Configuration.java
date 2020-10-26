@@ -127,6 +127,10 @@ public interface Configuration extends Supplier<String> {
     return isSet() ? this : defaultConfiguration;
   }
 
+  default String or(Supplier<String> supplier) {
+    return isSet() ? get() : supplier.get();
+  }
+
   /**
    * Returns this configuration value if it's {@link #isSet() set}, otherwise
    * returns the given {@code defaultValue}.
