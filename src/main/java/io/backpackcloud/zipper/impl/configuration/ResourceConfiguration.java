@@ -36,20 +36,21 @@ import java.util.Scanner;
 
 public class ResourceConfiguration implements Configuration {
 
-  private final InputStream inputStream;
+  private final String resourcePath;
 
   @JsonCreator
   public ResourceConfiguration(String resourcePath) {
-    this.inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
+    this.resourcePath = resourcePath;
   }
 
   @Override
   public boolean isSet() {
-    return inputStream != null;
+    return ResourceConfiguration.class.getResource(resourcePath) != null;
   }
 
   @Override
   public String get() {
+    InputStream inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
     try (inputStream) {
       return new String(inputStream.readAllBytes());
     } catch (IOException e) {
@@ -64,6 +65,7 @@ public class ResourceConfiguration implements Configuration {
 
   @Override
   public List<String> readLines() {
+    InputStream inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
     try (inputStream) {
       Scanner      scanner = new Scanner(inputStream);
       List<String> lines   = new ArrayList<>();

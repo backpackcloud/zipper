@@ -153,10 +153,12 @@ public class ConfigurationTest {
     assertTrue(value instanceof ResourceConfiguration);
     assertTrue(value.isSet());
     assertTrue(value.get().contains("raw_value: foo"));
+    assertTrue(value.get().contains("raw_value: foo"));
 
     value = value("resource_composite");
     assertTrue(value instanceof ResourceConfiguration);
     assertTrue(value.isSet());
+    assertTrue(value.get().contains("raw_value: foo"));
     assertTrue(value.get().contains("raw_value: foo"));
   }
 
