@@ -16,20 +16,20 @@ file_value2:
   file: NOT_FOUND
 
 resource_value:
-  resource: /io/backpackcloud/zipper/impl/configuration.yaml
+  resource: /com/backpackcloud/zipper/impl/configuration.yaml
 
 env_composite:
   env: PATH
   property: fakeomatic.test
   file: LICENSE
-  resource: /io/backpackcloud/zipper/impl/configuration.yaml
+  resource: /com/backpackcloud/zipper/impl/configuration.yaml
   value: foo
 
 prop_composite:
   env: NOT_SET
   property: fakeomatic.test
   file: LICENSE
-  resource: /io/backpackcloud/zipper/impl/configuration.yaml
+  resource: /com/backpackcloud/zipper/impl/configuration.yaml
   value: foo
 
 file_composite:
@@ -43,7 +43,7 @@ resource_composite:
   env: NOT_SET
   property: not-set
   file: NONE
-  resource: /io/backpackcloud/zipper/impl/configuration.yaml
+  resource: /com/backpackcloud/zipper/impl/configuration.yaml
   value: foo
 
 raw_composite:

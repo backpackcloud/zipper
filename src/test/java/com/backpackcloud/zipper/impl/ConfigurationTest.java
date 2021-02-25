@@ -64,7 +64,7 @@ public class ConfigurationTest {
     try {
       testObject = objectMapper.readValue(
           new FileInputStream(
-              new File("src/test/resources/io/backpackcloud/zipper/impl/configuration.yaml")
+              new File("src/test/resources/com/backpackcloud/zipper/impl/configuration.yaml")
           ),
           TestObject.class
       );
