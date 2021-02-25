@@ -22,43 +22,48 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.configuration;
+package com.backpackcloud.zipper.impl.configuration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.backpackcloud.zipper.UnbelievableException;
-import io.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.Configuration;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
-public class FileConfiguration implements Configuration {
-
-  private final String path;
-
-  @JsonCreator
-  public FileConfiguration(String path) {
-    this.path = path;
-  }
+public class NotSuppliedConfiguration implements Configuration {
 
   @Override
   public boolean isSet() {
-    return new File(path).isFile();
+    return false;
   }
 
   @Override
   public String get() {
-    return read();
+    return "";
+  }
+
+  @Override
+  public int asInt() {
+    return 0;
+  }
+
+  @Override
+  public long asLong() {
+    return 0L;
+  }
+
+  @Override
+  public boolean asBoolean() {
+    return false;
   }
 
   @Override
   public String read() {
-    try {
-      return Files.readString(Path.of(path));
-    } catch (IOException e) {
-      throw new UnbelievableException(e);
-    }
+    return "";
+  }
+
+  @Override
+  public List<String> readLines() {
+    return Collections.emptyList();
   }
 
 }

@@ -22,47 +22,60 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.configuration;
+package com.backpackcloud.zipper.impl.configuration;
 
+import com.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.UnbelievableException;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import io.backpackcloud.zipper.Configuration;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class RawValueConfiguration implements Configuration {
+public class ResourceConfiguration implements Configuration {
 
-  private final String value;
+  private final String resourcePath;
 
   @JsonCreator
-  public RawValueConfiguration(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public String get() {
-    return this.value;
+  public ResourceConfiguration(String resourcePath) {
+    this.resourcePath = resourcePath;
   }
 
   @Override
   public boolean isSet() {
-    return true;
+    return ResourceConfiguration.class.getResource(resourcePath) != null;
+  }
+
+  @Override
+  public String get() {
+    InputStream inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
+    try (inputStream) {
+      return new String(inputStream.readAllBytes());
+    } catch (IOException e) {
+      throw new UnbelievableException(e);
+    }
   }
 
   @Override
   public String read() {
-    return value;
+    return get();
   }
 
   @Override
   public List<String> readLines() {
-    Scanner        scanner = new Scanner(read());
-    List<String> lines   = new ArrayList<>();
-    while (scanner.hasNextLine()) {
-      lines.add(scanner.nextLine());
+    InputStream inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
+    try (inputStream) {
+      Scanner      scanner = new Scanner(inputStream);
+      List<String> lines   = new ArrayList<>();
+      while (scanner.hasNextLine()) {
+        lines.add(scanner.nextLine());
+      }
+      return lines;
+    } catch (IOException e) {
+      throw new UnbelievableException(e);
     }
-    return lines;
   }
 
 }

@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl;
+package com.backpackcloud.zipper.impl;
 
+import com.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.backpackcloud.zipper.Configuration;
-import io.backpackcloud.zipper.UnbelievableException;
-import io.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
-import io.backpackcloud.zipper.impl.configuration.FileConfiguration;
-import io.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
-import io.backpackcloud.zipper.impl.configuration.RawValueConfiguration;
-import io.backpackcloud.zipper.impl.configuration.ResourceConfiguration;
-import io.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
-import io.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
+import com.backpackcloud.zipper.UnbelievableException;
+import com.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
+import com.backpackcloud.zipper.impl.configuration.FileConfiguration;
+import com.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
+import com.backpackcloud.zipper.impl.configuration.RawValueConfiguration;
+import com.backpackcloud.zipper.impl.configuration.ResourceConfiguration;
+import com.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

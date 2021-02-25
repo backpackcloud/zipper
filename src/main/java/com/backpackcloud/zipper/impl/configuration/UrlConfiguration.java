@@ -22,59 +22,59 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.configuration;
+package com.backpackcloud.zipper.impl.configuration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.backpackcloud.zipper.UnbelievableException;
-import io.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.UnbelievableException;
+import com.backpackcloud.zipper.Configuration;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
-import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class ResourceConfiguration implements Configuration {
+public class UrlConfiguration implements Configuration {
 
-  private final String resourcePath;
+  private final URL    url;
+  private       String content;
 
-  @JsonCreator
-  public ResourceConfiguration(String resourcePath) {
-    this.resourcePath = resourcePath;
-  }
-
-  @Override
-  public boolean isSet() {
-    return ResourceConfiguration.class.getResource(resourcePath) != null;
-  }
-
-  @Override
-  public String get() {
-    InputStream inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
-    try (inputStream) {
-      return new String(inputStream.readAllBytes());
-    } catch (IOException e) {
+  public UrlConfiguration(String url) {
+    try {
+      this.url = new URL(url);
+    } catch (MalformedURLException e) {
       throw new UnbelievableException(e);
     }
   }
 
   @Override
+  public boolean isSet() {
+    return true;
+  }
+
+  @Override
+  public String get() {
+    return url.toExternalForm();
+  }
+
+  @Override
   public String read() {
-    return get();
+    load();
+    return content;
   }
 
   @Override
   public List<String> readLines() {
-    InputStream inputStream = ResourceConfiguration.class.getResourceAsStream(resourcePath);
-    try (inputStream) {
-      Scanner      scanner = new Scanner(inputStream);
-      List<String> lines   = new ArrayList<>();
-      while (scanner.hasNextLine()) {
-        lines.add(scanner.nextLine());
+    load();
+    return content.lines().collect(Collectors.toList());
+  }
+
+  private void load() {
+    if (content != null) {
+      try {
+        content = url.getContent().toString();
+      } catch (IOException e) {
+        throw new UnbelievableException(e);
       }
-      return lines;
-    } catch (IOException e) {
-      throw new UnbelievableException(e);
     }
   }
 

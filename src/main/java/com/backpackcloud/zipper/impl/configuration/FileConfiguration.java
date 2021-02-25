@@ -22,29 +22,43 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.configuration;
+package com.backpackcloud.zipper.impl.configuration;
 
+import com.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.UnbelievableException;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import io.backpackcloud.zipper.Configuration;
 
-// TODO support pointing to a URL
-public class EnvironmentVariableConfiguration implements Configuration {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-  private final String key;
+public class FileConfiguration implements Configuration {
+
+  private final String path;
 
   @JsonCreator
-  public EnvironmentVariableConfiguration(String key) {
-    this.key = key;
+  public FileConfiguration(String path) {
+    this.path = path;
   }
 
   @Override
   public boolean isSet() {
-    return System.getenv().containsKey(key);
+    return new File(path).isFile();
   }
 
   @Override
   public String get() {
-    return System.getenv(key);
+    return read();
+  }
+
+  @Override
+  public String read() {
+    try {
+      return Files.readString(Path.of(path));
+    } catch (IOException e) {
+      throw new UnbelievableException(e);
+    }
   }
 
 }

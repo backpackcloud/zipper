@@ -22,44 +22,29 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper;
+package com.backpackcloud.zipper.impl.configuration;
 
-import java.util.function.Supplier;
+import com.backpackcloud.zipper.Configuration;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
-/**
- * OMG! I can't believe this is happening!
- *
- * @author Marcelo Guimarães
- */
-public class UnbelievableException extends RuntimeException {
+// TODO support pointing to a URL
+public class EnvironmentVariableConfiguration implements Configuration {
 
-  public UnbelievableException() {
+  private final String key;
+
+  @JsonCreator
+  public EnvironmentVariableConfiguration(String key) {
+    this.key = key;
   }
 
-  public UnbelievableException(String message) {
-    super(message);
+  @Override
+  public boolean isSet() {
+    return System.getenv().containsKey(key);
   }
 
-  public UnbelievableException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public UnbelievableException(Throwable cause) {
-    super(cause);
-  }
-
-  public UnbelievableException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
-
-  /**
-   * Creates a supplier that uses the given reason as the exception message.
-   *
-   * @param reason the exception message
-   * @return a supplier that creates a new UnbelievableException with the given reason.
-   */
-  public static Supplier<UnbelievableException> because(String reason) {
-    return () -> new UnbelievableException(reason);
+  @Override
+  public String get() {
+    return System.getenv(key);
   }
 
 }

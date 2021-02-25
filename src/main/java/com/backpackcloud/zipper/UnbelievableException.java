@@ -22,60 +22,44 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.configuration;
+package com.backpackcloud.zipper;
 
-import io.backpackcloud.zipper.UnbelievableException;
-import io.backpackcloud.zipper.Configuration;
+import java.util.function.Supplier;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.stream.Collectors;
+/**
+ * OMG! I can't believe this is happening!
+ *
+ * @author Marcelo Guimarães
+ */
+public class UnbelievableException extends RuntimeException {
 
-public class UrlConfiguration implements Configuration {
-
-  private final URL    url;
-  private       String content;
-
-  public UrlConfiguration(String url) {
-    try {
-      this.url = new URL(url);
-    } catch (MalformedURLException e) {
-      throw new UnbelievableException(e);
-    }
+  public UnbelievableException() {
   }
 
-  @Override
-  public boolean isSet() {
-    return true;
+  public UnbelievableException(String message) {
+    super(message);
   }
 
-  @Override
-  public String get() {
-    return url.toExternalForm();
+  public UnbelievableException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  @Override
-  public String read() {
-    load();
-    return content;
+  public UnbelievableException(Throwable cause) {
+    super(cause);
   }
 
-  @Override
-  public List<String> readLines() {
-    load();
-    return content.lines().collect(Collectors.toList());
+  public UnbelievableException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
   }
 
-  private void load() {
-    if (content != null) {
-      try {
-        content = url.getContent().toString();
-      } catch (IOException e) {
-        throw new UnbelievableException(e);
-      }
-    }
+  /**
+   * Creates a supplier that uses the given reason as the exception message.
+   *
+   * @param reason the exception message
+   * @return a supplier that creates a new UnbelievableException with the given reason.
+   */
+  public static Supplier<UnbelievableException> because(String reason) {
+    return () -> new UnbelievableException(reason);
   }
 
 }

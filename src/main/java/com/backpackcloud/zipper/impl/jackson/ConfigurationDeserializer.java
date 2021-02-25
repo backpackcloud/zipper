@@ -22,19 +22,19 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.jackson;
+package com.backpackcloud.zipper.impl.jackson;
 
+import com.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
+import com.backpackcloud.zipper.impl.configuration.UrlConfiguration;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
-import io.backpackcloud.zipper.impl.configuration.FileConfiguration;
-import io.backpackcloud.zipper.impl.configuration.RawValueConfiguration;
-import io.backpackcloud.zipper.impl.configuration.ResourceConfiguration;
-import io.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
-import io.backpackcloud.zipper.impl.configuration.UrlConfiguration;
-import io.backpackcloud.zipper.Configuration;
+import com.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
+import com.backpackcloud.zipper.impl.configuration.FileConfiguration;
+import com.backpackcloud.zipper.impl.configuration.RawValueConfiguration;
+import com.backpackcloud.zipper.impl.configuration.ResourceConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;

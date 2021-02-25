@@ -22,29 +22,47 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper.impl.configuration;
+package com.backpackcloud.zipper.impl.configuration;
 
+import com.backpackcloud.zipper.Configuration;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import io.backpackcloud.zipper.Configuration;
 
-// TODO support pointing to a URL
-public class SystemPropertyConfiguration implements Configuration {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
-  private final String key;
+public class RawValueConfiguration implements Configuration {
+
+  private final String value;
 
   @JsonCreator
-  public SystemPropertyConfiguration(String key) {
-    this.key = key;
-  }
-
-  @Override
-  public boolean isSet() {
-    return System.getProperties().containsKey(key);
+  public RawValueConfiguration(String value) {
+    this.value = value;
   }
 
   @Override
   public String get() {
-    return System.getProperty(key);
+    return this.value;
+  }
+
+  @Override
+  public boolean isSet() {
+    return true;
+  }
+
+  @Override
+  public String read() {
+    return value;
+  }
+
+  @Override
+  public List<String> readLines() {
+    Scanner        scanner = new Scanner(read());
+    List<String> lines   = new ArrayList<>();
+    while (scanner.hasNextLine()) {
+      lines.add(scanner.nextLine());
+    }
+    return lines;
   }
 
 }

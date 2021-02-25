@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package io.backpackcloud.zipper;
+package com.backpackcloud.zipper;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
-import io.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
+import com.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
+import com.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
 
 import java.io.IOException;
 import java.nio.file.Files;
