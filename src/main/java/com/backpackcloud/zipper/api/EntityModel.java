@@ -33,10 +33,11 @@ public class EntityModel<E extends Entity> {
       .forEach(element -> {
         Link link = element.getAnnotation(Link.class);
         String rel = link.rel().isEmpty() ? element.name() : link.rel();
+        String title = link.title().isEmpty() ? element.type().getSimpleName() : link.title();
         Entity entity = element.getValue();
         ApiResource resource = entity.getClass().getAnnotation(ApiResource.class);
         String href = String.format("%s/%s/%s", baseUrl, resource.name(), entity.id());
-        this.links.put(rel, new EntityLink(href, link.title()));
+        this.links.put(rel, new EntityLink(href, title));
       });
   }
 

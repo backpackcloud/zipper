@@ -8,7 +8,7 @@ public class EntityLink {
   private final String title;
 
   public EntityLink(String href, String title) {
-    this.href = href != null && href.isEmpty() ? null : href;
+    this.href = href;
     this.title = title;
   }
 
