@@ -35,7 +35,7 @@
   </parent>
 
   <artifactId>zipper</artifactId>
-  <version>0.3.1</version>
+  <version>0.4.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <description>
@@ -79,9 +79,17 @@
 
     <jackson.version>2.10.4</jackson.version>
     <junit.version>5.6.2</junit.version>
+
+    <trugger.version>7.0.0</trugger.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.backpackcloud</groupId>
+      <artifactId>trugger</artifactId>
+      <version>${trugger.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
