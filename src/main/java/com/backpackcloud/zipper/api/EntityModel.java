@@ -1,6 +1,8 @@
 package com.backpackcloud.zipper.api;
 
 import com.backpackcloud.zipper.domain.Entity;
+import com.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
+import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
@@ -13,15 +15,19 @@ import static com.backpackcloud.trugger.element.Elements.elements;
 
 public class EntityModel<E extends Entity> {
 
+  private static final String API_BASE_URL = new EnvironmentVariableConfiguration("API_BASE_URL")
+    .or(new SystemPropertyConfiguration("api.base.url"))
+    .or(() -> String.format("http://%s:%s",
+      System.getProperty("quarkus.http.host", "localhost"),
+      System.getProperty("quarkus.http.port", "8080")));
+
   @JsonUnwrapped
   private final E result;
-  private final String baseUrl;
   @JsonProperty("_links")
   private final Map<String, EntityLink> links;
 
-  public EntityModel(E result, String baseUrl) {
+  public EntityModel(E result) {
     this.result = result;
-    this.baseUrl = baseUrl;
     this.links = new HashMap<>();
     initializeLinks();
   }
@@ -36,7 +42,7 @@ public class EntityModel<E extends Entity> {
         String title = link.title().isEmpty() ? element.type().getSimpleName() : link.title();
         Entity entity = element.getValue();
         ApiResource resource = entity.getClass().getAnnotation(ApiResource.class);
-        String href = String.format("%s/%s/%s", baseUrl, resource.name(), entity.id());
+        String href = String.format("%s/%s/%s", API_BASE_URL, resource.name(), entity.id());
         this.links.put(rel, new EntityLink(href, title));
       });
   }
