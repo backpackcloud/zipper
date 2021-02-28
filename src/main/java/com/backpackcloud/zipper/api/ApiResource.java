@@ -7,8 +7,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiResource {
 
-  String name();
-
   Class<? extends ApiResourceModel> model();
 
 }

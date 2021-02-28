@@ -6,4 +6,6 @@ public interface ApiResourceModel {
 
   UUID id();
 
+  Class<? extends ApiResourceController> controllerClass();
+
 }

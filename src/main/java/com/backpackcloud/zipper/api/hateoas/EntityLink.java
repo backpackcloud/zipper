@@ -1,11 +1,12 @@
 package com.backpackcloud.zipper.api.hateoas;
 
-import com.backpackcloud.zipper.api.ApiResource;
-import com.backpackcloud.zipper.domain.Entity;
+import com.backpackcloud.zipper.api.ApiResourceModel;
 import com.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
 import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.ws.rs.Path;
 
 public class EntityLink {
 
@@ -18,16 +19,15 @@ public class EntityLink {
   private final String href;
   private final String title;
 
-  public EntityLink(Entity entity, String title) {
-    ApiResource resource = entity.getClass().getAnnotation(ApiResource.class);
-    String href = String.format("/%s/%s", resource.name(), entity.id());
+  public EntityLink(ApiResourceModel model, String title) {
+    Path path = model.controllerClass().getAnnotation(Path.class);
 
-    this.href = API_BASE_URL + href;
+    this.href = API_BASE_URL + path.value() + "/" + model.id();
     this.title = title;
   }
 
-  public EntityLink(Entity entity) {
-    this(entity, null);
+  public EntityLink(ApiResourceModel model) {
+    this(model, null);
   }
 
   @JsonProperty
