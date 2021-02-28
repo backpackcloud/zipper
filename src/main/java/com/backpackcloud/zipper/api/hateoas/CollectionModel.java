@@ -21,11 +21,6 @@ public class CollectionModel<E extends Entity> {
     this.links = new HashMap<>();
   }
 
-  @JsonProperty("list")
-  public List<EntityModel<E>> result() {
-    return result;
-  }
-
   @JsonProperty("total")
   public int total() {
     return result.size();
@@ -35,6 +30,11 @@ public class CollectionModel<E extends Entity> {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   public Map<String, EntityLink> links() {
     return links;
+  }
+
+  @JsonProperty("list")
+  public List<EntityModel<E>> result() {
+    return result;
   }
 
 }

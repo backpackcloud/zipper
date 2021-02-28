@@ -27,15 +27,14 @@ public class EntityModel<E extends Entity> {
   private final Set<String> fields;
 
   public EntityModel(E result) {
-    this(result, new String[0]);
+    this(result, Collections.emptySet());
   }
 
-  public EntityModel(E result, String... fields) {
+  public EntityModel(E result, Set<String> fields) {
     this.result = result;
     this.annotation = result.getClass().getAnnotation(ApiResource.class);
     this.links = new HashMap<>();
-    this.fields = new HashSet<>(fields.length);
-    this.fields.addAll(Arrays.asList(fields));
+    this.fields = fields.isEmpty() ? Collections.emptySet() : new HashSet<>(fields);
     Optional<ReflectedConstructor> constructor = reflect()
       .constructor()
       .withParameters(result.getClass())
