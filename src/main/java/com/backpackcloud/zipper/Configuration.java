@@ -24,9 +24,10 @@
 
 package com.backpackcloud.zipper;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.backpackcloud.zipper.impl.configuration.ConfigurationChain;
 import com.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
 import com.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -177,6 +178,10 @@ public interface Configuration extends Supplier<String> {
    */
   default boolean orElse(boolean defaultValue) {
     return isSet() ? asBoolean() : defaultValue;
+  }
+
+  static ConfigurationChain configuration() {
+    return new ConfigurationChain(new NotSuppliedConfiguration());
   }
 
 }
