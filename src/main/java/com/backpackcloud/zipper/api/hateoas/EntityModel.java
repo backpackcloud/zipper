@@ -32,6 +32,7 @@ public class EntityModel<E extends Entity> {
 
   public EntityModel(E result, String... fields) {
     this.result = result;
+    this.annotation = result.getClass().getAnnotation(ApiResource.class);
     this.links = new HashMap<>();
     this.fields = new HashSet<>(fields.length);
     this.fields.addAll(Arrays.asList(fields));
