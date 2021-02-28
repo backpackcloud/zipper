@@ -4,7 +4,6 @@ import com.backpackcloud.trugger.element.Element;
 import com.backpackcloud.trugger.reflection.Reflection;
 import com.backpackcloud.zipper.UnbelievableException;
 import com.backpackcloud.zipper.api.ApiResourceModel;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.ws.rs.GET;
@@ -16,7 +15,7 @@ import static com.backpackcloud.trugger.element.Elements.element;
 import static com.backpackcloud.trugger.reflection.MethodPredicates.annotatedWith;
 import static com.backpackcloud.zipper.Configuration.configuration;
 
-public class EntityLink {
+public class EntityLink implements ApiLink {
 
   private static final String API_BASE_URL = configuration()
     .env("API_BASE_URL")
@@ -25,15 +24,17 @@ public class EntityLink {
 
   private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{(\\w+)}");
 
+  private final String rel;
   private final String href;
   private final String title;
 
-  public EntityLink(ApiResourceModel model, String title) {
+  public EntityLink(String rel, ApiResourceModel model, String title) {
     String basePath = model.controllerClass().getAnnotation(Path.class).value();
     String subPath = Reflection.reflect().methods()
       .filter(annotatedWith(GET.class))
       .filter(annotatedWith(Link.class))
       .filter(annotatedWith(Path.class))
+      .filter(method -> "_self".equals(method.getAnnotation(Link.class).rel()))
       .from(model.controllerClass())
       .stream().findFirst()
       .map(method -> method.getAnnotation(Path.class))
@@ -56,23 +57,29 @@ public class EntityLink {
       path.replace(matcher.start(), matcher.end(), value);
     }
 
+    this.rel = rel;
     this.href = API_BASE_URL + path.toString();
     this.title = title;
   }
 
-  public EntityLink(ApiResourceModel model) {
-    this(model, null);
+  public EntityLink(String rel, ApiResourceModel model) {
+    this(rel, model, null);
   }
 
-  @JsonProperty
-  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Override
   public String title() {
     return title;
   }
 
   @JsonProperty
+  @Override
   public String href() {
     return href;
+  }
+
+  @Override
+  public String rel() {
+    return rel;
   }
 
 }

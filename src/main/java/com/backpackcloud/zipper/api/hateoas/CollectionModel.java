@@ -1,5 +1,6 @@
 package com.backpackcloud.zipper.api.hateoas;
 
+import com.backpackcloud.zipper.api.CollectionFilter;
 import com.backpackcloud.zipper.api.PropertyFilter;
 import com.backpackcloud.zipper.domain.Entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,13 +14,13 @@ import java.util.stream.Collectors;
 public class CollectionModel<E extends Entity> {
 
   private final List<EntityModel<E>> result;
-  private final Map<String, EntityLink> links;
+  private final Map<String, ApiLink> links;
 
-  public CollectionModel(List<E> result) {
-    this(result, PropertyFilter.NONE);
+  public CollectionModel(List<E> result, CollectionFilter collectionFilter) {
+    this(result, collectionFilter, PropertyFilter.NONE);
   }
 
-  public CollectionModel(List<E> result, PropertyFilter filter) {
+  public CollectionModel(List<E> result, CollectionFilter collectionFilter, PropertyFilter filter) {
     this.result = result.stream()
       .map(e -> new EntityModel<>(e, filter))
       .collect(Collectors.toList());
@@ -33,7 +34,7 @@ public class CollectionModel<E extends Entity> {
 
   @JsonProperty("_links")
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  public Map<String, EntityLink> links() {
+  public Map<String, ApiLink> links() {
     return links;
   }
 

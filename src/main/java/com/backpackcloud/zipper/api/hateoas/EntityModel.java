@@ -9,7 +9,6 @@ import com.backpackcloud.zipper.domain.Entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +24,7 @@ public class EntityModel<E extends Entity> {
   private final ApiResourceModel resourceModel;
   private ApiResource annotation;
   @JsonProperty("_links")
-  private final Map<String, EntityLink> links;
+  private final Map<String, ApiLink> links;
 
   public EntityModel(E result) {
     this(result, PropertyFilter.NONE);
@@ -54,7 +53,7 @@ public class EntityModel<E extends Entity> {
   }
 
   private void initializeLinks() {
-    links.put("_self", new EntityLink(resourceModel));
+    links.put("_self", new EntityLink("_self", resourceModel));
     elements()
       .filter(annotatedWith(Link.class))
       .from(resourceModel)
@@ -62,16 +61,8 @@ public class EntityModel<E extends Entity> {
         Link link = element.getAnnotation(Link.class);
         String rel = link.rel().isEmpty() ? element.name() : link.rel();
         String title = link.title().isEmpty() ? element.type().getSimpleName() : link.title();
-        this.links.put(rel, new EntityLink(element.getValue(), title));
+        this.links.put(rel, new EntityLink(rel, element.getValue(), title));
       });
-  }
-
-  public ApiResourceModel resourceModel() {
-    return resourceModel;
-  }
-
-  public Map<String, EntityLink> links() {
-    return Collections.unmodifiableMap(links);
   }
 
 }
