@@ -1,8 +1,10 @@
-package com.backpackcloud.zipper.api;
+package com.backpackcloud.zipper.api.hateoas;
 
+import com.backpackcloud.zipper.api.ApiResource;
 import com.backpackcloud.zipper.domain.Entity;
 import com.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
 import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EntityLink {
@@ -29,6 +31,7 @@ public class EntityLink {
   }
 
   @JsonProperty
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public String title() {
     return title;
   }

@@ -9,4 +9,6 @@ public @interface ApiResource {
 
   String name();
 
+  Class<? extends ApiResourceModel> model();
+
 }

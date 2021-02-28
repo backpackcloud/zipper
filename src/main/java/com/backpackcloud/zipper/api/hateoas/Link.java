@@ -1,4 +1,4 @@
-package com.backpackcloud.zipper.api;
+package com.backpackcloud.zipper.api.hateoas;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
