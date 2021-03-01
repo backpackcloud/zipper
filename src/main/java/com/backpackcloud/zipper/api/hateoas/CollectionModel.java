@@ -14,11 +14,17 @@ public class CollectionModel<E extends Entity> {
 
   private final List<EntityModel<E>> list;
   private final Map<String, ApiLink> links;
+  private final Long total;
 
   public CollectionModel(Collection<E> list) {
+    this(list, null);
+  }
+
+  public CollectionModel(Collection<E> list, Long total) {
     this.list = list.stream()
       .map(EntityModel::new)
       .collect(Collectors.toList());
+    this.total = total;
     this.links = new HashMap<>();
   }
 
@@ -44,9 +50,14 @@ public class CollectionModel<E extends Entity> {
     };
   }
 
-  @JsonProperty("total")
-  public int total() {
+  @JsonProperty("count")
+  public int count() {
     return list.size();
+  }
+
+  @JsonProperty("total")
+  public Long total() {
+    return total;
   }
 
   @JsonProperty("list")
