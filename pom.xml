@@ -35,7 +35,7 @@
   </parent>
 
   <artifactId>zipper</artifactId>
-  <version>0.4.0-SNAPSHOT</version>
+  <version>0.4.0</version>
   <packaging>jar</packaging>
 
   <description>
@@ -85,19 +85,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>com.backpackcloud</groupId>
-      <artifactId>trugger</artifactId>
-      <version>${trugger.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>${jaxrs-api.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
