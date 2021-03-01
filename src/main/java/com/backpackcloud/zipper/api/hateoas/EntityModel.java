@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,10 +35,10 @@ public class EntityModel<E extends Entity> implements ApiModel<E> {
         Matcher matcher = PATH_PATTERN.matcher(uri);
         while (matcher.find()) {
           String value = Elements.element(matcher.group("name"))
-            .from(entity)
-            .map(Element::getValue)
-            .map(Object::toString)
-            .orElseThrow(UnbelievableException::new);
+              .from(entity)
+              .map(Element::getValue)
+              .map(Object::toString)
+              .orElseThrow(UnbelievableException::new);
           uri.replace(matcher.start(), matcher.end(), value);
         }
         LinkMapper<ApiModel<E>> mapper = link(uri.toString());
@@ -69,6 +70,11 @@ public class EntityModel<E extends Entity> implements ApiModel<E> {
         return EntityModel.this;
       }
     };
+  }
+
+  @Override
+  public Optional<ApiLink> linkTo(String rel) {
+    return Optional.ofNullable(links.get(rel));
   }
 
 }
