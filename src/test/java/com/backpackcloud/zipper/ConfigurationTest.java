@@ -22,21 +22,19 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.zipper.impl;
+package com.backpackcloud.zipper;
 
-import com.backpackcloud.zipper.Configuration;
-import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.backpackcloud.zipper.UnbelievableException;
 import com.backpackcloud.zipper.impl.configuration.EnvironmentVariableConfiguration;
 import com.backpackcloud.zipper.impl.configuration.FileConfiguration;
 import com.backpackcloud.zipper.impl.configuration.NotSuppliedConfiguration;
 import com.backpackcloud.zipper.impl.configuration.RawValueConfiguration;
 import com.backpackcloud.zipper.impl.configuration.ResourceConfiguration;
+import com.backpackcloud.zipper.impl.configuration.SystemPropertyConfiguration;
 import com.backpackcloud.zipper.impl.jackson.ConfigurationDeserializer;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
