@@ -24,27 +24,79 @@
 
 package com.backpackcloud.zipper;
 
+import com.backpackcloud.zipper.impl.serializer.SerializerImpl;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+
+import java.io.File;
+
 /**
  * Interface that exposes components for serializing different formats of input.
  */
 public interface Serializer {
 
   /**
+   * Serializes the given object into a String.
+   *
+   * @param object the object to serialize
+   * @return the serialized object.
+   */
+  String serialize(Object object);
+
+  /**
+   * Deserialize the given input into an object of the given class.
+   *
+   * @param input the input to deserialize
+   * @param type  the type of the result object
+   * @return the deserialized object.
+   */
+  <E> E deserialize(String input, Class<E> type);
+
+  /**
+   * Deserialize the given file content into an object of the given class.
+   *
+   * @param file the file containing the input to deserialize
+   * @param type the type of the result object
+   * @return the deserialized object.
+   */
+  <E> E deserialize(File file, Class<E> type);
+
+  Serializer addDependency(String name, Object dependency);
+
+  <E> Serializer addDependency(Class<E> type, E dependency);
+
+  /**
    * Returns the mapper for json data type.
    *
    * @return the mapper for json data type.
    */
-  Mapper json();
+  static Serializer json() {
+    ObjectMapper jsonMapper = new ObjectMapper();
+    jsonMapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule());
+    jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    return new SerializerImpl(jsonMapper);
+  }
 
   /**
    * Returns the mapper for the yaml data type.
    *
    * @return the mapper for the yaml data type.
    */
-  Mapper yaml();
+  static Serializer yaml() {
+    ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    yamlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    yamlMapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule());
 
-  Serializer addDependency(String name, Object dependency);
+    return new SerializerImpl(yamlMapper);
+  }
 
-  <E> Serializer addDependency(Class<E> type, E dependency);
+  static Serializer using(ObjectMapper objectMapper) {
+    return new SerializerImpl(objectMapper);
+  }
 
 }

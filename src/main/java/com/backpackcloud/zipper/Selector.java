@@ -24,60 +24,20 @@
 
 package com.backpackcloud.zipper;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.backpackcloud.zipper.impl.SelectorImpl;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
-public class Selector implements Predicate<TagMap> {
+@JsonDeserialize(as = SelectorImpl.class)
+public interface Selector extends Predicate<TagMap> {
 
-  private final List<Predicate<TagMap>> predicates;
-
-  @JsonCreator
-  public Selector(Map<String, String> values) {
-    predicates = new ArrayList<>(values.size());
-
-    values.forEach((key, value) -> {
-      Predicate<TagMap> predicate = null;
-
-      for (String v : value.split("\\s*\\|\\s*")) {
-        if (predicate == null) {
-          predicate = createPredicate(key, v);
-        } else {
-          predicate = predicate.or(createPredicate(key, v));
-        }
-      }
-
-      predicates.add(predicate);
-    });
+  default boolean test(Taggable taggable) {
+    return test(taggable.tags());
   }
 
-  public Selector(List<Predicate<TagMap>> predicates) {
-    this.predicates = predicates;
-  }
-
-  @Override
-  public boolean test(TagMap tagMap) {
-    return predicates.stream().allMatch(predicate -> predicate.test(tagMap));
-  }
-
-  private static Predicate<TagMap> createPredicate(String key, String value) {
-    switch (value) {
-      case "*":
-        return tagMap -> tagMap.get(key).isPresent();
-      case "!":
-        return tagMap -> tagMap.get(key).isEmpty();
-      default:
-        if (value.startsWith("!")) return createPredicate(key, value.substring(1)).negate();
-        return tagMap -> tagMap.get(key).filter(tag -> value.equals(tag.value())).isPresent();
-    }
-  }
-
-  public static Selector empty() {
-    return new Selector(Collections.emptyList());
+  static Selector empty () {
+    return SelectorImpl.empty();
   }
 
 }

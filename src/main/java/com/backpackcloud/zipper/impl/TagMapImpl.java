@@ -22,36 +22,54 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.zipper;
+package com.backpackcloud.zipper.impl;
 
+import com.backpackcloud.zipper.Tag;
+import com.backpackcloud.zipper.TagMap;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-public class Tag {
+import java.util.*;
 
-  private final String name;
-  private final String value;
-
-  public Tag(String name, String value) {
-    this.name = name;
-    this.value = value;
-  }
-
-  public String name() {
-    return name;
-  }
+public class TagMapImpl implements TagMap {
 
   @JsonValue
-  public String value() {
-    return value;
+  private final Map<String, Tag> map;
+
+  @JsonCreator
+  public TagMapImpl(Map<String, String> map) {
+    this.map = new HashMap<>(map.size());
+    map.forEach((key, value) -> this.map.put(key, new Tag(key, value)));
   }
 
-  public int intValue() {
-    return Integer.parseInt(value);
+  public TagMapImpl(List<Tag> tags) {
+    this.map = new HashMap<>(tags.size());
+    tags.forEach(tag -> map.put(tag.name(), tag));
   }
 
-  public boolean booleanValue() {
-    return Boolean.parseBoolean(value);
+  @Override
+  public void add(Tag tag) {
+    map.put(tag.name(), tag);
+  }
+
+  @Override
+  public Optional<Tag> get(String name) {
+    return Optional.ofNullable(map.get(name));
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
+  @Override
+  public int size() {
+    return map.size();
+  }
+
+  @Override
+  public Collection<Tag> all() {
+    return map.values();
   }
 
 }

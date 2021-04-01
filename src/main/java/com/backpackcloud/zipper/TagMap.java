@@ -24,58 +24,35 @@
 
 package com.backpackcloud.zipper;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.backpackcloud.zipper.impl.TagMapImpl;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class TagMap {
+@JsonDeserialize(as = TagMapImpl.class)
+@JsonSerialize(as = TagMapImpl.class)
+public interface TagMap {
 
-  @JsonValue
-  private final Map<String, Tag> map;
+  void add(Tag tag);
 
-  @JsonCreator
-  public TagMap(Map<String, String> map) {
-    this.map = new HashMap<>(map.size());
-    map.forEach((key, value) -> this.map.put(key, new Tag(key, value)));
+  Optional<Tag> get(String name);
+
+  boolean isEmpty();
+
+  int size();
+
+  Collection<Tag> all();
+
+  static TagMap of(Map<String, String> values) {
+    return new TagMapImpl(values);
   }
 
-  public TagMap(List<Tag> tags) {
-    this.map = new HashMap<>(tags.size());
-    tags.forEach(tag -> map.put(tag.name(), tag));
+  static TagMap empty() {
+    return new TagMapImpl(new HashMap<>());
   }
-
-  public void add(Tag tag) {
-    map.put(tag.name(), tag);
-  }
-
-  public Optional<Tag> get(String name) {
-    return Optional.ofNullable(map.get(name));
-  }
-
-  public boolean isEmpty() {
-    return map.isEmpty();
-  }
-
-  public int size() {
-    return map.size();
-  }
-
-  public Collection<Tag> all() {
-    return map.values();
-  }
-
-  public static TagMap of(Map<String, String> values) {
-    return new TagMap(values);
-  }
-
-  public static TagMap empty() {
-    return new TagMap(new HashMap<>());
-  }
-
 
 }

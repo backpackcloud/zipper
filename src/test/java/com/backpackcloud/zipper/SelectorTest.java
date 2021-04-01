@@ -26,6 +26,7 @@ package com.backpackcloud.zipper;
 
 import com.backpackcloud.spectaculous.Operation;
 import com.backpackcloud.spectaculous.Spec;
+import com.backpackcloud.zipper.impl.SelectorImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap;
@@ -40,8 +41,8 @@ import static org.mockito.Mockito.when;
 
 public class SelectorTest {
 
-  Operation<Selector, Boolean> test(TagMap labelSet) {
-    return selector -> selector.test(labelSet);
+  Operation<Selector, Boolean> test(TagMap tagMap) {
+    return selector -> selector.test(tagMap);
   }
 
   @Test
@@ -55,17 +56,17 @@ public class SelectorTest {
 
     Spec.describe(Selector.class)
 
-        .given(new Selector(Arrays.asList(ok, ok, ok, ok)))
-        .because("All predicates should accept the label set")
-        .expect(true).from(test(labels))
+      .given(new SelectorImpl(Arrays.asList(ok, ok, ok, ok)))
+      .because("All predicates should accept the label set")
+      .expect(true).from(test(labels))
 
-        .given(new Selector(Arrays.asList(ok, ok, notOk, ok)))
-        .expect(false).from(test(labels))
+      .given(new SelectorImpl(Arrays.asList(ok, ok, notOk, ok)))
+      .expect(false).from(test(labels))
 
-        .given(Selector.empty())
-        .because("Empty selector should match any label set")
-        .expect(true).from(test(labels))
-        .expect(true).from(test(TagMap.empty()));
+      .given(SelectorImpl.empty())
+      .because("Empty selector should match any label set")
+      .expect(true).from(test(labels))
+      .expect(true).from(test(TagMap.empty()));
   }
 
   @Test
@@ -77,39 +78,39 @@ public class SelectorTest {
 
     Spec.describe(Selector.class)
 
-        .given(new Selector(values))
+      .given(new SelectorImpl(values))
 
-        .because("All values should be tested")
-        .expect(true).from(test(labels))
+      .because("All values should be tested")
+      .expect(true).from(test(labels))
 
-        .given(selector("foo:*", "bar:*"))
+      .given(selector("foo:*", "bar:*"))
 
-        .because("Wildcard should accept any values")
-        .expect(true).from(test(labels))
+      .because("Wildcard should accept any values")
+      .expect(true).from(test(labels))
 
-        .given(selector("foo:!", "bar:!"))
-        .because("Exclamation mark rejects any value")
-        .expect(false).from(test(labels))
+      .given(selector("foo:!", "bar:!"))
+      .because("Exclamation mark rejects any value")
+      .expect(false).from(test(labels))
 
-        .given(selector("baz:!", "test:!"))
-        .expect(true).from(test(labels))
+      .given(selector("baz:!", "test:!"))
+      .expect(true).from(test(labels))
 
-        .given(selector("foo:baz|bar"))
-        .because("Pipe should defines a set of allowed values")
-        .expect(true).from(test(labels))
+      .given(selector("foo:baz|bar"))
+      .because("Pipe should defines a set of allowed values")
+      .expect(true).from(test(labels))
 
-        .given(selector("bar:baz|bar"))
-        .expect(false).from(test(labels));
+      .given(selector("bar:baz|bar"))
+      .expect(false).from(test(labels));
   }
 
   private Selector selector(String... values) {
     Map map = Arrays.stream(values)
-        .map(v -> {
-          String[] split = v.split(":");
-          return new AbstractMap.SimpleEntry(split[0], split[1]);
-        })
-        .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-    return new Selector(map);
+      .map(v -> {
+        String[] split = v.split(":");
+        return new AbstractMap.SimpleEntry(split[0], split[1]);
+      })
+      .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+    return new SelectorImpl(map);
   }
 
 }

@@ -80,8 +80,6 @@
     <jackson.version>2.10.4</jackson.version>
     <junit.version>5.6.2</junit.version>
 
-    <trugger.version>7.0.0</trugger.version>
-    <jaxrs-api.version>2.0</jaxrs-api.version>
     <spectaculous.version>0.2.0</spectaculous.version>
     <mockito-core.version>3.2.4</mockito-core.version>
   </properties>

@@ -24,34 +24,18 @@
 
 package com.backpackcloud.zipper;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Optional;
 
-public class Tag {
+public interface Taggable {
 
-  private final String name;
-  private final String value;
+  TagMap tags();
 
-  public Tag(String name, String value) {
-    this.name = name;
-    this.value = value;
+  default void tag(String name, String value) {
+    tags().add(new Tag(name, value));
   }
 
-  public String name() {
-    return name;
-  }
-
-  @JsonValue
-  public String value() {
-    return value;
-  }
-
-  public int intValue() {
-    return Integer.parseInt(value);
-  }
-
-  public boolean booleanValue() {
-    return Boolean.parseBoolean(value);
+  default Optional<Tag> tag(String name) {
+    return tags().get(name);
   }
 
 }
