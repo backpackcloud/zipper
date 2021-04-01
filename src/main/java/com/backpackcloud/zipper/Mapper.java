@@ -25,6 +25,7 @@
 package com.backpackcloud.zipper;
 
 import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 
@@ -60,5 +61,12 @@ public interface Mapper {
   <E> E deserialize(File file, Class<E> type);
 
   TreeNode deserialize(String input);
+
+  /**
+   * Returns the Jackson ObjectMapper that this Mapper is delegating operations.
+   *
+   * @return the ObjectMapper responsible for doing the operations
+   */
+  ObjectMapper getDelegate();
 
 }

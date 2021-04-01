@@ -114,6 +114,10 @@ public class SerializerImpl implements Serializer {
       }
     }
 
+    @Override
+    public ObjectMapper getDelegate() {
+      return objectMapper;
+    }
   }
 
 }
