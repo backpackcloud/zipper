@@ -79,7 +79,7 @@ public interface Serializer {
     jsonMapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule());
     jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    return new SerializerImpl(jsonMapper);
+    return using(jsonMapper);
   }
 
   /**
@@ -92,7 +92,7 @@ public interface Serializer {
     yamlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     yamlMapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule());
 
-    return new SerializerImpl(yamlMapper);
+    return using(yamlMapper);
   }
 
   static Serializer using(ObjectMapper objectMapper) {
