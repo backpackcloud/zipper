@@ -55,4 +55,33 @@ public interface TagMap {
     return new TagMapImpl(new HashMap<>());
   }
 
+  static TagMap immutable(TagMap tagMap) {
+    return new TagMap() {
+      @Override
+      public void add(Tag tag) {
+        throw new UnbelievableException("Cannot add a tag to an Immutable TagMap");
+      }
+
+      @Override
+      public Optional<Tag> get(String name) {
+        return tagMap.get(name);
+      }
+
+      @Override
+      public boolean isEmpty() {
+        return tagMap.isEmpty();
+      }
+
+      @Override
+      public int size() {
+        return tagMap.size();
+      }
+
+      @Override
+      public Collection<Tag> all() {
+        return tagMap.all();
+      }
+    };
+  }
+
 }
