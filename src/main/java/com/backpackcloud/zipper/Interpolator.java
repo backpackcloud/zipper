@@ -24,12 +24,18 @@ public class Interpolator implements Function<String, String> {
   public String apply(String value) {
     if (value == null || value.isBlank()) return null;
 
-    StringBuilder result = new StringBuilder(value);
-    Matcher matcher = patter.matcher(result);
+    StringBuilder result = new StringBuilder();
+    Matcher matcher = patter.matcher(value);
 
+    int pos = 0;
     while (matcher.find()) {
       Object tokenValue = tokenResolver.apply(matcher.group("token"));
-      result.replace(matcher.start(), matcher.end(), String.valueOf(tokenValue));
+      result.append(value, pos, matcher.start()).append(tokenValue);
+      pos = matcher.end();
+    }
+
+    if (pos < value.length()) {
+      result.append(value.substring(pos));
     }
 
     return result.toString();
