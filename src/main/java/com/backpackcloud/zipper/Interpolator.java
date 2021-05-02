@@ -30,7 +30,6 @@ public class Interpolator implements Function<String, String> {
     while (matcher.find()) {
       Object tokenValue = tokenResolver.apply(matcher.group("token"));
       result.replace(matcher.start(), matcher.end(), String.valueOf(tokenValue));
-      matcher = patter.matcher(result);
     }
 
     return result.toString();
