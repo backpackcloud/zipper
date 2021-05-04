@@ -29,4 +29,17 @@ public class InterpolatorTest {
     verify(function, times(2)).apply("person");
   }
 
+  @Test
+  public void testFormat() {
+    Function<String, Object> function = Mockito.mock(Function.class);
+    when(function.apply("foo")).thenReturn("bar");
+
+    Interpolator interpolator = new Interpolator(function);
+
+    assertEquals("|bar  |", interpolator.apply("|{foo|-5}|"));
+    assertEquals("|  bar|", interpolator.apply("|{foo|5}|"));
+
+    verify(function, times(2)).apply("foo");
+  }
+
 }

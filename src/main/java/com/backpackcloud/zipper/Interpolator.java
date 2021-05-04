@@ -29,8 +29,18 @@ public class Interpolator implements Function<String, String> {
 
     int pos = 0;
     while (matcher.find()) {
-      result.append(value, pos, matcher.start())
-        .append(tokenResolver.apply(matcher.group("token")));
+      String token = matcher.group("token");
+      String format = "";
+      int indexOfPipe = token.indexOf("|");
+
+      if (indexOfPipe > 0) {
+        format = token.substring(indexOfPipe + 1);
+        token = token.substring(0, indexOfPipe);
+      }
+
+      Object resolvedValue = tokenResolver.apply(token);
+
+      result.append(value, pos, matcher.start()).append(String.format("%" + format + "s", resolvedValue));
       pos = matcher.end();
     }
 

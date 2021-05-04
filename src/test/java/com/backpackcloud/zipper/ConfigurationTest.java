@@ -38,7 +38,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -61,9 +60,7 @@ public class ConfigurationTest {
   public void init() {
     try {
       testObject = objectMapper.readValue(
-          new FileInputStream(
-              new File("src/test/resources/com/backpackcloud/zipper/impl/configuration.yaml")
-          ),
+          new FileInputStream("src/test/resources/com/backpackcloud/zipper/impl/configuration.yaml"),
           TestObject.class
       );
     } catch (IOException e) {
