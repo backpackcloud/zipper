@@ -82,6 +82,7 @@
 
     <spectaculous.version>0.2.0</spectaculous.version>
     <mockito-core.version>3.2.4</mockito-core.version>
+    <trugger.version>7.0.0</trugger.version>
   </properties>
 
   <dependencies>
@@ -125,6 +126,12 @@
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-parameter-names</artifactId>
       <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.backpackcloud</groupId>
+      <artifactId>trugger</artifactId>
+      <version>${trugger.version}</version>
     </dependency>
 
     <dependency>

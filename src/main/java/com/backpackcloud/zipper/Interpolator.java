@@ -1,5 +1,9 @@
 package com.backpackcloud.zipper;
 
+import com.backpackcloud.trugger.element.Element;
+import com.backpackcloud.trugger.element.Elements;
+
+import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +53,17 @@ public class Interpolator implements Function<String, String> {
     }
 
     return result.toString();
+  }
+
+  public static Interpolator from(Map<String, Object> context) {
+    return new Interpolator(context::get);
+  }
+
+  public static Interpolator from(Object context) {
+    return new Interpolator(token -> Elements.element(token)
+      .from(context)
+      .map(Element::getValue)
+      .orElseThrow(() -> new UnbelievableException("No such element: " + token)));
   }
 
 }
