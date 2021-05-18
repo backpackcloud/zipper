@@ -59,7 +59,7 @@ public interface LabelMap {
     return new LabelMap() {
       @Override
       public void add(Label label) {
-        throw new UnbelievableException("Cannot add a tag to an Immutable TagMap");
+        throw new UnbelievableException("Cannot add a label to an immutable label map");
       }
 
       @Override
