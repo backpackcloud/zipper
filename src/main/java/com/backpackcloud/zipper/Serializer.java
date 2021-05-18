@@ -33,6 +33,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import java.io.File;
+import java.io.InputStream;
 
 /**
  * Interface that exposes components for serializing different formats of input.
@@ -64,6 +65,15 @@ public interface Serializer {
    * @return the deserialized object.
    */
   <E> E deserialize(File file, Class<E> type);
+
+  /**
+   * Deserialize the given input into an object of the given class.
+   *
+   * @param input the input to deserialize
+   * @param type  the type of the result object
+   * @return the deserialized object.
+   */
+  <E> E deserialize(InputStream input, Class<E> type);
 
   Serializer addDependency(String name, Object dependency);
 

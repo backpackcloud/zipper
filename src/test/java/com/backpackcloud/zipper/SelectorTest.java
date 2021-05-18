@@ -41,15 +41,15 @@ import static org.mockito.Mockito.when;
 
 public class SelectorTest {
 
-  Operation<Selector, Boolean> test(TagMap tagMap) {
-    return selector -> selector.test(tagMap);
+  Operation<Selector, Boolean> test(LabelMap labelMap) {
+    return selector -> selector.test(labelMap);
   }
 
   @Test
   public void testSelection() {
-    TagMap labels = TagMap.empty();
-    Predicate<TagMap> ok = mock(Predicate.class);
-    Predicate<TagMap> notOk = mock(Predicate.class);
+    LabelMap labels = LabelMap.empty();
+    Predicate<LabelMap> ok = mock(Predicate.class);
+    Predicate<LabelMap> notOk = mock(Predicate.class);
 
     when(ok.test(labels)).thenReturn(true);
     when(notOk.test(labels)).thenReturn(false);
@@ -66,7 +66,7 @@ public class SelectorTest {
       .given(SelectorImpl.empty())
       .because("Empty selector should match any label set")
       .expect(true).from(test(labels))
-      .expect(true).from(test(TagMap.empty()));
+      .expect(true).from(test(LabelMap.empty()));
   }
 
   @Test
@@ -74,7 +74,7 @@ public class SelectorTest {
     Map<String, String> values = new HashMap<>();
     values.put("foo", "bar");
     values.put("bar", "foo");
-    TagMap labels = TagMap.of(values);
+    LabelMap labels = LabelMap.of(values);
 
     Spec.describe(Selector.class)
 

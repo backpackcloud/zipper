@@ -25,7 +25,7 @@
 package com.backpackcloud.zipper.impl;
 
 import com.backpackcloud.zipper.Selector;
-import com.backpackcloud.zipper.TagMap;
+import com.backpackcloud.zipper.LabelMap;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import java.util.ArrayList;
@@ -36,14 +36,14 @@ import java.util.function.Predicate;
 
 public class SelectorImpl implements Selector {
 
-  private final List<Predicate<TagMap>> predicates;
+  private final List<Predicate<LabelMap>> predicates;
 
   @JsonCreator
   public SelectorImpl(Map<String, String> values) {
     predicates = new ArrayList<>(values.size());
 
     values.forEach((key, value) -> {
-      Predicate<TagMap> predicate = null;
+      Predicate<LabelMap> predicate = null;
 
       for (String v : value.split("\\s*\\|\\s*")) {
         if (predicate == null) {
@@ -57,16 +57,16 @@ public class SelectorImpl implements Selector {
     });
   }
 
-  public SelectorImpl(List<Predicate<TagMap>> predicates) {
+  public SelectorImpl(List<Predicate<LabelMap>> predicates) {
     this.predicates = predicates;
   }
 
   @Override
-  public boolean test(TagMap tagMap) {
-    return predicates.stream().allMatch(predicate -> predicate.test(tagMap));
+  public boolean test(LabelMap labelMap) {
+    return predicates.stream().allMatch(predicate -> predicate.test(labelMap));
   }
 
-  private static Predicate<TagMap> createPredicate(String key, String value) {
+  private static Predicate<LabelMap> createPredicate(String key, String value) {
     switch (value) {
       case "*":
         return tagMap -> tagMap.get(key).isPresent();

@@ -24,20 +24,33 @@
 
 package com.backpackcloud.zipper;
 
-import com.backpackcloud.zipper.impl.SelectorImpl;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.function.Predicate;
+public class Label {
 
-@JsonDeserialize(as = SelectorImpl.class)
-public interface Selector extends Predicate<LabelMap> {
+  private final String name;
+  private final String value;
 
-  default boolean test(Labelable labelable) {
-    return test(labelable.tags());
+  public Label(String name, String value) {
+    this.name = name;
+    this.value = value;
   }
 
-  static Selector empty () {
-    return SelectorImpl.empty();
+  public String name() {
+    return name;
+  }
+
+  @JsonValue
+  public String value() {
+    return value;
+  }
+
+  public int intValue() {
+    return Integer.parseInt(value);
+  }
+
+  public boolean booleanValue() {
+    return Boolean.parseBoolean(value);
   }
 
 }

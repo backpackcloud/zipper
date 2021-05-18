@@ -24,36 +24,36 @@
 
 package com.backpackcloud.zipper.impl;
 
-import com.backpackcloud.zipper.Tag;
-import com.backpackcloud.zipper.TagMap;
+import com.backpackcloud.zipper.Label;
+import com.backpackcloud.zipper.LabelMap;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.*;
 
-public class TagMapImpl implements TagMap {
+public class LabelMapImpl implements LabelMap {
 
   @JsonValue
-  private final Map<String, Tag> map;
+  private final Map<String, Label> map;
 
   @JsonCreator
-  public TagMapImpl(Map<String, String> map) {
+  public LabelMapImpl(Map<String, String> map) {
     this.map = new HashMap<>(map.size());
-    map.forEach((key, value) -> this.map.put(key, new Tag(key, value)));
+    map.forEach((key, value) -> this.map.put(key, new Label(key, value)));
   }
 
-  public TagMapImpl(List<Tag> tags) {
-    this.map = new HashMap<>(tags.size());
-    tags.forEach(tag -> map.put(tag.name(), tag));
-  }
-
-  @Override
-  public void add(Tag tag) {
-    map.put(tag.name(), tag);
+  public LabelMapImpl(List<Label> labels) {
+    this.map = new HashMap<>(labels.size());
+    labels.forEach(label -> map.put(label.name(), label));
   }
 
   @Override
-  public Optional<Tag> get(String name) {
+  public void add(Label label) {
+    map.put(label.name(), label);
+  }
+
+  @Override
+  public Optional<Label> get(String name) {
     return Optional.ofNullable(map.get(name));
   }
 
@@ -68,7 +68,7 @@ public class TagMapImpl implements TagMap {
   }
 
   @Override
-  public Collection<Tag> all() {
+  public Collection<Label> all() {
     return map.values();
   }
 

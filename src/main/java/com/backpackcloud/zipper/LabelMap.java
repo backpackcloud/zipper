@@ -24,7 +24,7 @@
 
 package com.backpackcloud.zipper;
 
-import com.backpackcloud.zipper.impl.TagMapImpl;
+import com.backpackcloud.zipper.impl.LabelMapImpl;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -33,53 +33,53 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@JsonDeserialize(as = TagMapImpl.class)
-@JsonSerialize(as = TagMapImpl.class)
-public interface TagMap {
+@JsonDeserialize(as = LabelMapImpl.class)
+@JsonSerialize(as = LabelMapImpl.class)
+public interface LabelMap {
 
-  void add(Tag tag);
+  void add(Label label);
 
-  Optional<Tag> get(String name);
+  Optional<Label> get(String name);
 
   boolean isEmpty();
 
   int size();
 
-  Collection<Tag> all();
+  Collection<Label> all();
 
-  static TagMap of(Map<String, String> values) {
-    return new TagMapImpl(values);
+  static LabelMap of(Map<String, String> values) {
+    return new LabelMapImpl(values);
   }
 
-  static TagMap empty() {
-    return new TagMapImpl(new HashMap<>());
+  static LabelMap empty() {
+    return new LabelMapImpl(new HashMap<>());
   }
 
-  static TagMap immutable(TagMap tagMap) {
-    return new TagMap() {
+  static LabelMap immutable(LabelMap labelMap) {
+    return new LabelMap() {
       @Override
-      public void add(Tag tag) {
+      public void add(Label label) {
         throw new UnbelievableException("Cannot add a tag to an Immutable TagMap");
       }
 
       @Override
-      public Optional<Tag> get(String name) {
-        return tagMap.get(name);
+      public Optional<Label> get(String name) {
+        return labelMap.get(name);
       }
 
       @Override
       public boolean isEmpty() {
-        return tagMap.isEmpty();
+        return labelMap.isEmpty();
       }
 
       @Override
       public int size() {
-        return tagMap.size();
+        return labelMap.size();
       }
 
       @Override
-      public Collection<Tag> all() {
-        return tagMap.all();
+      public Collection<Label> all() {
+        return labelMap.all();
       }
     };
   }

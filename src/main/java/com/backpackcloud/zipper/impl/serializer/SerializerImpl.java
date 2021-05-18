@@ -2,13 +2,12 @@ package com.backpackcloud.zipper.impl.serializer;
 
 import com.backpackcloud.zipper.Serializer;
 import com.backpackcloud.zipper.UnbelievableException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -63,5 +62,15 @@ public class SerializerImpl implements Serializer {
       throw new UnbelievableException(e);
     }
   }
+
+  @Override
+  public <E> E deserialize(InputStream input, Class<E> type) {
+    try (input) {
+      return objectMapper.readValue(input, type);
+    } catch (IOException e) {
+      throw new UnbelievableException(e);
+    }
+  }
+
 
 }

@@ -24,20 +24,18 @@
 
 package com.backpackcloud.zipper;
 
-import com.backpackcloud.zipper.impl.SelectorImpl;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Optional;
 
-import java.util.function.Predicate;
+public interface Labelable {
 
-@JsonDeserialize(as = SelectorImpl.class)
-public interface Selector extends Predicate<LabelMap> {
+  LabelMap tags();
 
-  default boolean test(Labelable labelable) {
-    return test(labelable.tags());
+  default void tag(String name, String value) {
+    tags().add(new Label(name, value));
   }
 
-  static Selector empty () {
-    return SelectorImpl.empty();
+  default Optional<Label> tag(String name) {
+    return tags().get(name);
   }
 
 }
