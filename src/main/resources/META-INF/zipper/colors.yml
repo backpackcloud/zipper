@@ -1,0 +1,86 @@
+black: "252525"
+grey: "4D6377"
+white: "ffffff"
+red: "ff5d4e"
+green: "8FBE55"
+yellow: "ffcb43"
+blue: "4fb5f7"
+cyan: "2aa198"
+orange: "cb4b16"
+purple: "9b51bb"
+teal: "008081"
+
+segment_fg: white
+segment_bg: grey
+
+prompt_error: red
+prompt_ok: purple
+
+command_error: red
+
+keyboard: blue
+
+segment_command_status_error_fg: red
+segment_command_status_error_bg: segment_bg
+
+segment_command_status_ok_fg: green
+segment_command_status_ok_bg: segment_bg
+
+segment_errors_fg: segment_fg
+segment_errors_bg: segment_bg
+
+segment_command_duration_fg: segment_fg
+segment_command_duration_bg: segment_bg
+
+# For any input errors
+error: red
+# For the current number of entries loaded (shown in the left prompt)
+status_resource_count: cyan
+# For the current number of entries filtered by the current filter (shown in the left prompt)
+status_filter_count: yellow
+# The current output limit
+status_limit: purple
+
+# The last command duration (shown in the right prompt)
+status_duration_time: orange
+
+# For the names shown in count table (used by the command `count`)
+count_key: cyan
+# For the values shown in the count table (used by the command `count`)
+count_value: white
+
+# For listing items (used by the command `list`)
+list_item_name: blue
+
+# The command name when it's a valid command
+highlighter_valid_command: green
+# The arguments for a valid command
+highlighter_valid_command_args: white
+
+# The command name when it's not a valid command
+highlighter_invalid_command: red
+# The arguments for an invalid command
+highlighter_invalid_command_args: white
+
+# The command group listed in the help command
+help_command_group: yellow
+# The command name listed in the help command
+help_command_name: blue
+# The command description listed in the help command
+help_command_description: white
+
+# The usage header displayed in the help <command>
+help_usage: cyan
+# The block notes displayed help <command>
+help_block_title: yellow
+# The sections displayed in the help <command>
+help_section: blue
+# The example comments displayed in the help <command>
+help_comment: grey
+
+preference_name: blue
+preference_number: yellow
+preference_text: white
+preference_flag: orange
+preference_charset: cyan
+preference_timestamp_format: purple

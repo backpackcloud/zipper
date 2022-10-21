@@ -1,0 +1,66 @@
+raw_value: foo
+
+raw_value2:
+  value: bar
+
+env_value:
+  env: PATH
+
+property_value:
+  property: fakeomatic.test
+
+file_value:
+  file: LICENSE
+
+file_value2:
+  file: NOT_FOUND
+
+resource_value:
+  resource: com/backpackcloud/impl/configuration.yaml
+
+env_composite:
+  env: PATH
+  property: fakeomatic.test
+  file: LICENSE
+  resource: com/backpackcloud/impl/configuration.yaml
+  value: foo
+
+prop_composite:
+  env: NOT_SET
+  property: fakeomatic.test
+  file: LICENSE
+  resource: com/backpackcloud/impl/configuration.yaml
+  value: foo
+
+file_composite:
+  env: NOT_SET
+  property: not.set
+  file: LICENSE
+  resource: /META-INF/not-here
+  value: foo
+
+resource_composite:
+  env: NOT_SET
+  property: not-set
+  file: NONE
+  resource: com/backpackcloud/impl/configuration.yaml
+  value: foo
+
+raw_composite:
+  env: NOT_SET
+  property: not.set
+  file: NONE
+  resource: /META-INF/NOTHING
+  value: foo
+
+int_value:
+  value: 10
+
+long_value:
+  value: 100000000000000
+
+boolean_value:
+  value: true
+
+not_defined:
+  env: NOT_DEFINED
