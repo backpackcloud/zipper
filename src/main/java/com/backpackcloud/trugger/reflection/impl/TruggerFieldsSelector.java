@@ -50,6 +50,7 @@ public class TruggerFieldsSelector implements FieldsSelector {
     return new TruggerFieldsSelector(this.predicate.and(predicate));
   }
 
+  @Override
   public Stream<ReflectedField> from(Object target) {
     return new ClassIterator(target)
       .stream()
