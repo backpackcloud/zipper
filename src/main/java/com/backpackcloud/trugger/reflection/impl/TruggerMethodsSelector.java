@@ -25,7 +25,7 @@ package com.backpackcloud.trugger.reflection.impl;
 
 import com.backpackcloud.trugger.reflection.MethodsSelector;
 import com.backpackcloud.trugger.reflection.ReflectedMethod;
-import com.backpackcloud.trugger.util.Utils;
+import com.backpackcloud.trugger.util.ClassIterator;
 
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
@@ -52,7 +52,9 @@ public class TruggerMethodsSelector implements MethodsSelector {
 
   @Override
   public Stream<ReflectedMethod> from(Object target) {
-    return Stream.of(Utils.resolveType(target).getDeclaredMethods())
+    return new ClassIterator(target)
+      .stream()
+      .flatMap(type -> Stream.of(type.getDeclaredMethods()))
       .filter(predicate)
       .map(method -> new TruggerReflectedMethod(method, target));
   }
