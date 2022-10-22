@@ -52,7 +52,7 @@ public class TruggerMethodsSelector implements MethodsSelector {
 
   @Override
   public Stream<ReflectedMethod> from(Object target) {
-    return Stream.of(Utils.resolveType(target).getMethods())
+    return Stream.of(Utils.resolveType(target).getDeclaredMethods())
       .filter(predicate)
       .map(method -> new TruggerReflectedMethod(method, target));
   }

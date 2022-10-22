@@ -71,7 +71,7 @@ public class TruggerMethodSelector implements MethodSelector {
   public Optional<ReflectedMethod> from(Object target) {
     if (parameterTypes != null) {
       try {
-        return Optional.of(Utils.resolveType(target).getMethod(name, parameterTypes))
+        return Optional.of(Utils.resolveType(target).getDeclaredMethod(name, parameterTypes))
           .filter(predicate)
           .map(method -> new TruggerReflectedMethod(method, target));
       } catch (NoSuchMethodException e) {
@@ -79,7 +79,7 @@ public class TruggerMethodSelector implements MethodSelector {
       }
     }
 
-    return Stream.of(Utils.resolveType(target).getMethods())
+    return Stream.of(Utils.resolveType(target).getDeclaredMethods())
       .filter(ReflectionPredicates.ofName(name))
       .filter(predicate)
       .findFirst()
