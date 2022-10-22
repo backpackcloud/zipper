@@ -32,11 +32,11 @@ import com.backpackcloud.cli.ui.Paginator;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.impl.PaginatorImpl;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
+import com.backpackcloud.trugger.factory.Context;
+import com.backpackcloud.trugger.factory.ContextFactory;
 import com.backpackcloud.trugger.reflection.ReflectedMethod;
 import com.backpackcloud.trugger.reflection.Reflection;
 import com.backpackcloud.trugger.reflection.ReflectionPredicates;
-import com.backpackcloud.trugger.factory.Context;
-import com.backpackcloud.trugger.factory.ContextFactory;
 import org.jline.terminal.Terminal;
 
 import java.lang.reflect.Executable;
@@ -50,8 +50,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.backpackcloud.trugger.reflection.ReflectionPredicates.annotatedWith;
 
 public class AnnotatedCommandAdapter implements Command {
 
@@ -79,7 +77,7 @@ public class AnnotatedCommandAdapter implements Command {
   private void initialize() {
     Reflection.reflect()
       .methods()
-      .filter(annotatedWith(Action.class))
+      .annotatedWith(Action.class)
       .from(command)
       .forEach(method -> {
         Action action = method.getAnnotation(Action.class);
@@ -94,7 +92,7 @@ public class AnnotatedCommandAdapter implements Command {
 
     Reflection.reflect()
       .methods()
-      .filter(annotatedWith(Suggestions.class))
+      .annotatedWith(Suggestions.class)
       .from(command)
       .forEach(method -> Stream.of(method.getAnnotation(Suggestions.class).value())
         .forEach(action -> suggestions.put(action, method)));
