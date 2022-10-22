@@ -26,9 +26,10 @@ package com.backpackcloud.trugger.reflection.impl;
 import com.backpackcloud.trugger.reflection.MethodSelector;
 import com.backpackcloud.trugger.reflection.ReflectedMethod;
 import com.backpackcloud.trugger.reflection.ReflectionPredicates;
-import com.backpackcloud.trugger.util.Utils;
+import com.backpackcloud.trugger.util.ClassIterator;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -70,16 +71,24 @@ public class TruggerMethodSelector implements MethodSelector {
 
   public Optional<ReflectedMethod> from(Object target) {
     if (parameterTypes != null) {
-      try {
-        return Optional.of(Utils.resolveType(target).getDeclaredMethod(name, parameterTypes))
-          .filter(predicate)
-          .map(method -> new TruggerReflectedMethod(method, target));
-      } catch (NoSuchMethodException e) {
-        return Optional.empty();
-      }
+      return new ClassIterator(target)
+        .stream()
+        .map(type -> {
+          try {
+            return type.getDeclaredMethod(name, parameterTypes);
+          } catch (NoSuchMethodException e) {
+            return null;
+          }
+        })
+        .filter(Objects::nonNull)
+        .filter(predicate)
+        .findFirst()
+        .map(method -> new TruggerReflectedMethod(method, target));
     }
 
-    return Stream.of(Utils.resolveType(target).getDeclaredMethods())
+    return new ClassIterator(target)
+      .stream()
+      .flatMap(type -> Stream.of(type.getDeclaredMethods()))
       .filter(ReflectionPredicates.ofName(name))
       .filter(predicate)
       .findFirst()
