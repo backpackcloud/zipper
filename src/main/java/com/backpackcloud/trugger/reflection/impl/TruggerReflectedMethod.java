@@ -40,7 +40,7 @@ public class TruggerReflectedMethod extends TruggerReflectedObject<Method> imple
     super(method);
     this.method = method;
     this.target = target;
-    method.setAccessible(true);
+    method.trySetAccessible();
   }
 
   @Override

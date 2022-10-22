@@ -38,8 +38,7 @@ public class TruggerReflectedField extends TruggerReflectedObject<Field> impleme
     super(field);
     this.field = field;
     this.target = target;
-
-    field.setAccessible(true);
+    field.trySetAccessible();
   }
 
   @Override
