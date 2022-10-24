@@ -207,6 +207,9 @@ public class AnnotatedCommandAdapter implements Command {
       .whenOfType(String.class)
       .use(inputSupplier)
 
+      .whenOfType(Integer.class)
+      .use(() -> inputIterator.hasNext() ? inputIterator.next().asInt().orElse(null) : null)
+
       .whenOfType(Enum.class)
       .use(parameter -> {
         String name = inputSupplier.get();
