@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -87,6 +89,16 @@ public interface Configuration extends Supplier<String> {
    */
   default boolean asBoolean() {
     return Boolean.parseBoolean(get());
+  }
+
+  /**
+   * Gets the value of this configuration as an Enum.
+   *
+   * @param enumType the enum type
+   * @return the Enum which represents this configuration value
+   */
+  default <T extends Enum<T>> T asEnum(Class<T> enumType) {
+    return Enum.valueOf(enumType, get().toUpperCase().replaceAll("-", "_"));
   }
 
   /**
@@ -178,6 +190,22 @@ public interface Configuration extends Supplier<String> {
    */
   default boolean orElse(boolean defaultValue) {
     return isSet() ? asBoolean() : defaultValue;
+  }
+
+  /**
+   * Returns this configuration value if it's {@link #isSet() set}, otherwise
+   * returns the given {@code defaultValue}.
+   *
+   * @param defaultValue the default value to return
+   * @return this configuration value or the default value in case this
+   * configuration is not set.
+   */
+  default <T extends Enum<T>> T orElse(T defaultValue) {
+    return isSet() ? asEnum(defaultValue.getDeclaringClass()) : defaultValue;
+  }
+
+  default <T> Optional<T> map(Function<String, T> mapFunction) {
+    return isSet() ? Optional.of(mapFunction.apply(get())) : Optional.empty();
   }
 
   static ConfigurationChain configuration() {
