@@ -26,9 +26,6 @@ package com.backpackcloud.cli.preferences;
 
 import com.backpackcloud.UnbelievableException;
 
-import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
-
 /**
  * Represents a preference's specification.
  * <p>
@@ -88,24 +85,6 @@ public interface PreferenceSpec {
       @Override
       public Object convert(String input) {
         return input;
-      }
-    },
-    /**
-     * A timestamp preference. It holds a DateTimeFormatter value.
-     */
-    TIMESTAMP_FORMAT("Timestamp Format") {
-      @Override
-      public Object convert(String input) {
-        return DateTimeFormatter.ofPattern(input);
-      }
-    },
-    /**
-     * A charset preference. It holds a Charset value.
-     */
-    CHARSET("Charset") {
-      @Override
-      public Object convert(String input) {
-        return Charset.forName(input);
       }
     },
     /**

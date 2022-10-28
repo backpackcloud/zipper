@@ -26,8 +26,6 @@ package com.backpackcloud.cli.preferences;
 
 import com.backpackcloud.configuration.Configuration;
 
-import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -161,31 +159,6 @@ public interface UserPreferences {
    */
   default Supplier<Integer> number(PreferenceSpec spec) {
     return () -> (Integer) get(spec).value();
-  }
-
-  /**
-   * Returns a supplier that always supplies the current preference value.
-   * <p>
-   * Assumes a {@link PreferenceSpec.Type#CHARSET charset} preference.
-   *
-   * @param spec the preference spec
-   * @return a supplier that returns the preference value.
-   */
-  default Supplier<Charset> charset(PreferenceSpec spec) {
-    return () -> (Charset) get(spec).value();
-  }
-
-  /**
-   * Returns a supplier that always supplies the current preference value.
-   * <p>
-   * Assumes a {@link PreferenceSpec.Type#TIMESTAMP_FORMAT timestamp format}
-   * preference.
-   *
-   * @param spec the preference spec
-   * @return a supplier that returns the preference value.
-   */
-  default Supplier<DateTimeFormatter> timestampFormatter(PreferenceSpec spec) {
-    return () -> (DateTimeFormatter) get(spec).value();
   }
 
   /**
