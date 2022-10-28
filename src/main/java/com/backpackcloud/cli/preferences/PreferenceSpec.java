@@ -74,18 +74,11 @@ public interface PreferenceSpec {
     FLAG("Flag") {
       @Override
       public Object convert(String input) {
-        switch (input) {
-          case "on":
-          case "true":
-          case "yes":
-            return true;
-          case "off":
-          case "false":
-          case "no":
-            return false;
-          default:
-            throw new UnbelievableException("Invalid input!");
-        }
+        return switch (input) {
+          case "on", "true", "yes" -> true;
+          case "off", "false", "no" -> false;
+          default -> throw new UnbelievableException("Invalid input!");
+        };
       }
     },
     /**
