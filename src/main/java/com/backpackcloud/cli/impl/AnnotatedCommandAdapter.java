@@ -118,7 +118,14 @@ public class AnnotatedCommandAdapter implements Command {
 
   private void invokeAction(CommandContext commandContext, ReflectedMethod actionMethod, List<CommandInput> commandInputs) {
     Object[] args = resolveArgs(commandContext, commandInputs, actionMethod.unwrap());
-    actionMethod.invoke(args);
+    Object returnValue = actionMethod.invoke(args);
+    if (returnValue instanceof String output) {
+      commandContext.writer().writeln(output);
+    } else if (returnValue instanceof Displayable displayable) {
+      commandContext.writer().writeln(displayable);
+    } else if (returnValue != null) {
+      commandContext.writer().writeln(String.valueOf(returnValue));
+    }
   }
 
   @Override
