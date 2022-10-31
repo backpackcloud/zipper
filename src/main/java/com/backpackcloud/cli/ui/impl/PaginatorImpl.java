@@ -60,11 +60,11 @@ public class PaginatorImpl implements Paginator {
 
     private final List<E> data;
     private int pageSize = preferences.number(UserPreference.RESULTS_PER_PAGE).get();
-    private BiConsumer<Writer, E> consumer = (writer, e) -> {
-      if (e instanceof Displayable) {
-        writer.writeln((Displayable) e);
+    private BiConsumer<Writer, E> consumer = (writer, obj) -> {
+      if (obj instanceof Displayable displayable) {
+        writer.writeln(displayable);
       } else {
-        writer.writeln(String.valueOf(e));
+        writer.writeln(String.valueOf(obj));
       }
     };
 
@@ -74,7 +74,9 @@ public class PaginatorImpl implements Paginator {
 
     @Override
     public PaginatorBuilder<E> pageSize(int resultsPerPage) {
-      this.pageSize = resultsPerPage;
+      if (resultsPerPage > 0) {
+        this.pageSize = resultsPerPage;
+      }
       return this;
     }
 
