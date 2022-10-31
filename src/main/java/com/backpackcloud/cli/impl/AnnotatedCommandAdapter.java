@@ -123,12 +123,21 @@ public class AnnotatedCommandAdapter implements Command {
       Paginate annotation = actionMethod.getAnnotation(Paginate.class);
       PaginatorImpl paginator = new PaginatorImpl(preferences, terminal, commandContext);
 
-      List<?> resultList = actionMethod.invoke(args);
+      Object returnValue = actionMethod.invoke(args);
 
-      paginator.from(resultList)
-        .print(this::printReturn)
-        .pageSize(annotation.pageSize())
-        .paginate();
+      if (returnValue instanceof List<?> returnList) {
+        paginator.from(returnList)
+          .print(this::printReturn)
+          .pageSize(annotation.pageSize())
+          .paginate();
+      } else if (returnValue instanceof Stream<?> returnStream) {
+        paginator.from(returnStream)
+          .print(this::printReturn)
+          .pageSize(annotation.pageSize())
+          .paginate();
+      } else {
+        throw new UnbelievableException("Unable to paginate return object, only streams and lists are supported.");
+      }
     } else {
       printReturn(commandContext.writer(), actionMethod.invoke(args));
     }
