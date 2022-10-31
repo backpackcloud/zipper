@@ -118,7 +118,21 @@ public class AnnotatedCommandAdapter implements Command {
 
   private void invokeAction(CommandContext commandContext, ReflectedMethod actionMethod, List<CommandInput> commandInputs) {
     Object[] args = resolveArgs(commandContext, commandInputs, actionMethod.unwrap());
-    printReturn(commandContext.writer(), actionMethod.invoke(args));
+
+    if (actionMethod.isAnnotationPresent(Paginate.class)) {
+      Paginate annotation = actionMethod.getAnnotation(Paginate.class);
+      PaginatorImpl paginator = new PaginatorImpl(preferences, terminal, commandContext);
+
+      List<?> resultList = actionMethod.invoke(args);
+
+      paginator.from(resultList)
+        .print(this::printReturn)
+        .pageSize(annotation.pageSize())
+        .paginate();
+    } else {
+      printReturn(commandContext.writer(), actionMethod.invoke(args));
+    }
+
   }
 
   private void printReturn(Writer writer, Object value) {
