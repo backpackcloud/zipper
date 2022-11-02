@@ -65,7 +65,7 @@ public class PreferencesCommand implements AnnotatedCommand {
   @Action("list")
   public void listPreferences(Writer writer) {
     userPreferences.list().forEach(preference -> {
-      writer.withStyle("preference_name").write(preference.spec().id()).write(" => ");
+      writer.withStyle("preference_name").write(preference.spec().id()).write(": ");
       writer.withStyle("preference_" + preference.spec().type().name().toLowerCase()).write(String.valueOf(preference.inputValue()));
       writer.newLine();
     });
