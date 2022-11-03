@@ -153,6 +153,8 @@ public class AnnotatedCommandAdapter implements Command {
       for (Object o : iterable) {
         printReturn(writer, o);
       }
+    } else if (value instanceof Stream<?> stream) {
+      stream.forEach(obj -> printReturn(writer, obj));
     } else if (value != null) {
       writer.writeln(String.valueOf(value));
     }
