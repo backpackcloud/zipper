@@ -77,10 +77,3 @@ help_block_title: yellow
 help_section: blue
 # The example comments displayed in the help <command>
 help_comment: grey
-
-preference_name: blue
-preference_number: yellow
-preference_text: white
-preference_flag: orange
-preference_charset: cyan
-preference_timestamp_format: purple

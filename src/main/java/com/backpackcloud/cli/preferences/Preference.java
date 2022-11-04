@@ -24,6 +24,8 @@
 
 package com.backpackcloud.cli.preferences;
 
+import com.backpackcloud.cli.Displayable;
+
 import java.util.function.Consumer;
 
 /**
@@ -33,7 +35,7 @@ import java.util.function.Consumer;
  * @param <E>
  * @author Marcelo "Ataxexe" Guimarães
  */
-public interface Preference<E> {
+public interface Preference<E> extends Displayable {
 
   /**
    * @return the spec for this preference.

@@ -28,7 +28,6 @@ import com.backpackcloud.cli.Action;
 import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Suggestions;
-import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.preferences.Preference;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.ui.Suggestion;
@@ -38,6 +37,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @ApplicationScoped
 @CommandDefinition(
   name = "preferences",
@@ -52,23 +52,19 @@ public class PreferencesCommand implements AnnotatedCommand {
     this.userPreferences = userPreferences;
   }
 
-  @Action("set")
-  public void setPreference(Preference<?> preference, String value) {
+  @Action
+  public void set(Preference<?> preference, String value) {
     preference.set(value);
   }
 
-  @Action("clear")
-  public void clearPreference(Preference<?> preference) {
+  @Action
+  public void clear(Preference<?> preference) {
     preference.reset();
   }
 
-  @Action("list")
-  public void listPreferences(Writer writer) {
-    userPreferences.list().forEach(preference -> {
-      writer.withStyle("preference_name").write(preference.spec().id()).write(": ");
-      writer.withStyle("preference_" + preference.spec().type().name().toLowerCase()).write(String.valueOf(preference.inputValue()));
-      writer.newLine();
-    });
+  @Action
+  public List<Preference<?>> list() {
+    return userPreferences.list();
   }
 
   @Suggestions({"set", "clear"})

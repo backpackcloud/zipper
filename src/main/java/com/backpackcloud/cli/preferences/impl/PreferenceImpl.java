@@ -24,6 +24,7 @@
 
 package com.backpackcloud.cli.preferences.impl;
 
+import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.preferences.Preference;
 import com.backpackcloud.cli.preferences.PreferenceSpec;
 
@@ -75,6 +76,19 @@ public class PreferenceImpl<E> implements Preference<E> {
   public void listen(Consumer<E> listener) {
     listener.accept(this.currentValue);
     this.listeners.add(listener);
+  }
+
+  @Override
+  public void toDisplay(Writer writer) {
+    writer
+      .withStyle("preference_name")
+      .write(spec.id()).write(": ")
+
+      .withStyle("preference_" + spec.type().name().toLowerCase())
+      .write(String.valueOf(currentInputValue))
+
+      .withStyle("preference_description")
+      .write(String.format(" (%s)", spec.description()));
   }
 
 }
