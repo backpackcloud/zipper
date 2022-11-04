@@ -223,6 +223,9 @@ public class AnnotatedCommandAdapter implements Command {
           .value();
       })
 
+      .whenAnnotatedWith(ParameterCount.class)
+      .use(commandInputs::size)
+
       .whenOfType(CommandInput.class)
       .use(() -> inputIterator.hasNext() ? inputIterator.next() : null)
 
