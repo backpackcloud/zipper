@@ -51,13 +51,13 @@ public class ColorCommand implements AnnotatedCommand {
     this.colorMap = colorMap;
   }
 
-  @Action("set")
-  public void setColor(String colorName, String colorValue) {
+  @Action
+  public void set(String colorName, String colorValue) {
     colorMap.put(colorName, colorValue);
   }
 
-  @Action("list")
-  public void listColors(Writer writer) {
+  @Action
+  public void list(Writer writer) {
     colorMap.colorKeys().forEach(color ->
       writer.write(color).write(": ")
         .withStyle(color).writeln(colorMap.valueOf(color)));

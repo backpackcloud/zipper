@@ -83,6 +83,10 @@ public class AnnotatedCommandAdapter implements Command {
         Action action = method.getAnnotation(Action.class);
         String actionName = action.value();
 
+        if (actionName.isBlank()) {
+          actionName = method.getName();
+        }
+
         actions.put(actionName, method);
       });
 
@@ -101,7 +105,7 @@ public class AnnotatedCommandAdapter implements Command {
   @Override
   public void execute(CommandContext context) {
     if (actions.size() == 1) {
-      invokeAction(context, actions.get(""), context.input().asList()); // ugly as my ass, but I'll improve it later (you know I won't, right?)
+      invokeAction(context, actions.values().iterator().next(), context.input().asList());
     } else {
       List<CommandInput> input = context.input().asList();
       if (input.isEmpty()) {
