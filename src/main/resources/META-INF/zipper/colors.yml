@@ -13,9 +13,6 @@ teal: "008081"
 segment_fg: white
 segment_bg: grey
 
-prompt_error: red
-prompt_ok: purple
-
 command_error: red
 
 keyboard: blue

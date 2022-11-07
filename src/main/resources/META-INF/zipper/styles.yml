@@ -1,3 +1,6 @@
+prompt_error: red//b
+prompt_ok: purple//b
+
 error: red//i
 
 preference_name: blue
