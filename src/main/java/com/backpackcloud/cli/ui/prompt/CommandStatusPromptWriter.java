@@ -24,7 +24,6 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.CLIStateMonitor;
 import com.backpackcloud.cli.CommandListener;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
@@ -34,12 +33,10 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class CommandStatusPromptWriter implements PromptWriter {
 
-  private final CLIStateMonitor cliState;
   private boolean commandError;
 
 
-  public CommandStatusPromptWriter(CommandListener listener, CLIStateMonitor cliState) {
-    this.cliState = cliState;
+  public CommandStatusPromptWriter(CommandListener listener) {
     listener.beforeCommand(() -> commandError = false);
     listener.onCommandError(e -> commandError = true);
   }
@@ -51,14 +48,12 @@ public class CommandStatusPromptWriter implements PromptWriter {
 
   @Override
   public void addTo(Prompt prompt, PromptSide side) {
-    if (cliState.isWaitingForInput()) {
-      if (commandError) {
-        prompt.newSegment("command_status_error")
-          .addIcon("error");
-      } else {
-        prompt.newSegment("command_status_ok")
-          .addIcon("ok");
-      }
+    if (commandError) {
+      prompt.newSegment("command_status_error")
+        .addIcon("error");
+    } else {
+      prompt.newSegment("command_status_ok")
+        .addIcon("ok");
     }
   }
 }

@@ -24,7 +24,6 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.CLIStateMonitor;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 
@@ -33,11 +32,6 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class NewLineWriter implements PromptWriter {
 
-  private final CLIStateMonitor cliState;
-
-  public NewLineWriter(CLIStateMonitor cliState) {
-    this.cliState = cliState;
-  }
 
   @Override
   public String name() {
@@ -46,9 +40,7 @@ public class NewLineWriter implements PromptWriter {
 
   @Override
   public void addTo(Prompt prompt, PromptSide side) {
-    if (cliState.isWaitingForInput()) {
-      prompt.newLine();
-    }
+    prompt.newLine();
   }
 
 }
