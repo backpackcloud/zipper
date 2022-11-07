@@ -101,6 +101,10 @@ public interface Configuration extends Supplier<String> {
     return Enum.valueOf(enumType, get().toUpperCase().replaceAll("-", "_"));
   }
 
+  default String[] asArray() {
+    return get().split("\\s*,\\s*");
+  }
+
   /**
    * Assumes this configuration value is pointing to an external location
    * and reads the value at that location.
