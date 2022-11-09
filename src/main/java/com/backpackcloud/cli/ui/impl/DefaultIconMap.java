@@ -60,9 +60,4 @@ public class DefaultIconMap implements IconMap {
     this.icons.put(name, symbol);
   }
 
-  @Override
-  public void remove(String name) {
-    this.icons.remove(name);
-  }
-
 }

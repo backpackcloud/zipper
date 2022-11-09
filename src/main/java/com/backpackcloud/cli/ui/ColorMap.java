@@ -33,7 +33,7 @@ public interface ColorMap {
 
   void put(String key, String color);
 
-  Set<String> colorKeys();
+  Set<String> colors();
 
   String valueOf(String key);
 

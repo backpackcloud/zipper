@@ -26,8 +26,9 @@ package com.backpackcloud.cli.ui.impl;
 
 import com.backpackcloud.cli.ui.StyleMap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class DefaultStyleMap implements StyleMap {
 
@@ -43,8 +44,13 @@ public class DefaultStyleMap implements StyleMap {
   }
 
   @Override
-  public Optional<String> styleOf(String name) {
-    return Optional.ofNullable(styles.get(name));
+  public List<String> styles() {
+    return new ArrayList<>(styles.keySet());
+  }
+
+  @Override
+  public String styleOf(String name) {
+    return styles.get(name);
   }
 
 }

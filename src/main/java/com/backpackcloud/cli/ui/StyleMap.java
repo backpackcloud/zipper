@@ -24,12 +24,14 @@
 
 package com.backpackcloud.cli.ui;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface StyleMap {
 
-  Optional<String> styleOf(String name);
+  String styleOf(String name);
 
   void put(String name, String style);
+
+  List<String> styles();
 
 }

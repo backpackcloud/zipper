@@ -34,6 +34,4 @@ public interface IconMap {
 
   void put(String name, String symbol);
 
-  void remove(String name);
-
 }

@@ -31,7 +31,7 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -68,16 +68,16 @@ public class DefaultWriter implements Writer {
 
   @Override
   public Writer withStyle(String style) {
-    return style().parse(theme.styleMap().styleOf(style).orElse(style)).set();
+    String mappedStyle = theme.styleMap().styleOf(style);
+    return style().parse(mappedStyle != null ? mappedStyle : style).set();
   }
 
   @Override
   public Writer withStyle(String... styles) {
     return Arrays.stream(styles)
       .map(theme.styleMap()::styleOf)
-      .filter(Optional::isPresent)
+      .filter(Objects::nonNull)
       .findFirst()
-      .map(Optional::get)
       .map(style -> style().parse(style).set())
       .orElse(this);
   }

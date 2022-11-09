@@ -30,45 +30,97 @@ import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Suggestions;
 import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.ui.ColorMap;
+import com.backpackcloud.cli.ui.IconMap;
+import com.backpackcloud.cli.ui.StyleMap;
 import com.backpackcloud.cli.ui.Suggestion;
+import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.stream.Collectors;
-@ApplicationScoped
+
 @CommandDefinition(
-  name = "color",
-  description = "Manages the UI colors"
+  name = "theme",
+  description = "Manages the UI theme"
 )
 @RegisterForReflection
-public class ColorCommand implements AnnotatedCommand {
+@ApplicationScoped
+public class ThemeCommand implements AnnotatedCommand {
 
+  private final IconMap iconMap;
   private final ColorMap colorMap;
+  private final StyleMap styleMap;
 
-  public ColorCommand(ColorMap colorMap) {
-    this.colorMap = colorMap;
+  public ThemeCommand(Theme theme) {
+    this.iconMap = theme.iconMap();
+    this.colorMap = theme.colorMap();
+    this.styleMap = theme.styleMap();
   }
 
   @Action
-  public void set(String colorName, String colorValue) {
+  public void style(String styleName, String styleValue) {
+    styleMap.put(styleName, styleValue);
+  }
+
+  @Suggestions
+  public List<Suggestion> style() {
+    return styleMap.styles().stream()
+      .map(style -> PromptSuggestion.suggest(style)
+        .describedAs(styleMap.styleOf(style)))
+      .collect(Collectors.toList());
+  }
+
+  @Action
+  public void styles(Writer writer) {
+    styleMap.styles().forEach(name -> {
+        String mappedStyle = styleMap.styleOf(name);
+        writer.write(name).write(": ")
+          .withStyle(mappedStyle).writeln(mappedStyle);
+      }
+    );
+  }
+
+  @Action
+  public void color(String colorName, String colorValue) {
     colorMap.put(colorName, colorValue);
   }
 
+  @Suggestions
+  public List<Suggestion> color() {
+    return colorMap.colors().stream()
+      .map(color -> PromptSuggestion.suggest(color)
+        .describedAs(colorMap.valueOf(color)))
+      .collect(Collectors.toList());
+  }
+
   @Action
-  public void list(Writer writer) {
-    colorMap.colorKeys().forEach(color ->
+  public void colors(Writer writer) {
+    colorMap.colors().forEach(color ->
       writer.write(color).write(": ")
         .withStyle(color).writeln(colorMap.valueOf(color)));
   }
 
-  @Suggestions("set")
-  public List<Suggestion> suggest() {
-    return colorMap.colorKeys().stream()
-      .map(color -> PromptSuggestion.suggest(color)
-        .describedAs(colorMap.valueOf(color)))
+  @Action
+  public void icon(String iconName, String iconValue) {
+    iconMap.put(iconName, iconValue);
+  }
+
+  @Suggestions
+  public List<Suggestion> icon() {
+    return iconMap.icons().stream()
+      .map(icon -> PromptSuggestion.suggest(icon)
+        .describedAs(iconMap.symbolOf(icon)))
       .collect(Collectors.toList());
+  }
+
+  @Action
+  public void icons(Writer writer) {
+    iconMap.icons().forEach(icon ->
+      writer.write(icon)
+        .write(": ")
+        .writeln(iconMap.symbolOf(icon)));
   }
 
 }

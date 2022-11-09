@@ -55,7 +55,7 @@ public class DefaultColorMap implements ColorMap {
   }
 
   @Override
-  public Set<String> colorKeys() {
+  public Set<String> colors() {
     return new HashSet<>(colors.keySet());
   }
 
