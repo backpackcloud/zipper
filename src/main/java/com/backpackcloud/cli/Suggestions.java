@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Suggestions {
 
-  String[] value() default {""};
+  String[] value() default {};
 
 }

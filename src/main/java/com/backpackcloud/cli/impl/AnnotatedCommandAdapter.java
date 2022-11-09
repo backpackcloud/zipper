@@ -98,8 +98,14 @@ public class AnnotatedCommandAdapter implements Command {
       .methods()
       .annotatedWith(Suggestions.class)
       .from(command)
-      .forEach(method -> Stream.of(method.getAnnotation(Suggestions.class).value())
-        .forEach(action -> suggestions.put(action, method)));
+      .forEach(method -> {
+        String[] actions = method.getAnnotation(Suggestions.class).value();
+        if (actions.length == 0) {
+          actions = new String[]{method.getName()};
+        }
+        Stream.of(actions)
+          .forEach(action -> suggestions.put(action, method));
+      });
   }
 
   @Override
