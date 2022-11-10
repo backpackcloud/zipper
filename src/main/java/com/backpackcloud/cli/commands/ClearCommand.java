@@ -71,7 +71,7 @@ public class ClearCommand implements AnnotatedCommand {
   }
 
   @Suggestions
-  public List<Suggestion> suggest() {
+  public List<Suggestion> execute() {
     return registries.keySet().stream()
       .map(PromptSuggestion::suggest)
       .collect(Collectors.toList());
