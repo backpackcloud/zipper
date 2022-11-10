@@ -173,7 +173,7 @@ public class AnnotatedCommandAdapter implements Command {
   @Override
   public List<Suggestion> suggest(CommandInput commandInput) {
     if (actions.size() == 1) {
-      return invokeSuggestion(suggestions.get(""), commandInput.asList());
+      return invokeSuggestion(suggestions.values().iterator().next(), commandInput.asList());
     } else {
       List<CommandInput> input = commandInput.asList();
       if (input.size() <= 1) {
