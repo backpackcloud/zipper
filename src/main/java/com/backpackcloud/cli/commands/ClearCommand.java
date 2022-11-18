@@ -33,7 +33,6 @@ import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@ApplicationScoped
 @CommandDefinition(
   name = "clear",
   description = "Clears the given records or everything"

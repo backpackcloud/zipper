@@ -30,9 +30,6 @@ import com.backpackcloud.cli.CommandContext;
 import com.backpackcloud.cli.CommandDefinition;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
 @CommandDefinition(
   name = "exit",
   description = "Exits the program"

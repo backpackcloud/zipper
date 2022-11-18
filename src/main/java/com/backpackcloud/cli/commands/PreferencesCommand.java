@@ -34,11 +34,9 @@ import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
 @CommandDefinition(
   name = "preferences",
   description = "Manages the user preferences"

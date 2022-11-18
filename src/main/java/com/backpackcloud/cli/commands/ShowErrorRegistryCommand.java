@@ -31,10 +31,8 @@ import com.backpackcloud.cli.ErrorRegistry;
 import com.backpackcloud.cli.ui.Paginator;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-@ApplicationScoped
 @CommandDefinition(
   name = "errors",
   description = "Shows the error registry"

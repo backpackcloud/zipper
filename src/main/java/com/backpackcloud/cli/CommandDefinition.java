@@ -24,12 +24,16 @@
 
 package com.backpackcloud.cli;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Stereotype;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+@Stereotype
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
+@ApplicationScoped
 public @interface CommandDefinition {
 
   String name();

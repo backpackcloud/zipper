@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
   description = "Manages the UI theme"
 )
 @RegisterForReflection
-@ApplicationScoped
 public class ThemeCommand implements AnnotatedCommand {
 
   private final IconMap iconMap;
