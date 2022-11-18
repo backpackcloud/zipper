@@ -25,13 +25,12 @@
 package com.backpackcloud.cli.impl.cdi;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.cli.ErrorRegistry;
-import com.backpackcloud.configuration.UserConfigurationLoader;
 import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CLI;
 import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.CommandListener;
 import com.backpackcloud.cli.CommandNotifier;
+import com.backpackcloud.cli.ErrorRegistry;
 import com.backpackcloud.cli.Segments;
 import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.Writers;
@@ -51,7 +50,10 @@ import com.backpackcloud.cli.ui.impl.DefaultStyleMap;
 import com.backpackcloud.cli.ui.impl.DefaultTheme;
 import com.backpackcloud.configuration.Configuration;
 import com.backpackcloud.configuration.ResourceConfiguration;
+import com.backpackcloud.configuration.UserConfigurationLoader;
+import com.backpackcloud.serializer.JSON;
 import com.backpackcloud.serializer.Serializer;
+import com.backpackcloud.serializer.YAML;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.arc.DefaultBean;
@@ -162,27 +164,26 @@ public class Producers {
   @Singleton
   @Produces
   @DefaultBean
-  public ColorMap createColorMap() {
-    return new DefaultColorMap(loadMap("colors"));
+  public ColorMap createColorMap(@YAML Serializer serializer) {
+    return new DefaultColorMap(loadMap(serializer, "colors"));
   }
 
   @Singleton
   @Produces
   @DefaultBean
-  public IconMap createIconMap() {
-    return new DefaultIconMap(loadMap("icons"));
+  public IconMap createIconMap(@YAML Serializer serializer) {
+    return new DefaultIconMap(loadMap(serializer, "icons"));
   }
 
   @Singleton
   @Produces
   @DefaultBean
-  public StyleMap createStyleMap() {
-    return new DefaultStyleMap(loadMap("styles"));
+  public StyleMap createStyleMap(@YAML Serializer serializer) {
+    return new DefaultStyleMap(loadMap(serializer, "styles"));
   }
 
-  private Map<String, String> loadMap(String mapName) {
+  private Map<String, String> loadMap(Serializer serializer, String mapName) {
     Configuration configuration = new ResourceConfiguration("META-INF/zipper/" + mapName + ".yml");
-    Serializer serializer = Serializer.yaml();
     Map<String, String> map = serializer.deserialize(configuration.read(), HashMap.class);
 
     Configuration extraMap = new ResourceConfiguration("META-INF/config/" + mapName + ".yml");
@@ -206,18 +207,38 @@ public class Producers {
   @Singleton
   @Produces
   @DefaultBean
-  public UserPreferences createUserPreferences() {
+  public UserPreferences createUserPreferences(@YAML Serializer serializer) {
     UserConfigurationLoader loader = new UserConfigurationLoader("zipper");
     UserPreferences preferences = new UserPreferencesImpl();
 
     loader.resolve()
       .filter(Configuration::isSet)
       .map(Configuration::read)
-      .map(configuration -> Serializer.yaml().deserialize(configuration, FilePreferences.class))
+      .map(configuration -> serializer.deserialize(configuration, FilePreferences.class))
       .map(FilePreferences::preferences)
       .ifPresent(preferences::load);
 
     return preferences;
+  }
+
+  private Serializer json;
+  private Serializer yaml;
+
+  @Produces
+  public Serializer createSerializer(InjectionPoint ip) {
+    if (ip.getAnnotated().isAnnotationPresent(JSON.class)) {
+      if (json == null) {
+        json = Serializer.json();
+      }
+      return json;
+    }
+    if (ip.getAnnotated().isAnnotationPresent(YAML.class)) {
+      if (yaml == null) {
+        yaml = Serializer.yaml();
+      }
+      return yaml;
+    }
+    throw new UnbelievableException("Cannot find serializer");
   }
 
   @RegisterForReflection
