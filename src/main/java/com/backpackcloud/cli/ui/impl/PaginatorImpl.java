@@ -106,6 +106,10 @@ public class PaginatorImpl implements Paginator {
       boolean validInput;
 
       while (cursor < count) {
+        if (preferences.isEnabled(UserPreference.CLEAR_ON_PAGING)) {
+          System.out.print("\033[H\033[2J");
+          System.out.flush();
+        }
         end = cursor + pageSize;
         data.subList(cursor, Math.min(end, count)).forEach(item -> consumer.accept(writer, item));
         try {
@@ -153,10 +157,6 @@ public class PaginatorImpl implements Paginator {
                 return;
               }
               default -> validInput = false;
-            }
-            if (preferences.isEnabled(UserPreference.CLEAR_ON_PAGING)) {
-              System.out.print("\033[H\033[2J");
-              System.out.flush();
             }
           } while (!validInput);
           writer.newLine();
