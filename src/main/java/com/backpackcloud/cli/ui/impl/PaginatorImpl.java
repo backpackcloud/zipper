@@ -154,8 +154,10 @@ public class PaginatorImpl implements Paginator {
               }
               default -> validInput = false;
             }
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
+            if (preferences.isEnabled(UserPreference.CLEAR_ON_PAGING)) {
+              System.out.print("\033[H\033[2J");
+              System.out.flush();
+            }
           } while (!validInput);
           writer.newLine();
         } catch (IOException e) {

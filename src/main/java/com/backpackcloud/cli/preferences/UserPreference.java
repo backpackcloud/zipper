@@ -52,6 +52,12 @@ public enum UserPreference implements PreferenceSpec {
     "true"
   ),
 
+  CLEAR_ON_PAGING(
+    "clears the screen before paging actions",
+    Type.FLAG,
+    "false"
+  ),
+
   LEFT_PROMPT_HEAD(
     "The head icon for the left prompt",
     Type.TEXT,
