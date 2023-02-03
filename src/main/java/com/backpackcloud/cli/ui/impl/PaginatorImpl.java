@@ -141,14 +141,14 @@ public class PaginatorImpl implements Paginator {
               case 67, 66 -> cursor = end;
               // Arrows right and up
               case 68, 65 -> cursor = Math.max(0, cursor - pageSize);
-              case 'r', 'p' -> {
+              case 'r' -> {
                 if (end < count) {
                   data.subList(end, count).forEach(item -> consumer.accept(writer, item));
                   return;
                 }
                 cursor = count;
               }
-              case 'q', 'c' -> {
+              case 'q' -> {
                 writer.newLine();
                 return;
               }
