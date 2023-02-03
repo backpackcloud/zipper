@@ -131,10 +131,10 @@ public class PaginatorImpl implements Paginator {
             .write("\t")
 
             .withStyle("white").writeIcon("nf-fa-play").write(" ")
-            .withStyle("keyboard").write("r/p ")
+            .withStyle("keyboard").write("r ")
 
             .withStyle("white").writeIcon("nf-fa-stop").write(" ")
-            .withStyle("keyboard").write("q/c");
+            .withStyle("keyboard").write("q");
           terminal.enterRawMode();
 
           do {
