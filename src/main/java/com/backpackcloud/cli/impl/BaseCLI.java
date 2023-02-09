@@ -154,9 +154,16 @@ public class BaseCLI implements CLI {
             .bold().italic()
             .set().write("An error occurred").newLine();
         }
-      } catch (UserInterruptException | EndOfFileException e) {
-        notifier.notifyError(e);
-        System.out.println();
+      } catch (EndOfFileException e) {
+        // if ctrl+d is pressed, exit cli
+        return;
+      } catch (UserInterruptException e) {
+        // exit cli if there's no input
+        // this would make it easy to just cancel the current prompt and start again
+        // if ctrl+c is pressed without any input, cli will just end
+        if (e.getPartialLine().isBlank()) {
+          return;
+        }
       }
     }
   }
