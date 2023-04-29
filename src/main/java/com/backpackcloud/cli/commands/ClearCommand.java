@@ -33,7 +33,7 @@ import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.enterprise.inject.Instance;
+import jakarta.enterprise.inject.Instance;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

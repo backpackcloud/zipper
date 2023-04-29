@@ -26,7 +26,7 @@ package com.backpackcloud.cli.impl;
 
 import com.backpackcloud.cli.ErrorRegistry;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;

@@ -28,7 +28,7 @@ import com.backpackcloud.cli.ErrorRegistry;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class ErrorCountPromptWriter implements PromptWriter {

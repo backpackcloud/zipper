@@ -37,7 +37,7 @@ import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.stream.Collectors;
 

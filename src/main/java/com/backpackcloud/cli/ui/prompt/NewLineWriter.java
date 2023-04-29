@@ -27,7 +27,7 @@ package com.backpackcloud.cli.ui.prompt;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class NewLineWriter implements PromptWriter {
