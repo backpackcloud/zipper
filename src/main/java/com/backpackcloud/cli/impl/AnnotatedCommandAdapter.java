@@ -120,7 +120,7 @@ public class AnnotatedCommandAdapter implements Command {
     List<CommandInput> input = context.input().asList();
     if (actions.size() == 1) {
       invokeAction(context, actions.values().iterator().next(), input);
-      eventBus.publish(definition.name(), null);
+      eventBus.publish(String.format("command.%s", definition.name()), null);
     } else {
       if (input.isEmpty()) {
         throw new UnbelievableException("No action given");
@@ -128,7 +128,7 @@ public class AnnotatedCommandAdapter implements Command {
       String actionName = input.iterator().next().asString();
       if (actions.containsKey(actionName)) {
         invokeAction(context, actions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
-        eventBus.publish(String.format("%s.%s", definition.name(), actionName), null);
+        eventBus.publish(String.format("command.%s.%s", definition.name(), actionName), null);
       } else {
         throw new UnbelievableException("Action " + actionName + " not recognized");
       }
