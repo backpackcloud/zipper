@@ -58,6 +58,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
@@ -92,6 +93,7 @@ public class Producers {
                        Instance<Command> commands,
                        Instance<AnnotatedCommand> annotatedCommands,
                        Instance<PromptWriter> promptWriters,
+                       EventBus eventBus,
                        Terminal terminal,
                        CommandNotifier commandNotifier,
                        UserPreferences preferences,
@@ -118,7 +120,7 @@ public class Producers {
       .collect(Collectors.toCollection(ArrayList::new));
 
     annotatedCommands.stream()
-      .map(command -> new AnnotatedCommandAdapter(command, preferences, terminal))
+      .map(command -> new AnnotatedCommandAdapter(command, preferences, terminal, eventBus))
       .forEach(cliCommands::add);
 
     return new BaseCLI(

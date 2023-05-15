@@ -37,6 +37,7 @@ import com.backpackcloud.trugger.factory.ContextFactory;
 import com.backpackcloud.trugger.reflection.ReflectedMethod;
 import com.backpackcloud.trugger.reflection.Reflection;
 import com.backpackcloud.trugger.reflection.ReflectionPredicates;
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 
 import java.lang.reflect.Executable;
@@ -64,10 +65,16 @@ public class AnnotatedCommandAdapter implements Command {
 
   private final CommandDefinition definition;
 
-  public AnnotatedCommandAdapter(AnnotatedCommand command, UserPreferences preferences, Terminal terminal) {
+  private final EventBus eventBus;
+
+  public AnnotatedCommandAdapter(AnnotatedCommand command,
+                                 UserPreferences preferences,
+                                 Terminal terminal,
+                                 EventBus eventBus) {
     this.command = command;
     this.preferences = preferences;
     this.terminal = terminal;
+    this.eventBus = eventBus;
     this.actions = new HashMap<>();
     this.suggestions = new HashMap<>();
     this.definition = command.getClass().getAnnotation(CommandDefinition.class);
@@ -110,16 +117,18 @@ public class AnnotatedCommandAdapter implements Command {
 
   @Override
   public void execute(CommandContext context) {
+    List<CommandInput> input = context.input().asList();
     if (actions.size() == 1) {
-      invokeAction(context, actions.values().iterator().next(), context.input().asList());
+      invokeAction(context, actions.values().iterator().next(), input);
+      eventBus.publish(definition.name(), null);
     } else {
-      List<CommandInput> input = context.input().asList();
       if (input.isEmpty()) {
         throw new UnbelievableException("No action given");
       }
       String actionName = input.iterator().next().asString();
       if (actions.containsKey(actionName)) {
         invokeAction(context, actions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
+        eventBus.publish(String.format("%s.%s", definition.name(), actionName), null);
       } else {
         throw new UnbelievableException("Action " + actionName + " not recognized");
       }
@@ -151,7 +160,6 @@ public class AnnotatedCommandAdapter implements Command {
     } else {
       printReturn(commandContext.writer(), actionMethod.invoke(args));
     }
-
   }
 
   private void printReturn(Writer writer, Object value) {
