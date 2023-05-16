@@ -37,7 +37,7 @@ import com.backpackcloud.trugger.factory.ContextFactory;
 import com.backpackcloud.trugger.reflection.ReflectedMethod;
 import com.backpackcloud.trugger.reflection.Reflection;
 import com.backpackcloud.trugger.reflection.ReflectionPredicates;
-import io.vertx.mutiny.core.eventbus.EventBus;
+import io.vertx.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 
 import java.lang.reflect.Executable;
@@ -118,9 +118,9 @@ public class AnnotatedCommandAdapter implements Command {
   @Override
   public void execute(CommandContext context) {
     List<CommandInput> input = context.input().asList();
+    String event = definition.event().isEmpty() ? definition.name() : definition.event();
     if (actions.size() == 1) {
       invokeAction(context, actions.values().iterator().next(), input);
-      eventBus.publish(String.format("command.%s", definition.name()), null);
     } else {
       if (input.isEmpty()) {
         throw new UnbelievableException("No action given");
@@ -128,11 +128,12 @@ public class AnnotatedCommandAdapter implements Command {
       String actionName = input.iterator().next().asString();
       if (actions.containsKey(actionName)) {
         invokeAction(context, actions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
-        eventBus.publish(String.format("command.%s.%s", definition.name(), actionName), null);
+        eventBus.publish(String.format("command.%s.%s", event, actionName), context);
       } else {
         throw new UnbelievableException("Action " + actionName + " not recognized");
       }
     }
+    eventBus.publish(String.format("command.%s", event), context);
   }
 
   private void invokeAction(CommandContext commandContext, ReflectedMethod actionMethod, List<CommandInput> commandInputs) {

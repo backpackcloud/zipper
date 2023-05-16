@@ -36,6 +36,7 @@ import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.Writers;
 import com.backpackcloud.cli.impl.AnnotatedCommandAdapter;
 import com.backpackcloud.cli.impl.BaseCLI;
+import com.backpackcloud.cli.impl.CommandContextImpl;
 import com.backpackcloud.cli.impl.DefaultCommandNotifier;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.preferences.impl.UserPreferencesImpl;
@@ -58,7 +59,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import io.vertx.mutiny.core.eventbus.EventBus;
+import io.quarkus.vertx.LocalEventBusCodec;
+import io.vertx.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
@@ -101,6 +103,8 @@ public class Producers {
                        Writer consoleWriter) {
     Map<String, PromptWriter> writers = new HashMap<>();
     promptWriters.forEach(w -> writers.put(w.name(), w));
+
+    eventBus.registerDefaultCodec(CommandContextImpl.class, new LocalEventBusCodec<>());
 
     Annotated annotated = point.getAnnotated();
     Segments segments = annotated.isAnnotationPresent(Segments.class) ?
