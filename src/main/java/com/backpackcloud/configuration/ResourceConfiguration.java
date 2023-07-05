@@ -58,11 +58,14 @@ public class ResourceConfiguration implements Configuration {
   @Override
   public String get() {
     InputStream inputStream = classLoader.getResourceAsStream(resourcePath);
-    try (inputStream) {
-      return new String(inputStream.readAllBytes());
-    } catch (IOException e) {
-      throw new UnbelievableException(e);
+    if (inputStream != null) {
+      try (inputStream) {
+        return new String(inputStream.readAllBytes());
+      } catch (IOException e) {
+        throw new UnbelievableException(e);
+      }
     }
+    return null;
   }
 
   @Override

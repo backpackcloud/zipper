@@ -195,7 +195,7 @@ public class Producers {
     Configuration extraMap = new ResourceConfiguration("META-INF/config/" + mapName + ".yml");
     if (extraMap.isSet()) {
       String content = extraMap.read();
-      if (!content.isEmpty()) {
+      if (content != null && !content.isEmpty()) {
         map.putAll(serializer.deserialize(extraMap.read(), HashMap.class));
       }
     }
