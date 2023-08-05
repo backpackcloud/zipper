@@ -74,7 +74,7 @@
     <jline.version>3.21.0</jline.version>
     <quarkus.version>3.0.1.Final</quarkus.version>
     <jandex.version>1.2.2</jandex.version>
-    <jaxrs-api.version>2.0</jaxrs-api.version>
+    <jaxrs-api.version>3.1.0</jaxrs-api.version>
   </properties>
 
   <dependencyManagement>
@@ -140,8 +140,8 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
       <version>${jaxrs-api.version}</version>
       <scope>provided</scope>
     </dependency>

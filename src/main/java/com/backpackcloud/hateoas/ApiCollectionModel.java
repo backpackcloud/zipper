@@ -2,7 +2,7 @@ package com.backpackcloud.hateoas;
 
 import com.backpackcloud.hateoas.impl.CollectionModel;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Optional;
 

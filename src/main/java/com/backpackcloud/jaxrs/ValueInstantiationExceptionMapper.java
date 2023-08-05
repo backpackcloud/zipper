@@ -27,9 +27,9 @@ package com.backpackcloud.jaxrs;
 import com.backpackcloud.UnbelievableException;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class ValueInstantiationExceptionMapper implements ExceptionMapper<ValueInstantiationException> {
