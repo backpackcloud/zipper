@@ -85,6 +85,11 @@ public final class Backstage<T> implements Spectacle<T> {
   }
 
   @Override
+  public Spectacle<T> test(Predicate<? super T> test) {
+    return test(supplier.get(), test, () -> reason);
+  }
+
+  @Override
   public Spectacle<T> then(TargetedAction<? super T> action) {
     try {
       action.run(supplier.get());

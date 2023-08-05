@@ -77,6 +77,8 @@ public interface Spectacle<T> {
    */
   Spectacle<T> then(TargetedAction<? super T> action);
 
+  Spectacle<T> test(Predicate<? super T> test);
+
   /**
    * Defines an action statement that doesn't require the target object.
    *
