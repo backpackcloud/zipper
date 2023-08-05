@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 Marcelo Guimarães
+ * Copyright (c) 2020 Marcelo Guimarães <ataxexe@backpackcloud.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.backpackcloud.trugger.reflection;
+
+package com.backpackcloud.jaxrs;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.trugger.reflection.impl.TruggerReflector;
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 
-import java.util.function.Function;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-/**
- * A utility class for help the use of Reflection.
- *
- * @author Marcelo Guimaraes
- */
-public final class Reflection {
+@Provider
+public class ValueInstantiationExceptionMapper implements ExceptionMapper<ValueInstantiationException> {
 
-  private Reflection() {
-  }
-
-  public static Reflector reflect() {
-    return new TruggerReflector();
-  }
-
-  public static Function<String, Object> elementResolver(Object target) {
-    return name -> Reflection.reflect().method(name)
-      .withoutParameters()
-      .from(target)
-      .map(ReflectedMethod::invoke)
-      .or(() -> Reflection.reflect()
-        .field(name)
-        .from(target)
-        .map(ReflectedField::get))
-      .map(Object::toString)
-      .orElseThrow(UnbelievableException::new);
+  @Override
+  public Response toResponse(ValueInstantiationException e) {
+    Throwable cause = e.getCause();
+    if (cause instanceof UnbelievableException) {
+      return Response.status(400).entity(cause.getMessage()).build();
+    }
+    return Response.status(400).entity(e.getMessage()).build();
   }
 
 }

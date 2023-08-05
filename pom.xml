@@ -74,6 +74,7 @@
     <jline.version>3.21.0</jline.version>
     <quarkus.version>3.0.1.Final</quarkus.version>
     <jandex.version>1.2.2</jandex.version>
+    <jaxrs-api.version>2.0</jaxrs-api.version>
   </properties>
 
   <dependencyManagement>
@@ -136,6 +137,13 @@
       <groupId>org.jline</groupId>
       <artifactId>jline-reader</artifactId>
       <version>${jline.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <version>${jaxrs-api.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
