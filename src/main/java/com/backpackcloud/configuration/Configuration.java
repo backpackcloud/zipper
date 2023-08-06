@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -56,6 +57,17 @@ public interface Configuration extends Supplier<String> {
    * @return {@code true} if this source holds any configuration value.
    */
   boolean isSet();
+
+  default Configuration ifSet(Consumer<Configuration> action) {
+    if (isSet()) {
+      action.accept(this);
+    }
+    return this;
+  }
+
+  default <E> Optional<E> map(Function<Configuration, E> function) {
+    return isSet() ? Optional.ofNullable(function.apply(this)) : Optional.empty();
+  }
 
   /**
    * Gets the value of this configuration.
@@ -206,10 +218,6 @@ public interface Configuration extends Supplier<String> {
    */
   default <T extends Enum<T>> T orElse(T defaultValue) {
     return isSet() ? asEnum(defaultValue.getDeclaringClass()) : defaultValue;
-  }
-
-  default <T> Optional<T> map(Function<String, T> mapFunction) {
-    return isSet() ? Optional.of(mapFunction.apply(get())) : Optional.empty();
   }
 
   static ConfigurationChain configuration() {

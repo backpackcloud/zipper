@@ -49,8 +49,14 @@ public class UserConfigurationLoader {
       .map(File::getPath);
   }
 
-  public Optional<Configuration> resolve() {
-    return resolveLocation().map(FileConfiguration::new);
+  public Configuration resolve() {
+    return resolveLocation()
+      .<Configuration>map(FileConfiguration::new)
+      .orElseGet(this::getDefault);
+  }
+
+  public Configuration getDefault() {
+    return new ResourceConfiguration("META-INF/" + prefix + ".yml");
   }
 
 }

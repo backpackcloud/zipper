@@ -71,6 +71,7 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -220,12 +221,9 @@ public class Producers {
     UserConfigurationLoader loader = new UserConfigurationLoader("zipper");
     UserPreferences preferences = new UserPreferencesImpl();
 
-    loader.resolve()
-      .filter(Configuration::isSet)
-      .map(Configuration::read)
-      .map(configuration -> serializer.deserialize(configuration, FilePreferences.class))
-      .map(FilePreferences::preferences)
-      .ifPresent(preferences::load);
+    loader.resolve().ifSet(conf ->
+      preferences.load(serializer.deserialize(conf.read(), FilePreferences.class).preferences())
+    );
 
     return preferences;
   }
