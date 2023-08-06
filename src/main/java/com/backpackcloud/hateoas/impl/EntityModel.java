@@ -5,7 +5,7 @@ import com.backpackcloud.hateoas.ApiModel;
 import com.backpackcloud.hateoas.Link;
 import com.backpackcloud.hateoas.LinkMapper;
 import com.backpackcloud.text.Interpolator;
-import com.backpackcloud.trugger.reflection.Reflection;
+import com.backpackcloud.trugger.util.ElementResolver;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
@@ -30,7 +30,7 @@ public class EntityModel<E> implements ApiModel<E> {
     Link[] declaredLinks = entity.getClass().getAnnotationsByType(Link.class);
     if (declaredLinks.length == 0) return;
 
-    Interpolator interpolator = new Interpolator(Reflection.elementResolver(entity));
+    Interpolator interpolator = new Interpolator(ElementResolver.of(entity)::resolve);
     for (Link link : declaredLinks) {
       interpolator.eval(link.uri())
         .ifPresent(uri -> interpolator.eval(link.title())

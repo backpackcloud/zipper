@@ -23,10 +23,7 @@
  */
 package com.backpackcloud.trugger.reflection;
 
-import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.trugger.reflection.impl.TruggerReflector;
-
-import java.util.function.Function;
 
 /**
  * A utility class for help the use of Reflection.
@@ -40,19 +37,6 @@ public final class Reflection {
 
   public static Reflector reflect() {
     return new TruggerReflector();
-  }
-
-  public static Function<String, Object> elementResolver(Object target) {
-    return name -> Reflection.reflect().method(name)
-      .withoutParameters()
-      .from(target)
-      .map(ReflectedMethod::invoke)
-      .or(() -> Reflection.reflect()
-        .field(name)
-        .from(target)
-        .map(ReflectedField::get))
-      .map(Object::toString)
-      .orElseThrow(UnbelievableException::new);
   }
 
 }
