@@ -25,19 +25,12 @@
 package com.backpackcloud.cli.impl.cdi;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.cli.AnnotatedCommand;
-import com.backpackcloud.cli.CLI;
-import com.backpackcloud.cli.Command;
-import com.backpackcloud.cli.CommandListener;
-import com.backpackcloud.cli.CommandNotifier;
-import com.backpackcloud.cli.ErrorRegistry;
-import com.backpackcloud.cli.Segments;
-import com.backpackcloud.cli.Writer;
-import com.backpackcloud.cli.Writers;
+import com.backpackcloud.cli.*;
 import com.backpackcloud.cli.impl.AnnotatedCommandAdapter;
 import com.backpackcloud.cli.impl.BaseCLI;
 import com.backpackcloud.cli.impl.CommandContextImpl;
 import com.backpackcloud.cli.impl.DefaultCommandNotifier;
+import com.backpackcloud.cli.preferences.Preference;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.preferences.impl.UserPreferencesImpl;
 import com.backpackcloud.cli.ui.ColorMap;
@@ -61,9 +54,6 @@ import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.quarkus.vertx.LocalEventBusCodec;
 import io.vertx.core.eventbus.EventBus;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Instance;
@@ -71,6 +61,8 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.inject.Singleton;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -138,6 +130,16 @@ public class Producers {
       rightPromptWriters,
       commandNotifier
     );
+  }
+
+
+  @Produces
+  public Preference getPreference(InjectionPoint ip, UserPreferences preferences) {
+    PreferenceValue annotation = ip.getAnnotated().getAnnotation(PreferenceValue.class);
+    String preferenceName = annotation.value().isEmpty() ? ip.getMember().getName() : annotation.value();
+
+    return preferences.find(preferenceName)
+      .orElseThrow(UnbelievableException.because("Preference not found: " + preferenceName));
   }
 
   @Singleton
