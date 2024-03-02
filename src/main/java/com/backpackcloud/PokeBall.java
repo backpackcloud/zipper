@@ -13,7 +13,7 @@ public final class PokeBall {
 
   }
 
-  static void gottaCatchEmAll(Action action) {
+  public static void gottaCatchEmAll(Action action) {
     try {
       action.run();
     } catch (Throwable e) {
