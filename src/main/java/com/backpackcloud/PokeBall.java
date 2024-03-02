@@ -7,18 +7,18 @@ import com.backpackcloud.spectaculous.Action;
  *
  * @author Marcelo Guimarães
  */
-public interface PokeBall {
+public final class PokeBall {
 
-  void execute(Action action);
+  private PokeBall() {
 
-  static PokeBall gottaCatchEmAll() {
-    return action -> {
-      try {
-        action.run();
-      } catch (Throwable e) {
-        // gotta catch'em all!!
-      }
-    };
+  }
+
+  static void gottaCatchEmAll(Action action) {
+    try {
+      action.run();
+    } catch (Throwable e) {
+      // gotta catch'em all!!
+    }
   }
 
 }
