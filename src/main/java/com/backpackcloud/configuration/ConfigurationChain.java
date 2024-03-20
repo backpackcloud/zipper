@@ -112,6 +112,10 @@ public class ConfigurationChain implements Configuration {
     return new ConfigurationChain(configuration.or(new ResourceConfiguration(classLoader, key)));
   }
 
+  public ConfigurationChain resource(String key) {
+    return new ConfigurationChain(configuration.or(new ResourceConfiguration(Thread.currentThread().getContextClassLoader(), key)));
+  }
+
   public ConfigurationChain property(String key) {
     return new ConfigurationChain(configuration.or(new SystemPropertyConfiguration(key)));
   }
