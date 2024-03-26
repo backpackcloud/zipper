@@ -22,39 +22,16 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli;
+package com.backpackcloud;
 
-import java.util.Objects;
-
-public class KeyValuePair<K, V> {
-
-  private final K key;
-  private final V value;
-
-  public KeyValuePair(K key, V value) {
-    this.key = key;
-    this.value = value;
-  }
-
-  public K key() {
-    return key;
-  }
-
-  public V value() {
-    return value;
-  }
+public record Pair<K, V>(K key, V value) {
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    KeyValuePair<?, ?> that = (KeyValuePair<?, ?>) o;
+    Pair<?, ?> that = (Pair<?, ?>) o;
     return key.equals(that.key) && value.equals(that.value);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(key, value);
   }
 
 }
