@@ -24,7 +24,13 @@
 
 package com.backpackcloud;
 
+import java.util.Map;
+
 public record Pair<K, V>(K key, V value) {
+
+  public Pair(Map.Entry<K, V> entry) {
+    this(entry.getKey(), entry.getValue());
+  }
 
   @Override
   public boolean equals(Object o) {
