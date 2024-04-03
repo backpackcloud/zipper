@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -62,6 +63,10 @@ public interface Tags {
 
   static Tags from(Set<String> tagSet) {
     return new DefaultTagSet(tagSet);
+  }
+
+  static Tags from(Collection<String> tags) {
+    return new DefaultTagSet(new HashSet<>(tags));
   }
 
   @JsonCreator
