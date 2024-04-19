@@ -34,6 +34,7 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,36 +51,30 @@ public class CommandCompleter implements Completer {
   @Override
   public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
     if (userPreferences.isEnabled(UserPreference.COMPLETION)) {
-      List<String> words = line.words();
-      String firstWord = words.get(0);
-
-      if (words.size() == 1) {
-        commands.entrySet().stream()
-          .filter(entry -> entry.getKey().startsWith(firstWord))
-          .map(entry -> convert(PromptSuggestion
-            .suggest(entry.getKey())
-            .describedAs(entry.getValue().description())
-            .asPartOf(entry.getValue().type())))
-          .forEach(candidates::add);
-      } else if (commands.containsKey(firstWord)) {
-        List<String> args = line.words().subList(1, line.words().size());
-        commands.get(firstWord).suggest(new CommandInputImpl(args)).stream()
-          .map(this::convert)
-          .forEach(candidates::add);
-      }
+      suggest(line.words()).stream()
+        .map(Suggestion::toCandidate)
+        .forEach(candidates::add);
     }
   }
 
-  private Candidate convert(Suggestion suggestion) {
-    return new Candidate(
-      suggestion.value(),
-      suggestion.value(),
-      suggestion.group().orElse(null),
-      suggestion.description().orElse(null),
-      null,
-      null,
-      suggestion.isComplete()
-    );
+  public List<Suggestion> suggest(List<String> words) {
+    List<Suggestion> suggestions = new ArrayList<>();
+    String firstWord = words.get(0);
+
+    if (words.size() == 1) {
+      commands.entrySet().stream()
+        .filter(entry -> entry.getKey().startsWith(firstWord))
+        .map(entry -> PromptSuggestion
+          .suggest(entry.getKey())
+          .describedAs(entry.getValue().description())
+          .asPartOf(entry.getValue().type()))
+        .forEach(suggestions::add);
+    } else if (commands.containsKey(firstWord)) {
+      List<String> args = words.subList(1, words.size());
+      suggestions.addAll(commands.get(firstWord).suggest(new CommandInputImpl(args)));
+    }
+
+    return suggestions;
   }
 
 }

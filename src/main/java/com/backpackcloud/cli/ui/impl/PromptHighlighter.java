@@ -24,7 +24,6 @@
 
 package com.backpackcloud.cli.ui.impl;
 
-import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.preferences.UserPreference;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.ui.Theme;
@@ -35,8 +34,6 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -47,20 +44,11 @@ public class PromptHighlighter implements Highlighter {
   private final Theme theme;
 
   public PromptHighlighter(UserPreferences userPreferences,
-                           Collection<Command> commands,
+                           Set<String> commands,
                            Theme theme) {
     this.theme = theme;
-    this.commands = new HashSet<>();
+    this.commands = commands;
     this.userPreferences = userPreferences;
-
-    commands.forEach(command -> {
-      this.commands.add(command.name());
-      this.commands.addAll(command.aliases());
-    });
-  }
-
-  public void addCommand(String name) {
-    this.commands.add(name);
   }
 
   @Override

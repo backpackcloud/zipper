@@ -24,16 +24,25 @@
 
 package com.backpackcloud.cli;
 
+import com.backpackcloud.cli.ui.Suggestion;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface CLI {
-
-  void registerMacro(String name, List<String> commands);
 
   void start();
 
   void stop();
 
   void execute(String... commands);
-  
+
+  List<String> availableCommands();
+
+  List<Suggestion> suggest(String input);
+
+  Optional<String> leftPrompt();
+
+  Optional<String> rightPrompt();
+
 }

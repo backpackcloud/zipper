@@ -24,6 +24,8 @@
 
 package com.backpackcloud.cli.ui;
 
+import org.jline.reader.Candidate;
+
 import java.util.Optional;
 
 /**
@@ -66,5 +68,17 @@ public interface Suggestion {
    * @return the optional group which this suggestion belongs to.
    */
   Optional<String> group();
+
+  default Candidate toCandidate() {
+    return new Candidate(
+      this.value(),
+      this.value(),
+      this.group().orElse(null),
+      this.description().orElse(null),
+      null,
+      null,
+      this.isComplete()
+    );
+  }
 
 }

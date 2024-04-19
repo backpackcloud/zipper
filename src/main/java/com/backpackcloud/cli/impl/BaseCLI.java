@@ -30,11 +30,11 @@ import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.CommandNotifier;
 import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.Writers;
-import com.backpackcloud.cli.commands.MacroCommand;
 import com.backpackcloud.cli.preferences.UserPreference;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
+import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.impl.CommandCompleter;
 import com.backpackcloud.cli.ui.impl.PromptHighlighter;
@@ -57,6 +57,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class BaseCLI implements CLI {
 
@@ -68,6 +69,7 @@ public class BaseCLI implements CLI {
   private final Map<String, Command> commands;
 
   private final PromptHighlighter highlighter;
+  private final CommandCompleter commandCompleter;
 
   private final Collection<PromptWriter> leftPrompt;
   private final Collection<PromptWriter> rightPrompt;
@@ -97,13 +99,14 @@ public class BaseCLI implements CLI {
       command.aliases().forEach(alias -> this.commands.put(alias, command));
     });
 
-    this.highlighter = new PromptHighlighter(preferences, commands, theme);
+    this.highlighter = new PromptHighlighter(preferences, this.commands.keySet(), theme);
 
+    commandCompleter = new CommandCompleter(this.commands, preferences);
     this.lineReader = LineReaderBuilder.builder()
       .terminal(terminal)
       .highlighter(highlighter)
       .history(new DefaultHistory())
-      .completer(new CommandCompleter(this.commands, preferences))
+      .completer(commandCompleter)
       .build();
 
     this.lineReader.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true);
@@ -115,12 +118,6 @@ public class BaseCLI implements CLI {
         this.lineReader.setAutosuggestion(LineReader.SuggestionType.NONE);
       }
     });
-  }
-
-  @Override
-  public void registerMacro(String name, List<String> commands) {
-    this.commands.put(name, new MacroCommand(name, this, commands));
-    this.highlighter.addCommand(name);
   }
 
   @Override
@@ -182,6 +179,27 @@ public class BaseCLI implements CLI {
     } finally {
       notifier.notifyDone();
     }
+  }
+
+  @Override
+  public List<String> availableCommands() {
+    return new ArrayList<>(this.commands.keySet());
+  }
+
+  @Override
+  public List<Suggestion> suggest(String input) {
+    ParsedLine line = lineReader.getParser().parse(input, 0);
+    return commandCompleter.suggest(line.words());
+  }
+
+  @Override
+  public Optional<String> leftPrompt() {
+    return Optional.of(buildLeftPrompt());
+  }
+
+  @Override
+  public Optional<String> rightPrompt() {
+    return Optional.of(buildRightPrompt());
   }
 
   private String buildLeftPrompt() {
