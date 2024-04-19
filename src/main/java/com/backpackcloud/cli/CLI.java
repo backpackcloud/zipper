@@ -25,11 +25,16 @@
 package com.backpackcloud.cli;
 
 import com.backpackcloud.cli.ui.Suggestion;
+import com.backpackcloud.serializer.Serializer;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.Router;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CLI {
+
+  void attach(Writer writer);
 
   void start();
 
@@ -37,12 +42,33 @@ public interface CLI {
 
   void execute(String... commands);
 
-  List<String> availableCommands();
+  void execute(Writer writer, String... commands);
+
+  List<Command> availableCommands();
 
   List<Suggestion> suggest(String input);
 
   Optional<String> leftPrompt();
 
   Optional<String> rightPrompt();
+
+  default void expose(Router router) {
+    Serializer serializer = Serializer.json();
+
+    router.route(HttpMethod.POST, "/cli").handler(routingContext -> {
+
+    });
+
+    router.route(HttpMethod.GET, "/cli/prompts").handler(routingContext -> {
+      routingContext.response()
+        .setStatusCode(200)
+        .putHeader("content-type", "application/json; charset=utf-8")
+        .end("", "utf-8");
+    });
+
+    router.route(HttpMethod.PUT, "/cli/prompts").handler(routingContext -> {
+
+    });
+  }
 
 }

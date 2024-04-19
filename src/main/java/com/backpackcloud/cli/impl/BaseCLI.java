@@ -61,7 +61,6 @@ import java.util.Optional;
 
 public class BaseCLI implements CLI {
 
-  private final Writer console;
   private final UserPreferences preferences;
   private final Theme theme;
 
@@ -74,6 +73,8 @@ public class BaseCLI implements CLI {
   private final Collection<PromptWriter> leftPrompt;
   private final Collection<PromptWriter> rightPrompt;
   private final CommandNotifier notifier;
+
+  private Writer console;
 
   private boolean stop;
 
@@ -118,6 +119,11 @@ public class BaseCLI implements CLI {
         this.lineReader.setAutosuggestion(LineReader.SuggestionType.NONE);
       }
     });
+  }
+
+  @Override
+  public void attach(Writer writer) {
+    this.console = writer;
   }
 
   @Override
@@ -167,11 +173,16 @@ public class BaseCLI implements CLI {
 
   @Override
   public void execute(String... commands) {
+    execute(console, commands);
+  }
+
+  @Override
+  public void execute(Writer writer, String... commands) {
     notifier.notifyStart();
     try {
       for (String command : commands) {
         if (!command.isEmpty()) {
-          parseAndExecute(lineReader.getParser().parse(command, 0));
+          parseAndExecute(writer, lineReader.getParser().parse(command, 0));
         }
       }
     } catch (Exception e) {
@@ -182,8 +193,8 @@ public class BaseCLI implements CLI {
   }
 
   @Override
-  public List<String> availableCommands() {
-    return new ArrayList<>(this.commands.keySet());
+  public List<Command> availableCommands() {
+    return new ArrayList<>(this.commands.values());
   }
 
   @Override
@@ -232,8 +243,7 @@ public class BaseCLI implements CLI {
     return builder.toString();
   }
 
-  private void parseAndExecute(ParsedLine parsedLine) {
-    Writer writer = console;
+  private void parseAndExecute(Writer writer, ParsedLine parsedLine) {
     List<String> args = new ArrayList<>(parsedLine.words());
     String commandName = args.get(0);
     Command command = commands.get(commandName);
