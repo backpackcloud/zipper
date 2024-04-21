@@ -34,7 +34,6 @@ import com.backpackcloud.cli.preferences.UserPreference;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
-import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.impl.CommandCompleter;
 import com.backpackcloud.cli.ui.impl.PromptHighlighter;
@@ -57,7 +56,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class BaseCLI implements CLI {
 
@@ -67,14 +65,11 @@ public class BaseCLI implements CLI {
   private final LineReader lineReader;
   private final Map<String, Command> commands;
 
-  private final PromptHighlighter highlighter;
-  private final CommandCompleter commandCompleter;
-
   private final Collection<PromptWriter> leftPrompt;
   private final Collection<PromptWriter> rightPrompt;
   private final CommandNotifier notifier;
 
-  private Writer console;
+  private final Writer console;
 
   private boolean stop;
 
@@ -100,14 +95,11 @@ public class BaseCLI implements CLI {
       command.aliases().forEach(alias -> this.commands.put(alias, command));
     });
 
-    this.highlighter = new PromptHighlighter(preferences, this.commands.keySet(), theme);
-
-    commandCompleter = new CommandCompleter(this.commands, preferences);
     this.lineReader = LineReaderBuilder.builder()
       .terminal(terminal)
-      .highlighter(highlighter)
+      .highlighter(new PromptHighlighter(preferences, this.commands.keySet(), theme))
       .history(new DefaultHistory())
-      .completer(commandCompleter)
+      .completer(new CommandCompleter(this.commands, preferences))
       .build();
 
     this.lineReader.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true);
@@ -119,11 +111,6 @@ public class BaseCLI implements CLI {
         this.lineReader.setAutosuggestion(LineReader.SuggestionType.NONE);
       }
     });
-  }
-
-  @Override
-  public void attach(Writer writer) {
-    this.console = writer;
   }
 
   @Override
@@ -190,27 +177,6 @@ public class BaseCLI implements CLI {
     } finally {
       notifier.notifyDone();
     }
-  }
-
-  @Override
-  public List<Command> availableCommands() {
-    return new ArrayList<>(this.commands.values());
-  }
-
-  @Override
-  public List<Suggestion> suggest(String input) {
-    ParsedLine line = lineReader.getParser().parse(input, 0);
-    return commandCompleter.suggest(line.words());
-  }
-
-  @Override
-  public Optional<String> leftPrompt() {
-    return Optional.of(buildLeftPrompt());
-  }
-
-  @Override
-  public Optional<String> rightPrompt() {
-    return Optional.of(buildRightPrompt());
   }
 
   private String buildLeftPrompt() {
