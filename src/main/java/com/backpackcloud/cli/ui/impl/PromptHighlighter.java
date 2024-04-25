@@ -51,6 +51,10 @@ public class PromptHighlighter implements Highlighter {
     this.userPreferences = userPreferences;
   }
 
+  public void addCommand(String command) {
+    commands.add(command);
+  }
+
   @Override
   public AttributedString highlight(LineReader reader, String buffer) {
     if (userPreferences.isDisabled(UserPreference.HIGHLIGHTER)) {

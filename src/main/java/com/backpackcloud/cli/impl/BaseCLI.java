@@ -30,6 +30,7 @@ import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.CommandNotifier;
 import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.Writers;
+import com.backpackcloud.cli.commands.MacroCommand;
 import com.backpackcloud.cli.preferences.UserPreference;
 import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.ui.Prompt;
@@ -65,6 +66,8 @@ public class BaseCLI implements CLI {
   private final LineReader lineReader;
   private final Map<String, Command> commands;
 
+  private final PromptHighlighter highlighter;
+
   private final Collection<PromptWriter> leftPrompt;
   private final Collection<PromptWriter> rightPrompt;
   private final CommandNotifier notifier;
@@ -95,9 +98,11 @@ public class BaseCLI implements CLI {
       command.aliases().forEach(alias -> this.commands.put(alias, command));
     });
 
+    this.highlighter = new PromptHighlighter(preferences, this.commands.keySet(), theme);
+
     this.lineReader = LineReaderBuilder.builder()
       .terminal(terminal)
-      .highlighter(new PromptHighlighter(preferences, this.commands.keySet(), theme))
+      .highlighter(highlighter)
       .history(new DefaultHistory())
       .completer(new CommandCompleter(this.commands, preferences))
       .build();
@@ -111,6 +116,12 @@ public class BaseCLI implements CLI {
         this.lineReader.setAutosuggestion(LineReader.SuggestionType.NONE);
       }
     });
+  }
+
+  @Override
+  public void registerMacro(String name, List<String> commands) {
+    this.commands.put(name, new MacroCommand(name, this, commands));
+    this.highlighter.addCommand(name);
   }
 
   @Override

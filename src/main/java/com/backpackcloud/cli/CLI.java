@@ -24,11 +24,15 @@
 
 package com.backpackcloud.cli;
 
+import java.util.List;
+
 public interface CLI {
 
   void start();
 
   void stop();
+
+  void registerMacro(String name, List<String> commands);
 
   void execute(String... commands);
 
