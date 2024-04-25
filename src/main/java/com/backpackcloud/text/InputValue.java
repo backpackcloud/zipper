@@ -60,7 +60,7 @@ public interface InputValue extends Supplier<String> {
   }
 
   default <T extends Enum<T>> T asEnum(Class<T> enumType) {
-    return Enum.valueOf(enumType, asString().toUpperCase().replaceAll("([- ])", "_"));
+    return Enum.valueOf(enumType, asString().toUpperCase().replaceAll("([- .])", "_"));
   }
 
   default <T extends Enum<T>> T or(T defaultValue) {
