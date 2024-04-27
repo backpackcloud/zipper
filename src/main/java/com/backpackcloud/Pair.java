@@ -26,18 +26,13 @@ package com.backpackcloud;
 
 import java.util.Map;
 
+/**
+ * A simple Key/Value pair implementation.
+ */
 public record Pair<K, V>(K key, V value) {
 
   public Pair(Map.Entry<K, V> entry) {
     this(entry.getKey(), entry.getValue());
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Pair<?, ?> that = (Pair<?, ?>) o;
-    return key.equals(that.key) && value.equals(that.value);
   }
 
 }
