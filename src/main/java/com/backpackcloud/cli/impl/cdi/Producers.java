@@ -45,7 +45,6 @@ import com.backpackcloud.cli.ui.impl.DefaultTheme;
 import com.backpackcloud.configuration.Configuration;
 import com.backpackcloud.configuration.ResourceConfiguration;
 import com.backpackcloud.configuration.UserConfigurationLoader;
-import com.backpackcloud.serializer.JSON;
 import com.backpackcloud.serializer.Serializer;
 import com.backpackcloud.serializer.YAML;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -228,26 +227,6 @@ public class Producers {
     );
 
     return preferences;
-  }
-
-  private Serializer json;
-  private Serializer yaml;
-
-  @Produces
-  public Serializer createSerializer(InjectionPoint ip) {
-    if (ip.getAnnotated().isAnnotationPresent(JSON.class)) {
-      if (json == null) {
-        json = Serializer.json();
-      }
-      return json;
-    }
-    if (ip.getAnnotated().isAnnotationPresent(YAML.class)) {
-      if (yaml == null) {
-        yaml = Serializer.yaml();
-      }
-      return yaml;
-    }
-    throw new UnbelievableException("Cannot find serializer");
   }
 
   @RegisterForReflection
