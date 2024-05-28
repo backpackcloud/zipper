@@ -34,6 +34,7 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ public class PromptHighlighter implements Highlighter {
                            Set<String> commands,
                            Theme theme) {
     this.theme = theme;
-    this.commands = commands;
+    this.commands = new HashSet<>(commands);
     this.userPreferences = userPreferences;
   }
 
