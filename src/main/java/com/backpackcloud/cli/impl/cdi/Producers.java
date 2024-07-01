@@ -44,7 +44,7 @@ import com.backpackcloud.cli.ui.impl.DefaultStyleMap;
 import com.backpackcloud.cli.ui.impl.DefaultTheme;
 import com.backpackcloud.configuration.Configuration;
 import com.backpackcloud.configuration.ResourceConfiguration;
-import com.backpackcloud.configuration.UserConfigurationLoader;
+import com.backpackcloud.configuration.ConfigurationSupplier;
 import com.backpackcloud.serializer.Serializer;
 import com.backpackcloud.serializer.YAML;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -219,10 +219,10 @@ public class Producers {
   @Produces
   @DefaultBean
   public UserPreferences createUserPreferences(@YAML Serializer serializer) {
-    UserConfigurationLoader loader = new UserConfigurationLoader("zipper");
+    ConfigurationSupplier loader = new ConfigurationSupplier("zipper");
     UserPreferences preferences = new UserPreferencesImpl();
 
-    loader.resolve().ifSet(conf ->
+    loader.get().ifSet(conf ->
       preferences.load(serializer.deserialize(conf.read(), FilePreferences.class).preferences())
     );
 

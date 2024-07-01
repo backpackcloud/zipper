@@ -26,18 +26,18 @@ package com.backpackcloud.configuration;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class UserConfigurationLoader {
+public class ConfigurationSupplier implements Supplier<Configuration> {
 
   private final String name;
 
-  public UserConfigurationLoader(String name) {
+  public ConfigurationSupplier(String name) {
     this.name = name;
   }
 
-  public Optional<String> resolveLocation() {
+  public Configuration get() {
     return Stream.of(System.getenv(name.toUpperCase() + "_CONFIG_FILE"),
         System.getProperty(name + ".config.file"),
         "./" + name + ".yml",
@@ -46,11 +46,7 @@ public class UserConfigurationLoader {
       .map(File::new)
       .filter(File::exists)
       .findFirst()
-      .map(File::getPath);
-  }
-
-  public Configuration resolve() {
-    return resolveLocation()
+      .map(File::getPath)
       .<Configuration>map(FileConfiguration::new)
       .orElseGet(this::getDefault);
   }
