@@ -31,17 +31,17 @@ import java.util.stream.Stream;
 
 public class UserConfigurationLoader {
 
-  private final String prefix;
+  private final String name;
 
-  public UserConfigurationLoader(String prefix) {
-    this.prefix = prefix;
+  public UserConfigurationLoader(String name) {
+    this.name = name;
   }
 
   public Optional<String> resolveLocation() {
-    return Stream.of(System.getenv(prefix.toUpperCase() + "_CONFIG_FILE"),
-        System.getProperty(prefix + ".config.file"),
-        "./" + prefix + ".yml",
-        System.getProperty("user.home") + "/" + prefix + ".yml")
+    return Stream.of(System.getenv(name.toUpperCase() + "_CONFIG_FILE"),
+        System.getProperty(name + ".config.file"),
+        "./" + name + ".yml",
+        System.getProperty("user.home") + "/" + name + ".yml")
       .filter(Objects::nonNull)
       .map(File::new)
       .filter(File::exists)
@@ -56,7 +56,7 @@ public class UserConfigurationLoader {
   }
 
   public Configuration getDefault() {
-    return new ResourceConfiguration("META-INF/" + prefix + ".yml");
+    return new ResourceConfiguration("META-INF/" + name + ".yml");
   }
 
 }
