@@ -24,6 +24,7 @@
 
 package com.backpackcloud.serializer;
 
+import com.backpackcloud.configuration.Configuration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -73,6 +74,10 @@ public interface Serializer {
    * @return the deserialized object.
    */
   <E> E deserialize(InputStream input, Class<E> type);
+
+  default <E> E deserialize(Configuration configuration, Class<E> type) {
+    return deserialize(configuration.read(), type);
+  }
 
   Serializer addDependency(String name, Object dependency);
 
