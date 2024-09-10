@@ -24,8 +24,6 @@
 
 package com.backpackcloud.configuration;
 
-import java.io.File;
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -38,17 +36,30 @@ public class ConfigurationSupplier implements Supplier<Configuration> {
   }
 
   public Configuration get() {
-    return Stream.of(System.getenv(name.toUpperCase() + "_CONFIG_FILE"),
-        System.getProperty(name + ".config.file"),
-        "./" + name + ".yml",
-        System.getProperty("user.home") + "/" + name + ".yml")
-      .filter(Objects::nonNull)
-      .map(File::new)
-      .filter(File::exists)
+    return Stream.of(fromEnvironment(),
+        fromSystemProperty(),
+        fromWorkingDir(),
+        fromUserHome())
+      .filter(Configuration::isSet)
       .findFirst()
-      .map(File::getPath)
-      .<Configuration>map(FileConfiguration::new)
       .orElseGet(this::getDefault);
+  }
+
+  public Configuration fromEnvironment() {
+    String path = System.getenv(name.toUpperCase() + "_CONFIG_FILE");
+    return path != null ? new FileConfiguration(path) : Configuration.NOT_SUPPLIED;
+  }
+
+  public Configuration fromSystemProperty() {
+    return new FileConfiguration(System.getProperty("user.home") + "/" + name + ".yml");
+  }
+
+  public Configuration fromWorkingDir() {
+    return new FileConfiguration("./" + name + ".yml");
+  }
+
+  public Configuration fromUserHome() {
+    return new FileConfiguration(System.getProperty("user.home") + "/" + name + ".yml");
   }
 
   public Configuration getDefault() {
