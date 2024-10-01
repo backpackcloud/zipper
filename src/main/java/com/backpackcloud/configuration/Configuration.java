@@ -224,4 +224,32 @@ public interface Configuration extends Supplier<String> {
     return new ConfigurationChain(new NotSuppliedConfiguration());
   }
 
+  static Configuration env(String key) {
+    return new EnvironmentVariableConfiguration(key);
+  }
+
+  static Configuration file(String key) {
+    return new FileConfiguration(key);
+  }
+
+  static Configuration resource(ClassLoader classLoader, String key) {
+    return new ResourceConfiguration(classLoader, key);
+  }
+
+  static Configuration resource(String key) {
+    return new ResourceConfiguration(Thread.currentThread().getContextClassLoader(), key);
+  }
+
+  static Configuration property(String key) {
+    return new SystemPropertyConfiguration(key);
+  }
+
+  static Configuration url(String key) {
+    return new UrlConfiguration(key);
+  }
+
+  static Configuration value(String key) {
+    return new RawValueConfiguration(key);
+  }
+
 }

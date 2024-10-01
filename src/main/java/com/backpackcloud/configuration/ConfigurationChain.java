@@ -101,31 +101,31 @@ public class ConfigurationChain implements Configuration {
   }
 
   public ConfigurationChain env(String key) {
-    return new ConfigurationChain(configuration.or(new EnvironmentVariableConfiguration(key)));
+    return new ConfigurationChain(configuration.or(Configuration.env(key)));
   }
 
   public ConfigurationChain file(String key) {
-    return new ConfigurationChain(configuration.or(new FileConfiguration(key)));
+    return new ConfigurationChain(configuration.or(Configuration.file(key)));
   }
 
   public ConfigurationChain resource(ClassLoader classLoader, String key) {
-    return new ConfigurationChain(configuration.or(new ResourceConfiguration(classLoader, key)));
+    return new ConfigurationChain(configuration.or(Configuration.resource(classLoader, key)));
   }
 
   public ConfigurationChain resource(String key) {
-    return new ConfigurationChain(configuration.or(new ResourceConfiguration(Thread.currentThread().getContextClassLoader(), key)));
+    return new ConfigurationChain(configuration.or(Configuration.resource(Thread.currentThread().getContextClassLoader(), key)));
   }
 
   public ConfigurationChain property(String key) {
-    return new ConfigurationChain(configuration.or(new SystemPropertyConfiguration(key)));
+    return new ConfigurationChain(configuration.or(Configuration.property(key)));
   }
 
   public ConfigurationChain url(String key) {
-    return new ConfigurationChain(configuration.or(new UrlConfiguration(key)));
+    return new ConfigurationChain(configuration.or(Configuration.url(key)));
   }
 
   public ConfigurationChain value(String key) {
-    return new ConfigurationChain(configuration.or(new RawValueConfiguration(key)));
+    return new ConfigurationChain(configuration.or(Configuration.value(key)));
   }
 
 }
