@@ -4,8 +4,7 @@ prompt: "❯"
 
 timer: ""
 
-notification-badge: nf-mdi-message_alert
-error-badge: nf-mdi-alert_circle
+error-badge: nf-fa-circle_exclamation
 
 separator-angled: ""
 separator-vertical: "│"
