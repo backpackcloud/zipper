@@ -117,23 +117,23 @@ public class PaginatorImpl implements Paginator {
             .withStyle("white").writeln("-".repeat(terminal.getWidth()))
 
             .withStyle("keyboard")
-            .writeIcon("nf-mdi-arrow_left")
+            .writeIcon("arrow-left")
             .write(" ")
-            .writeIcon("nf-mdi-arrow_up")
+            .writeIcon("arrow-up")
 
             .withStyle("white//b")
             .write(String.format(" (%d/%d) ", 1 + ((cursor) / pageSize), pages))
 
             .withStyle("keyboard")
-            .writeIcon("nf-mdi-arrow_down")
+            .writeIcon("arrow-down")
             .write(" ")
-            .writeIcon("nf-mdi-arrow_right")
+            .writeIcon("arrow-right")
             .write("\t")
 
-            .withStyle("white").writeIcon("nf-fa-play").write(" ")
+            .withStyle("white").writeIcon("continue").write(" ")
             .withStyle("keyboard").write("r ")
 
-            .withStyle("white").writeIcon("nf-fa-stop").write(" ")
+            .withStyle("white").writeIcon("stop").write(" ")
             .withStyle("keyboard").write("q");
           terminal.enterRawMode();
 

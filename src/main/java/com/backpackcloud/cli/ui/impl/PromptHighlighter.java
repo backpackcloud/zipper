@@ -88,7 +88,7 @@ public class PromptHighlighter implements Highlighter {
     if (commandError) {
       builder.append("  ")
         .style(AttributedStyle::blink)
-        .append(theme.iconMap().symbolOf("nf-fa-warning"));
+        .append(theme.iconMap().symbolOf("warning"));
     }
 
     return builder.toAttributedString();

@@ -38,15 +38,12 @@ public class TimerPromptWriter implements PromptWriter {
   private Duration lastCommandDuration = Duration.ZERO;
   private LocalDateTime start = LocalDateTime.now();
 
-  private int count;
-
   public TimerPromptWriter(CommandListener listener) {
     listener.beforeCommand(() -> {
       start = LocalDateTime.now();
       lastCommandDuration = null;
     });
     listener.afterCommand(() -> lastCommandDuration = Duration.between(start, LocalDateTime.now()));
-    listener.beforeInput(() -> count = 0);
   }
 
   @Override
@@ -58,7 +55,7 @@ public class TimerPromptWriter implements PromptWriter {
   public void addTo(Prompt prompt, PromptSide side) {
     Prompt.PromptSegmentBuilder segment = prompt.newSegment("command_duration");
 
-    segment.addIcon("nf-weather-time_" + ((++count % 12) + 1));
+    segment.addIcon("timer");
 
     Duration duration = lastCommandDuration != null ? lastCommandDuration :
       Duration.between(start, LocalDateTime.now());
