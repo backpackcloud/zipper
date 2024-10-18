@@ -20,7 +20,7 @@ keyboard: blue
 segment_command_status_error_fg: red
 segment_command_status_error_bg: segment_bg
 
-segment_command_status_ok_fg: green
+segment_command_status_ok_fg: segment_fg
 segment_command_status_ok_bg: segment_bg
 
 segment_errors_fg: segment_fg
