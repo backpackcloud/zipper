@@ -10,24 +10,16 @@ orange: "cb4b16"
 purple: "9b51bb"
 teal: "008081"
 
-segment_fg: white
-segment_bg: grey
+prompt-segment-fg: white
+prompt-segment-bg: "313131"
 
 command_error: red
 
 keyboard: blue
 
-segment_command_status_error_fg: red
-segment_command_status_error_bg: segment_bg
-
-segment_command_status_ok_fg: segment_fg
-segment_command_status_ok_bg: segment_bg
-
-segment_errors_fg: segment_fg
-segment_errors_bg: segment_bg
-
-segment_command_duration_fg: segment_fg
-segment_command_duration_bg: segment_bg
+icon-ok: green
+icon-error: red
+icon-timer: yellow
 
 # For any input errors
 error: red

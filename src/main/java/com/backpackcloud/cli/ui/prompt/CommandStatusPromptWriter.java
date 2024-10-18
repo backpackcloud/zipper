@@ -49,11 +49,11 @@ public class CommandStatusPromptWriter implements PromptWriter {
   @Override
   public void addTo(Prompt prompt, PromptSide side) {
     if (commandError) {
-      prompt.newSegment("command_status_error")
-        .addIcon("error");
+      prompt.newSegment()
+        .addIcon("error", "icon-error");
     } else {
-      prompt.newSegment("command_status_ok")
-        .addIcon("ok");
+      prompt.newSegment()
+        .addIcon("ok", "icon-ok");
     }
   }
 }

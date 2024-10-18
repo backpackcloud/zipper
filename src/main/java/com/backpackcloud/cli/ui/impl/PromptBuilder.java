@@ -40,58 +40,41 @@ public class PromptBuilder implements Prompt {
   private final String separator;
   private final String head;
 
-  private String foreground;
-  private String background;
+  private final String foreground;
+  private final String background;
 
   private boolean isOpened;
 
-  public PromptBuilder(Theme theme, Writer writer, String tail, String separator, String head) {
+  public PromptBuilder(Theme theme, Writer writer, String tail, String separator, String head, String foreground, String background) {
     this.theme = theme;
     this.writer = writer;
     this.tail = theme.iconMap().symbolOf(tail);
     this.separator = theme.iconMap().symbolOf(separator);
     this.head = theme.iconMap().symbolOf(head);
-  }
-
-  private void initSegment(String foreground, String background) {
     this.foreground = foreground;
     this.background = background;
-    writer.style()
-      .foreground(foreground)
-      .background(background)
-      .set().write(" ");
   }
 
   @Override
   public PromptSegmentBuilder newSegment() {
-    return newSegment(this.foreground, this.background);
-  }
-
-  @Override
-  public PromptSegmentBuilder newSegment(String foreground, String background) {
-    String bgColor = theme.colorMap().valueOf(this.background);
-    String newBgColor = theme.colorMap().valueOf(background);
     if (isOpened) {
-      if (bgColor.equals(newBgColor)) {
-        writer.style()
-          .foreground(foreground)
-          .background(this.background)
-          .set()
-          .write(separator);
-      } else {
-        writer.style()
-          .foreground(this.background)
-          .background(background)
-          .set()
-          .write(separator);
-      }
+      writer.style()
+        .foreground(foreground)
+        .background(background)
+        .set()
+        .write(separator);
     } else {
       isOpened = true;
       writer.style()
         .foreground(background)
         .set().write(tail);
     }
-    initSegment(foreground, background);
+
+    writer.style()
+      .foreground(foreground)
+      .background(background)
+      .set().write(" ");
+
     return new PromptSegmentBuilder() {
 
       private final AttributedStyle style = StyleBuilder
@@ -143,6 +126,17 @@ public class PromptBuilder implements Prompt {
       }
 
       @Override
+      public PromptSegmentBuilder addIcon(String icon, String color) {
+        AttributedStyle customStyle = StyleBuilder
+          .newSimpleBuilder(theme.colorMap())
+          .foreground(color)
+          .background(background)
+          .set();
+        writer.withStyle(customStyle).write(theme.iconMap().symbolOf(icon) + " ");
+        return this;
+      }
+
+      @Override
       public Prompt close() {
         return PromptBuilder.this;
       }
@@ -170,7 +164,10 @@ public class PromptBuilder implements Prompt {
     if (isOpened) {
       isOpened = false;
       writer.withStyle(foreground + "/" + background).write(" ");
-      writer.withStyle(background).write(head);
+      writer.style()
+        .foreground(background)
+        .set()
+        .write(head);
     }
     return this;
   }

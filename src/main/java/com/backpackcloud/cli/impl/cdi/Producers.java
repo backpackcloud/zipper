@@ -43,8 +43,8 @@ import com.backpackcloud.cli.ui.impl.DefaultIconMap;
 import com.backpackcloud.cli.ui.impl.DefaultStyleMap;
 import com.backpackcloud.cli.ui.impl.DefaultTheme;
 import com.backpackcloud.configuration.Configuration;
-import com.backpackcloud.configuration.ResourceConfiguration;
 import com.backpackcloud.configuration.ConfigurationSupplier;
+import com.backpackcloud.configuration.ResourceConfiguration;
 import com.backpackcloud.serializer.Serializer;
 import com.backpackcloud.serializer.YAML;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -186,8 +186,12 @@ public class Producers {
   @Singleton
   @Produces
   @DefaultBean
-  public StyleMap createStyleMap(@YAML Serializer serializer) {
-    return new DefaultStyleMap(loadMap(serializer, "styles"));
+  public StyleMap createStyleMap(@YAML Serializer serializer, ColorMap colorMap) {
+    Map<String, String> styleMap = loadMap(serializer, "styles");
+    colorMap.colors().stream()
+      .filter(color -> !styleMap.containsKey(color))
+      .forEach(color -> styleMap.put(color, colorMap.valueOf(color)));
+    return new DefaultStyleMap(styleMap);
   }
 
   private Map<String, String> loadMap(Serializer serializer, String mapName) {

@@ -53,9 +53,9 @@ public class TimerPromptWriter implements PromptWriter {
 
   @Override
   public void addTo(Prompt prompt, PromptSide side) {
-    Prompt.PromptSegmentBuilder segment = prompt.newSegment("command_duration");
+    Prompt.PromptSegmentBuilder segment = prompt.newSegment();
 
-    segment.addIcon("timer");
+    segment.addIcon("timer", "icon-timer");
 
     Duration duration = lastCommandDuration != null ? lastCommandDuration :
       Duration.between(start, LocalDateTime.now());

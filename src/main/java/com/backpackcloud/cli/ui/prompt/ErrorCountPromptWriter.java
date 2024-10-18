@@ -46,8 +46,8 @@ public class ErrorCountPromptWriter implements PromptWriter {
 
   @Override
   public void addTo(Prompt prompt, PromptSide side) {
-    prompt.newSegment("errors")
-      .addIcon("error-badge")
+    prompt.newSegment()
+      .addIcon("error-badge", "icon-error")
       .add(registry.size() + (!registry.viewed() ? "*" : ""));
   }
 

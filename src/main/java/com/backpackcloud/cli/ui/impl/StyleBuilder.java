@@ -24,13 +24,13 @@
 
 package com.backpackcloud.cli.ui.impl;
 
-import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.cli.ui.Color;
 import com.backpackcloud.cli.ui.ColorMap;
 import com.backpackcloud.cli.ui.Stylish;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 public class StyleBuilder<R> implements Stylish<R> {
@@ -52,19 +52,15 @@ public class StyleBuilder<R> implements Stylish<R> {
 
   @Override
   public Stylish<R> foreground(String foreground) {
-    Color color = colorMap.colorOf(foreground)
-      .orElseThrow(UnbelievableException
-        .because("Color " + foreground + " not found on color map"));
-    style = style.foregroundRgb(color.toInt());
+    Optional<Color> color = colorMap.colorOf(foreground);
+    color.ifPresent(value -> style = style.foregroundRgb(value.toInt()));
     return this;
   }
 
   @Override
   public Stylish<R> background(String background) {
-    Color color = colorMap.colorOf(background)
-      .orElseThrow(UnbelievableException
-        .because("Color " + background + " not found on color map"));
-    style = style.backgroundRgb(color.toInt());
+    Optional<Color> color = colorMap.colorOf(background);
+    color.ifPresent(value -> style = style.backgroundRgb(value.toInt()));
     return this;
   }
 

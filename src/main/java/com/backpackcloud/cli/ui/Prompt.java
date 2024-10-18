@@ -30,13 +30,7 @@ import com.backpackcloud.cli.ui.impl.PromptBuilder;
 
 public interface Prompt {
 
-  PromptSegmentBuilder newSegment(String foreground, String background);
-
   PromptSegmentBuilder newSegment();
-
-  default PromptSegmentBuilder newSegment(String name) {
-    return newSegment("segment_" + name + "_fg", "segment_" + name + "_bg");
-  }
 
   Prompt closeSegments();
 
@@ -47,7 +41,9 @@ public interface Prompt {
   void writeIndicator(String style);
 
   static Prompt create(Theme theme, Writer writer, String tail, String separator, String head) {
-    return new PromptBuilder(theme, writer, tail, separator, head);
+    return new PromptBuilder(theme, writer, tail, separator, head,
+      "prompt-segment-fg", "prompt-segment-bg"
+    );
   }
 
   interface PromptSegmentBuilder {
@@ -61,6 +57,8 @@ public interface Prompt {
     PromptSegmentBuilder add(Displayable object);
 
     PromptSegmentBuilder addIcon(String icon);
+
+    PromptSegmentBuilder addIcon(String icon, String color);
 
     Prompt close();
 

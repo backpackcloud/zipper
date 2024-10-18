@@ -1,5 +1,5 @@
 prompt_error: red//b
-prompt_ok: segment_bg//b
+prompt_ok: blue//b
 
 error: red//i
 
