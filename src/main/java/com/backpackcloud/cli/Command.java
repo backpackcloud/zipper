@@ -53,10 +53,6 @@ public interface Command extends Suggester {
    * @return a brief description of this command.
    */
   String description();
-
-  default boolean allowOutputRedirect() {
-    return false;
-  }
   
   /**
    * @return a list of alternative names this command responds to.

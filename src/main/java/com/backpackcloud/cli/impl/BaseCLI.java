@@ -46,12 +46,6 @@ import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -224,7 +218,6 @@ public class BaseCLI implements CLI {
     List<String> args = new ArrayList<>(parsedLine.words());
     String commandName = args.get(0);
     Command command = commands.get(commandName);
-    BufferedWriter fileWriter = null;
     boolean interactive = true;
     CommandContextImpl currentContext;
 
@@ -232,43 +225,11 @@ public class BaseCLI implements CLI {
       throw new UnbelievableException("Unknown command " + commandName);
     }
 
-    if (command.allowOutputRedirect() && (args.contains(">") && args.indexOf(">") == args.size() - 2)) {
-      int pos = args.indexOf(">");
-      String fileName = args.get(pos + 1);
-
-      try {
-        Path parent = Path.of(fileName).getParent();
-        if (parent != null) {
-          Files.createDirectories(parent);
-        }
-        fileWriter = new BufferedWriter(new FileWriter(fileName, StandardCharsets.UTF_8));
-      } catch (IOException e) {
-        throw new UnbelievableException(e);
-      }
-      writer = new OutputRedirectWriter(theme, fileWriter);
-      args = args.subList(0, pos);
-      interactive = false;
-    }
-
     List<String> argsList = args.subList(1, args.size());
 
-    try {
-      // only allow interaction if cli is taking user inputs
-      currentContext = new CommandContextImpl(this, argsList, writer, interactive);
-      command.execute(currentContext);
-    } finally {
-      try {
-        if (fileWriter != null) {
-          fileWriter.close();
-        }
-      } catch (IOException e) {
-        console.style()
-          .parse("command_error")
-          .bold().italic()
-          .set().write(e.getMessage()).newLine();
-        notifier.notifyError(e);
-      }
-    }
+    // only allow interaction if cli is taking user inputs
+    currentContext = new CommandContextImpl(this, argsList, writer, interactive);
+    command.execute(currentContext);
   }
 
 }

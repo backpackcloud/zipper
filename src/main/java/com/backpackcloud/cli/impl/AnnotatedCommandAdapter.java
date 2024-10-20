@@ -327,11 +327,6 @@ public class AnnotatedCommandAdapter implements Command {
   }
 
   @Override
-  public boolean allowOutputRedirect() {
-    return definition.allowOutputRedirect();
-  }
-
-  @Override
   public List<String> aliases() {
     return List.of(definition.aliases());
   }

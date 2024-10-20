@@ -74,9 +74,4 @@ public @interface CommandDefinition {
    */
   String description();
 
-  /**
-   * If this command prints information in the UI, this allows the UI to redirect the text to a file.
-   */
-  boolean allowOutputRedirect() default false;
-
 }
