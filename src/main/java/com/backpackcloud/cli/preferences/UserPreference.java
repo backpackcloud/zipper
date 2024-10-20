@@ -36,20 +36,29 @@ public enum UserPreference implements PreferenceSpec {
     Type.FLAG,
     "true"
   ),
+
   AUTO_SUGGEST(
     "suggests as you type",
     Type.FLAG,
     "true"
   ),
+
   HIGHLIGHTER(
     "highlights commands",
     Type.FLAG,
     "true"
   ),
+
   RESULT_PAGING(
     "enables result paging when applicable",
     Type.FLAG,
     "true"
+  ),
+
+  RESULTS_PER_PAGE(
+    "sets the results to show per page when paging is enabled",
+    Type.NUMBER,
+    "25"
   ),
 
   CLEAR_ON_PAGING(
@@ -63,11 +72,13 @@ public enum UserPreference implements PreferenceSpec {
     Type.TEXT,
     "head-blurred"
   ),
+
   LEFT_PROMPT_SEPARATOR(
     "The segment separator icon for the left prompt",
     Type.TEXT,
     "separator-none"
   ),
+
   LEFT_PROMPT_TAIL(
     "The tail icon for the left prompt",
     Type.TEXT,
@@ -79,21 +90,17 @@ public enum UserPreference implements PreferenceSpec {
     Type.TEXT,
     "head-slanted"
   ),
+
   RIGHT_PROMPT_SEPARATOR(
     "The segment separator icon for the right prompt",
     Type.TEXT,
     "separator-none"
   ),
+
   RIGHT_PROMPT_TAIL(
     "The tail icon for the right prompt",
     Type.TEXT,
     "tail-blurred"
-  ),
-
-  RESULTS_PER_PAGE(
-    "sets the results to show per page when paging is enabled",
-    Type.NUMBER,
-    "25"
   ),
 
   ;
