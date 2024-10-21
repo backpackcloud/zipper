@@ -35,7 +35,7 @@ public class FileSuggester {
 
   private Suggestion createSuggestion(File suggestion) {
     if (suggestion.isDirectory()) {
-      return PromptSuggestion.suggest(suggestion.getPath() + "/").incomplete();
+      return PromptSuggestion.suggest(suggestion.getPath() + File.separator).incomplete();
     }
     return PromptSuggestion.suggest(suggestion.getPath()).incomplete();
   }
