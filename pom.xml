@@ -145,7 +145,7 @@
 
     <dependency>
       <groupId>org.jline</groupId>
-      <artifactId>jline</artifactId>
+      <artifactId>jline-reader</artifactId>
       <version>${jline.version}</version>
     </dependency>
 
