@@ -71,7 +71,7 @@
     <junit.version>5.9.1</junit.version>
     <mockito.version>4.8.0</mockito.version>
     <hamcrest.version>2.2</hamcrest.version>
-    <jline.version>3.21.0</jline.version>
+    <jline.version>3.27.1</jline.version>
     <quarkus.version>3.9.4</quarkus.version>
     <jandex.version>1.2.2</jandex.version>
     <jaxrs-api.version>3.1.0</jaxrs-api.version>
@@ -145,7 +145,7 @@
 
     <dependency>
       <groupId>org.jline</groupId>
-      <artifactId>jline-reader</artifactId>
+      <artifactId>jline</artifactId>
       <version>${jline.version}</version>
     </dependency>
 
