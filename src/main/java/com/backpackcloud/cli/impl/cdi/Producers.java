@@ -91,8 +91,7 @@ public class Producers {
                        Terminal terminal,
                        CommandNotifier commandNotifier,
                        UserPreferences preferences,
-                       Theme theme,
-                       Writer consoleWriter) {
+                       Theme theme) {
     Map<String, PromptWriter> writers = new HashMap<>();
     promptWriters.forEach(w -> writers.put(w.name(), w));
 
@@ -124,7 +123,6 @@ public class Producers {
       preferences,
       theme,
       cliCommands,
-      consoleWriter,
       leftPromptWriters,
       rightPromptWriters,
       commandNotifier
@@ -153,13 +151,6 @@ public class Producers {
   @DefaultBean
   public CommandListener createCommandListener(CommandNotifier notifier) {
     return notifier.listener();
-  }
-
-  @Singleton
-  @Produces
-  @DefaultBean
-  public Writer createConsoleWriter(Theme theme) {
-    return Writers.forPrintStream(System.out, theme);
   }
 
   @Singleton
@@ -213,7 +204,9 @@ public class Producers {
   @DefaultBean
   public Terminal createTerminal() {
     try {
-      return TerminalBuilder.terminal();
+      return TerminalBuilder.builder()
+        .system(true)
+        .build();
     } catch (IOException e) {
       throw new UnbelievableException(e);
     }

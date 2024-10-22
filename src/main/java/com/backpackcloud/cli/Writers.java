@@ -29,18 +29,10 @@ import com.backpackcloud.cli.ui.impl.DefaultWriter;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 
-import java.io.PrintStream;
-
 public final class Writers {
 
   private Writers() {
 
-  }
-
-  public static Writer forPrintStream(PrintStream printStream, Theme theme) {
-    return new DefaultWriter(theme, AttributedStyle.DEFAULT,
-      AttributedString::new,
-      text -> printStream.print(text.toAnsi()));
   }
 
   public static Writer forStringBuilder(StringBuilder stringBuilder, Theme theme) {

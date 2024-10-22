@@ -37,6 +37,7 @@ import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.impl.CommandCompleter;
+import com.backpackcloud.cli.ui.impl.DefaultWriter;
 import com.backpackcloud.cli.ui.impl.PromptHighlighter;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -45,6 +46,8 @@ import org.jline.reader.ParsedLine;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStyle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +57,7 @@ import java.util.Map;
 
 public class BaseCLI implements CLI {
 
+  private final Terminal terminal;
   private final UserPreferences preferences;
   private final Theme theme;
 
@@ -74,16 +78,15 @@ public class BaseCLI implements CLI {
                  UserPreferences preferences,
                  Theme theme,
                  Collection<Command> commands,
-                 Writer consoleWriter,
                  Collection<PromptWriter> leftPrompt,
                  Collection<PromptWriter> rightPrompt,
                  CommandNotifier notifier) {
+    this.terminal = terminal;
     this.preferences = preferences;
     this.theme = theme;
     this.leftPrompt = leftPrompt;
     this.rightPrompt = rightPrompt;
     this.notifier = notifier;
-    this.console = consoleWriter;
 
     this.commands = new HashMap<>();
 
@@ -100,6 +103,13 @@ public class BaseCLI implements CLI {
       .history(new DefaultHistory())
       .completer(new CommandCompleter(this.commands, preferences))
       .build();
+
+    this.console = new DefaultWriter(
+      theme,
+      AttributedStyle.DEFAULT,
+      AttributedString::new,
+      text -> terminal.writer().print(text.toAnsi())
+    );
 
     this.lineReader.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true);
 
@@ -230,6 +240,7 @@ public class BaseCLI implements CLI {
     // only allow interaction if cli is taking user inputs
     currentContext = new CommandContextImpl(this, argsList, writer, interactive);
     command.execute(currentContext);
+    terminal.writer().flush();
   }
 
 }
