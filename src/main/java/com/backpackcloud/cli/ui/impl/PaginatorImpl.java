@@ -149,17 +149,11 @@ public class PaginatorImpl implements Paginator {
               // Left Arrow
               case 67 -> cursor = end;
               // Down Arrow
-              case 66 -> {
-                pageSize--;
-                paginate(cursor);
-              }
+              case 66 -> pageSize--;
               // Right Arrow
               case 68 -> cursor = Math.max(0, cursor - pageSize);
               // Up Arrow
-              case 65 -> {
-                pageSize++;
-                paginate(cursor);
-              }
+              case 65 -> pageSize++;
               case 'r' -> {
                 if (end < count) {
                   data.subList(end, count).forEach(item -> consumer.accept(writer, item));
