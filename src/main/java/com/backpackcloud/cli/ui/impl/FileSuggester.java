@@ -71,13 +71,6 @@ public class FileSuggester {
       Arrays.stream(parent.listFiles(p -> p.getPath().startsWith(path)))
         .map(this::createSuggestion)
         .forEach(result::add);
-    } else {
-      parent = file.getParentFile();
-      if (parent != null) {
-        Arrays.stream(parent.listFiles(p -> p.getName().startsWith(path)))
-          .map(this::createSuggestion)
-          .forEach(result::add);
-      }
     }
 
     return result;
