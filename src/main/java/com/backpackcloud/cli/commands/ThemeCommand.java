@@ -37,7 +37,6 @@ import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,9 +116,11 @@ public class ThemeCommand implements AnnotatedCommand {
   @Action
   public void icons(Writer writer) {
     iconMap.icons().forEach(icon ->
-      writer.write(icon)
+      writer.style().set()
+        .write(icon)
         .write(": ")
-        .writeln(iconMap.symbolOf(icon)));
+        .writeIcon(icon)
+        .newLine());
   }
 
 }

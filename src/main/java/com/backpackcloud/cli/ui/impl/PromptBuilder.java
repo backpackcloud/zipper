@@ -121,7 +121,7 @@ public class PromptBuilder implements Prompt {
 
       @Override
       public PromptSegmentBuilder addIcon(String icon) {
-        writer.withStyle(style).write(theme.iconMap().symbolOf(icon) + " ");
+        writer.withStyle(style).writeIcon(icon).write(" ");
         return this;
       }
 

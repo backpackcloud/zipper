@@ -27,7 +27,6 @@ package com.backpackcloud.cli.ui.impl;
 import com.backpackcloud.cli.ui.Color;
 import com.backpackcloud.cli.ui.ColorMap;
 import com.backpackcloud.cli.ui.Stylish;
-import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 
 import java.util.Optional;
@@ -154,11 +153,6 @@ public class StyleBuilder<R> implements Stylish<R> {
 
   public static Stylish<AttributedStyle> newSimpleBuilder(ColorMap colorMap) {
     return new StyleBuilder<>(AttributedStyle.DEFAULT, colorMap, Function.identity());
-  }
-
-  public static Stylish<Function<String, String>> newFormatterBuilder(ColorMap colorMap) {
-    return new StyleBuilder<>(AttributedStyle.DEFAULT, colorMap, attributedStyle -> text ->
-      new AttributedString(text, attributedStyle).toAnsi());
   }
 
 }
