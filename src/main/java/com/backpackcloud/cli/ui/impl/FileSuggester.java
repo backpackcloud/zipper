@@ -33,11 +33,16 @@ import java.util.List;
 
 public class FileSuggester {
 
+  private String normalize(String path) {
+    return path.replaceAll("\\\\", "/");
+  }
+
   private Suggestion createSuggestion(File suggestion) {
+    String path = normalize(suggestion.getPath());
     if (suggestion.isDirectory()) {
-      return PromptSuggestion.suggest(suggestion.getPath() + File.separator).incomplete();
+      return PromptSuggestion.suggest(path + "/").incomplete();
     }
-    return PromptSuggestion.suggest(suggestion.getPath()).incomplete();
+    return PromptSuggestion.suggest(path).incomplete();
   }
 
   public List<Suggestion> suggest(String input) {
