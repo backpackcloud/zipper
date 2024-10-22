@@ -88,6 +88,10 @@ public class PaginatorImpl implements Paginator {
 
     @Override
     public void paginate() {
+      paginate(0);
+    }
+
+    private void paginate(int start) {
       if (data.isEmpty()) {
         return;
       }
@@ -100,7 +104,7 @@ public class PaginatorImpl implements Paginator {
         return;
       }
 
-      int cursor = 0;
+      int cursor = start;
       int end;
 
       boolean validInput;
@@ -135,16 +139,27 @@ public class PaginatorImpl implements Paginator {
 
             .withStyle("white").writeIcon("stop").write(" ")
             .withStyle("keyboard").write("q");
+          terminal.writer().flush();
           terminal.enterRawMode();
 
           do {
             int read = terminal.reader().read();
             validInput = true;
             switch (read) {
-              // Arrows left and down
-              case 67, 66 -> cursor = end;
-              // Arrows right and up
-              case 68, 65 -> cursor = Math.max(0, cursor - pageSize);
+              // Left Arrow
+              case 67 -> cursor = end;
+              // Down Arrow
+              case 66 -> {
+                pageSize--;
+                paginate(cursor);
+              }
+              // Right Arrow
+              case 68 -> cursor = Math.max(0, cursor - pageSize);
+              // Up Arrow
+              case 65 -> {
+                pageSize++;
+                paginate(cursor);
+              }
               case 'r' -> {
                 if (end < count) {
                   data.subList(end, count).forEach(item -> consumer.accept(writer, item));
@@ -160,11 +175,13 @@ public class PaginatorImpl implements Paginator {
             }
           } while (!validInput);
           writer.newLine();
+          terminal.writer().flush();
         } catch (IOException e) {
           throw new UnbelievableException(e);
         }
       }
     }
+
   }
 
 }
