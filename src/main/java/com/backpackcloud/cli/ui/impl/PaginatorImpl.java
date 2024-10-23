@@ -110,6 +110,8 @@ public class PaginatorImpl implements Paginator {
       boolean validInput;
 
       while (cursor < count) {
+        pages = (int) Math.ceil((double) count / pageSize);
+
         if (preferences.isEnabled(UserPreference.CLEAR_ON_PAGING)) {
           System.out.print("\033[H\033[2J");
           System.out.flush();
