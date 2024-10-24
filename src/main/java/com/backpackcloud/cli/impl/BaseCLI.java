@@ -109,7 +109,14 @@ public class BaseCLI implements CLI {
       AttributedStyle.DEFAULT,
       AttributedString::new,
       text -> terminal.writer().print(text.toAnsi())
-    );
+    ) {
+      @Override
+      public Writer newLine() {
+        super.newLine();
+        flush();
+        return this;
+      }
+    };
 
     this.lineReader.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true);
 
@@ -131,6 +138,11 @@ public class BaseCLI implements CLI {
   @Override
   public void stop() {
     stop = true;
+  }
+
+  @Override
+  public void flush() {
+    terminal.flush();
   }
 
   @Override
@@ -240,7 +252,6 @@ public class BaseCLI implements CLI {
     // only allow interaction if cli is taking user inputs
     currentContext = new CommandContextImpl(this, argsList, writer, interactive);
     command.execute(currentContext);
-    terminal.writer().flush();
   }
 
 }
