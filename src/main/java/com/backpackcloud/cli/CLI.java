@@ -32,6 +32,8 @@ public interface CLI {
 
   void stop();
 
+  void flush();
+
   void registerMacro(String name, List<String> commands);
 
   void execute(String... commands);
