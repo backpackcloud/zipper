@@ -110,6 +110,7 @@ public class PaginatorImpl implements Paginator {
       boolean validInput;
 
       while (cursor < count) {
+        pageSize = Math.max(pageSize, 1);
         pages = (int) Math.ceil((double) count / pageSize);
 
         if (preferences.isEnabled(UserPreference.CLEAR_ON_PAGING)) {
@@ -151,11 +152,11 @@ public class PaginatorImpl implements Paginator {
               // Left Arrow
               case 67 -> cursor = end;
               // Down Arrow
-              case 66 -> pageSize--;
+              case 66 -> pageSize++;
               // Right Arrow
               case 68 -> cursor = Math.max(0, cursor - pageSize);
               // Up Arrow
-              case 65 -> pageSize++;
+              case 65 -> pageSize--;
               case 'r' -> {
                 if (end < count) {
                   data.subList(end, count).forEach(item -> consumer.accept(writer, item));
@@ -171,7 +172,6 @@ public class PaginatorImpl implements Paginator {
             }
           } while (!validInput);
           writer.newLine();
-          terminal.writer().flush();
         } catch (IOException e) {
           throw new UnbelievableException(e);
         }
