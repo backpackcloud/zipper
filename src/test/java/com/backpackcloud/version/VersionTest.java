@@ -4,6 +4,7 @@ import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.spectaculous.Backstage;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VersionTest {
@@ -137,6 +138,21 @@ public class VersionTest {
     assertTrue(a.compareTo(c) > 0);
     assertTrue(a.compareTo(d) > 0);
     assertTrue(c.compareTo(d) > 0);
+  }
+
+  @Test
+  public void testDerivatives() {
+    assertEquals(Version.of("1.2.3").withMicro(5), Version.of("1.2.5"));
+    assertEquals(Version.of("1.2.3").withMinor(4), Version.of("1.4.3"));
+    assertEquals(Version.of("1.2.3").withMajor(3), Version.of("3.2.3"));
+
+    assertEquals(Version.of("1").withMajor(3), Version.of("3"));
+    assertEquals(Version.of("1").withMinor(3), Version.of("1.3"));
+    assertEquals(Version.of("1").withMicro(3), Version.of("1.0.3"));
+
+    assertEquals(Version.of("1.2").withMajor(3), Version.of("3.2"));
+    assertEquals(Version.of("1.2").withMinor(3), Version.of("1.3"));
+    assertEquals(Version.of("1.2").withMicro(3), Version.of("1.2.3"));
   }
 
 }
