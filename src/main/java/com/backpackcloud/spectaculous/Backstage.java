@@ -122,11 +122,15 @@ public final class Backstage<T> implements Spectacle<T> {
   @Override
   public StatementActionDefinition<T> when(Action action) {
     return throwable -> {
+      boolean actionFailed = false;
       try {
         action.run();
-        throwSpecException();
       } catch (Throwable e) {
         test(e.getClass(), throwable::isAssignableFrom);
+        actionFailed = true;
+      }
+      if (!actionFailed) {
+        throwSpecException();
       }
       return Backstage.this;
     };
