@@ -40,8 +40,6 @@ public class Version implements Comparable<Version> {
   ///
   /// The remaining 20 bits are used to store the actual segment value. This leaves us with exactly 63 bits to store
   /// the values and flags, saving the last bit to avoid dealing with negative numbers.
-  @Basic(aggregable = true, projectable = true, sortable = true, searchable = true)
-  @ProtoField(1)
   private final long value;
   private final Precision precision;
 
@@ -137,6 +135,8 @@ public class Version implements Comparable<Version> {
    *
    * @return the internal representation of this version.
    */
+  @Basic(aggregable = true, projectable = true, sortable = true, searchable = true)
+  @ProtoField(1)
   public long value() {
     return value;
   }
