@@ -313,8 +313,20 @@ public class Version implements Comparable<Version> {
     return ZERO;
   }
 
+  /// Enumeration of the possible precision values a version object can have.
+  ///
+  /// The precision essentially tells which segments are used to determine a version value.
+  /// A segment might hold the value <code>zero</code>, but doesn't necessarily imply that
+  /// it's used to either format the version or to check its precedence with other versions.
+  ///
+  /// @author Ataxexe
   public enum Precision {
-    MAJOR, MINOR, MICRO
+    /// Indicates that only the major segment is used.
+    MAJOR,
+    /// Indicates that only the major and minor segments are used.
+    MINOR,
+    /// Indicates that all segments are used.
+    MICRO
   }
 
 }
