@@ -155,4 +155,19 @@ public class VersionTest {
     assertEquals(Version.of("1.2").withMicro(3), Version.of("1.2.3"));
   }
 
+  @Test
+  public void testNextVersions() {
+    assertEquals(Version.of("1.2.3").nextMicro(), Version.of("1.2.4"));
+    assertEquals(Version.of("1.2.3").nextMinor(), Version.of("1.3.3"));
+    assertEquals(Version.of("1.2.3").nextMajor(), Version.of("2.2.3"));
+
+    assertEquals(Version.of("1").nextMajor(), Version.of("2"));
+    assertEquals(Version.of("1").nextMinor(), Version.of("1"));
+    assertEquals(Version.of("1").nextMicro(), Version.of("1"));
+
+    assertEquals(Version.of("1.2").nextMajor(), Version.of("2.2"));
+    assertEquals(Version.of("1.2").nextMinor(), Version.of("1.3"));
+    assertEquals(Version.of("1.2").nextMicro(), Version.of("1.2"));
+  }
+
 }
