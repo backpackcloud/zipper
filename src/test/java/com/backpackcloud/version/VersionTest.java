@@ -5,6 +5,8 @@ import com.backpackcloud.spectaculous.Backstage;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VersionTest {
@@ -22,7 +24,7 @@ public class VersionTest {
       .from(Version::micro).expect(3)
 
       .from(Version::value)
-      .expect(0b0000_00000000000000000011_00000000000000000101_00000000000000000111L)
+      .expect(0b0_000000000000000000011_000000000000000000101_000000000000000000111L)
 
       .given(Version.of("9.7.10"))
 
@@ -34,7 +36,7 @@ public class VersionTest {
       .from(Version::micro).expect(10)
 
       .from(Version::value)
-      .expect(0b0000_00000000000000010011_00000000000000001111_00000000000000010101L)
+      .expect(0b0_000000000000000010011_000000000000000001111_000000000000000010101L)
 
       .given(Version.of("512.512.512"))
 
@@ -46,7 +48,7 @@ public class VersionTest {
       .from(Version::micro).expect(512)
 
       .from(Version::value)
-      .expect(0b0000_00000000010000000001_00000000010000000001_00000000010000000001L)
+      .expect(0b0_000000000010000000001_000000000010000000001_000000000010000000001L)
 
       .given(Version.of("1023.1023.1023"))
       .from(Version::precision).expect(Version.Precision.MICRO)
@@ -58,7 +60,7 @@ public class VersionTest {
       .from(Version::micro).expect(1023)
 
       .from(Version::value)
-      .expect(0b0000_00000000011111111111_00000000011111111111_00000000011111111111L)
+      .expect(0b0_000000000011111111111_000000000011111111111_000000000011111111111L)
 
       .given(Version.of("3.0.2000"))
 
@@ -66,20 +68,42 @@ public class VersionTest {
       .from(Version::precision).expect(Version.Precision.MICRO)
 
       .from(Version::value)
-      .expect(0b0000_00000000000000000111_00000000000000000001_00000000111110100001L);
+      .expect(0b0_000000000000000000111_000000000000000000001_000000000111110100001L);
+  }
+
+  @Test
+  public void testSegmentLimits() {
+    Backstage.describe(Version.class)
+      .given(Version.of("1048575.1.1"))
+      .from(Version::value)
+      .expect(0b0_111111111111111111111_000000000000000000011_000000000000000000011L)
+
+      .given(Version.of("1.1048575.1"))
+      .from(Version::value)
+      .expect(0b0_000000000000000000011_111111111111111111111_000000000000000000011L)
+
+      .given(Version.of("1.1.1048575"))
+      .from(Version::value)
+      .expect(0b0_000000000000000000011_000000000000000000011_111111111111111111111L);
   }
 
   @Test
   public void testInvalidVersions() {
     Backstage.describe(Version.class)
-      .when(() -> Version.of("524288.0.1"))
+      .when(() -> Version.of("1048576.0.1"))
       .expect(UnbelievableException.class)
 
-      .when(() -> Version.of("1.524288.1"))
+      .when(() -> Version.of("1.1048576.1"))
       .expect(UnbelievableException.class)
 
-      .when(() -> Version.of("1.1.524288"))
-      .expect(UnbelievableException.class);
+      .when(() -> Version.of("1.1.1048576"))
+      .expect(UnbelievableException.class)
+
+      .given(Version.of("invalid"))
+      .test(VersionCheck.equal(Version.NULL))
+
+      .given(Version.of("a.b.c"))
+      .test(VersionCheck.equal(Version.NULL));
   }
 
   @Test
@@ -91,7 +115,7 @@ public class VersionTest {
       .from(Version::precision).expect(Version.Precision.MICRO)
 
       .from(Version::value)
-      .expect(0b0000_00000000000000001111_00000000000000001001_00000000000000000101L)
+      .expect(0b0_000000000000000001111_000000000000000001001_000000000000000000101L)
 
       .given(Version.of("1.2.3-redhat-1"))
       .from(Version::precision).expect(Version.Precision.MICRO)
@@ -110,7 +134,7 @@ public class VersionTest {
       .from(Version::micro).expect(0)
 
       .from(Version::value)
-      .expect(0b0000_00000000000000101011_00000000000000000000_00000000000000000000L)
+      .expect(0b0_000000000000000101011_000000000000000000000_000000000000000000000L)
 
       .from(Version::toString).expect("21")
 
@@ -122,7 +146,7 @@ public class VersionTest {
       .from(Version::micro).expect(0)
 
       .from(Version::value)
-      .expect(0b0000_00000000000000000011_00000000000000001011_00000000000000000000L)
+      .expect(0b0_000000000000000000011_000000000000000001011_000000000000000000000L)
 
       .from(Version::toString).expect("1.5");
   }
@@ -138,6 +162,10 @@ public class VersionTest {
     assertTrue(a.compareTo(c) > 0);
     assertTrue(a.compareTo(d) > 0);
     assertTrue(c.compareTo(d) > 0);
+
+    assertTrue(Version.of("0.0").compareTo(Version.of("0")) > 0);
+    assertTrue(Version.of("0.0.0").compareTo(Version.of("0.0")) > 0);
+    assertTrue(Version.of("0.0.0").compareTo(Version.of("0")) > 0);
   }
 
   @Test
@@ -168,6 +196,57 @@ public class VersionTest {
     assertEquals(Version.of("1.2").nextMajor(), Version.of("2.2"));
     assertEquals(Version.of("1.2").nextMinor(), Version.of("1.3"));
     assertEquals(Version.of("1.2").nextMicro(), Version.of("1.2"));
+  }
+
+  @Test
+  public void testNullValue() {
+    Version nullVersion = Version.NULL;
+
+    assertEquals(
+      nullVersion.value(),
+      0b0_000000000000000000000_000000000000000000000_000000000000000000000L
+    );
+
+    assertEquals(Version.Precision.NONE, nullVersion.precision());
+
+    assertSame(nullVersion, nullVersion.nextMajor());
+    assertSame(nullVersion, nullVersion.nextMinor());
+    assertSame(nullVersion, nullVersion.nextMicro());
+
+    assertSame(nullVersion, nullVersion.withMajor(10));
+    assertSame(nullVersion, nullVersion.withMinor(10));
+    assertSame(nullVersion, nullVersion.withMicro(10));
+
+    assertNotEquals(nullVersion, new Version(0));
+    assertNotEquals(nullVersion, new Version(0, 0));
+    assertNotEquals(nullVersion, new Version(0, 0, 0));
+
+    assertTrue(nullVersion.compareTo(new Version(0)) < 0);
+    assertTrue(nullVersion.compareTo(new Version(0, 0)) < 0);
+    assertTrue(nullVersion.compareTo(new Version(0, 0, 0)) < 0);
+  }
+
+  @Test
+  public void testNormalization() {
+    assertEquals(
+      new Version(0b0_110011001111111110011_111111111111111111110_111111111111111111110L).value(),
+      0b0_110011001111111110011_000000000000000000000_000000000000000000000L
+    );
+
+    assertEquals(
+      new Version(0b0_110011001111111110011_111111111111111111110_111111111111111111110L).value(),
+      0b0_110011001111111110011_000000000000000000000_000000000000000000000L
+    );
+
+    assertEquals(
+      new Version(0b0_110011001111111110011_111111111111111111110_111110001111111111111L).value(),
+      0b0_110011001111111110011_000000000000000000000_000000000000000000000L
+    );
+
+    assertEquals(
+      new Version(0b0_110011001111111110010_111111111111111111110_111111111111111111110L).value(),
+      0b0_000000000000000000000_000000000000000000000_000000000000000000000L
+    );
   }
 
 }

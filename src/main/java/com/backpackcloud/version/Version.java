@@ -11,8 +11,8 @@ import java.util.Objects;
 /// A simple and lightweight three-segment version implementation.
 ///
 /// The segments are "major", "minor" and "micro". They are stored on a single <code>long</code> field with a
-/// predetermined length of 19 bits for each segment. That means the theoretical maximum value of a segment is
-/// <code>524287</code>.
+/// predetermined length of 20 bits for each segment. That means the theoretical maximum value of a segment is
+/// <code>(2 ^ 20) - 1 = 1_048_576</code>.
 ///
 /// It's possible to have a version object without the three segments, and that won't change their position
 /// in the field, so the objects are comparable regardless of how many segments they have.
@@ -23,12 +23,23 @@ import java.util.Objects;
 /// @author Ataxexe
 public class Version implements Comparable<Version> {
 
-  private static final int SEGMENT_MAJOR = 41;
-  private static final int SEGMENT_MINOR = 21;
+  // Variables that indicates how many bits we should shift to get to each segment
+  // Notice that there's a flag before each segment value, so that's why we need to add 1
+  private static final int SEGMENT_MAJOR = 43;
+  private static final int SEGMENT_MINOR = 22;
   private static final int SEGMENT_MICRO = 1;
+  // --------------------------------------------------
+  /// The theoretical maximum value of a segment
+  private static final int MAX = 0b11111111111111111111;
 
-  private static final int MAX = 524287;
-
+  /// Stores all the information about this version.
+  ///
+  /// There's a total of 21 bits allocated to each segment, being the first one a flag to indicate whether
+  /// the segment is counted. This allows us to use zeroes as both a value (when the flag is set to <code>one</code>)
+  /// or nothing (when the flag is set to <code>zero</code>).
+  ///
+  /// The remaining 20 bits are used to store the actual segment value. This leaves us with exactly 63 bits to store
+  /// the values and flags, saving the last bit to avoid dealing with negative numbers.
   @Basic(aggregable = true, projectable = true, sortable = true, searchable = true)
   @ProtoField(1)
   private final long value;
@@ -44,23 +55,35 @@ public class Version implements Comparable<Version> {
    */
   @ProtoFactory
   public Version(long value) {
-    if (value > 0b0000_11111111111111111111_11111111111111111111_11111111111111111111L) {
+    if (value < 0) {
       throw new UnbelievableException("Invalid value");
     }
-    this.value = value;
 
-    boolean knownMicro = (this.value & 0b0000_00000000000000000000_00000000000000000000_00000000000000000001L) ==
-      0b0000_00000000000000000000_00000000000000000000_00000000000000000001L;
+    boolean knownMicro = (value & 0b0_000000000000000000000_000000000000000000000_000000000000000000001L) ==
+      0b0_000000000000000000000_000000000000000000000_000000000000000000001L;
 
-    boolean knownMinor = (this.value & 0b0000_00000000000000000000_00000000000000000001_00000000000000000000L) ==
-      0b0000_00000000000000000000_00000000000000000001_00000000000000000000L;
+    boolean knownMinor = (value & 0b0_000000000000000000000_000000000000000000001_000000000000000000000L) ==
+      0b0_000000000000000000000_000000000000000000001_000000000000000000000L;
 
-    if (knownMicro && knownMinor) {
+    boolean knownMajor = (value & 0b0_000000000000000000001_000000000000000000000_000000000000000000000L) ==
+      0b0_000000000000000000001_000000000000000000000_000000000000000000000L;
+
+    // normalizes the internal implementation by zeroing segments that are not part of the precision
+    if (knownMicro && knownMinor && knownMajor) {
       this.precision = Precision.MICRO;
-    } else if (knownMinor) {
+      this.value = value;
+
+    } else if (knownMinor && knownMajor) {
       this.precision = Precision.MINOR;
-    } else {
+      this.value = value & 0b0_111111111111111111111_111111111111111111111_000000000000000000000L;
+
+    } else if (knownMajor) {
       this.precision = Precision.MAJOR;
+      this.value = value & 0b0_111111111111111111111_000000000000000000000_000000000000000000000L;
+
+    } else {
+      precision = Precision.NONE;
+      this.value = 0;
     }
   }
 
@@ -73,7 +96,7 @@ public class Version implements Comparable<Version> {
    */
   public Version(int major, int minor, int micro) {
     this(((long) major << SEGMENT_MAJOR | (long) minor << SEGMENT_MINOR | (long) micro << SEGMENT_MICRO) |
-      0b0000_00000000000000000001_00000000000000000001_00000000000000000001L);
+      0b0_000000000000000000001_000000000000000000001_000000000000000000001L);
 
     if (major > MAX || minor > MAX || micro > MAX) {
       throw new UnbelievableException("Invalid value");
@@ -88,7 +111,7 @@ public class Version implements Comparable<Version> {
    */
   public Version(int major, int minor) {
     this(((long) major << SEGMENT_MAJOR | (long) minor << SEGMENT_MINOR) |
-      0b0000_00000000000000000001_00000000000000000001_00000000000000000000L);
+      0b0_000000000000000000001_000000000000000000001_000000000000000000000L);
 
     if (major > MAX || minor > MAX) {
       throw new UnbelievableException("Invalid value");
@@ -102,7 +125,7 @@ public class Version implements Comparable<Version> {
    */
   public Version(int major) {
     this(((long) major << SEGMENT_MAJOR) |
-      0b0000_00000000000000000001_00000000000000000000_00000000000000000000L);
+      0b0_000000000000000000001_000000000000000000000_000000000000000000000L);
 
     if (major > MAX) {
       throw new UnbelievableException("Invalid value");
@@ -156,6 +179,7 @@ public class Version implements Comparable<Version> {
    */
   public Version nextMajor() {
     return switch (precision) {
+      case NONE -> NULL;
       case MAJOR -> new Version(major() + 1);
       case MINOR -> new Version(major() + 1, minor());
       case MICRO -> new Version(major() + 1, minor(), micro());
@@ -170,6 +194,7 @@ public class Version implements Comparable<Version> {
    */
   public Version nextMinor() {
     return switch (precision) {
+      case NONE -> NULL;
       case MAJOR -> new Version(major());
       case MINOR -> new Version(major(), minor() + 1);
       case MICRO -> new Version(major(), minor() + 1, micro());
@@ -184,6 +209,7 @@ public class Version implements Comparable<Version> {
    */
   public Version nextMicro() {
     return switch (precision) {
+      case NONE -> NULL;
       case MAJOR -> new Version(major());
       case MINOR -> new Version(major(), minor());
       case MICRO -> new Version(major(), minor(), micro() + 1);
@@ -198,6 +224,7 @@ public class Version implements Comparable<Version> {
    */
   public Version withMajor(int newMajor) {
     return switch (precision) {
+      case NONE -> NULL;
       case MAJOR -> new Version(newMajor);
       case MINOR -> new Version(newMajor, minor());
       case MICRO -> new Version(newMajor, minor(), micro());
@@ -212,6 +239,7 @@ public class Version implements Comparable<Version> {
    */
   public Version withMinor(int newMinor) {
     return switch (precision) {
+      case NONE -> NULL;
       case MAJOR, MINOR -> new Version(major(), newMinor);
       case MICRO -> new Version(major(), newMinor, micro());
     };
@@ -224,6 +252,9 @@ public class Version implements Comparable<Version> {
    * @return a new version with the given micro segment.
    */
   public Version withMicro(int newMicro) {
+    if (precision == Precision.NONE) {
+      return Version.NULL;
+    }
     return new Version(major(), minor(), newMicro);
   }
 
@@ -237,7 +268,7 @@ public class Version implements Comparable<Version> {
   }
 
   private int segment(int segmentFactor) {
-    return (int) ((this.value >>> segmentFactor) & 0b0000_00000000000000000000_00000000000000000000_01111111111111111111);
+    return (int) ((this.value >>> segmentFactor) & 0b0_000000000000000000000_000000000000000000000_011111111111111111111);
   }
 
   @Override
@@ -260,26 +291,27 @@ public class Version implements Comparable<Version> {
   @Override
   public String toString() {
     return switch (precision) {
+      case NONE -> "null";
       case MAJOR -> String.valueOf(major());
       case MINOR -> String.format("%d.%d", major(), minor());
       case MICRO -> String.format("%d.%d.%d", major(), minor(), micro());
     };
   }
 
-  /// The representation of a Version <code>0</code>.
-  public static final Version ZERO = new Version(0);
+  /// The representation of a Version <code>null</code>.
+  public static final Version NULL = new Version(0L);
 
   /**
-   * Tries to parse the given value in the format <code>major.minor.micro</code>. Returns {@link #ZERO}
+   * Tries to parse the given value in the format <code>major.minor.micro</code>. Returns {@link #NULL}
    * if it's not possible to parse the input.
    *
    * @param value the value to parse
-   * @return the Version representation of the given string, or {@link #ZERO} if not possible.
+   * @return the Version representation of the given string, or {@link #NULL} if not possible.
    */
   @JsonCreator
   public static Version of(String value) {
     if (value == null || value.isBlank()) {
-      return ZERO;
+      return NULL;
     }
     String[] tokens = value.split("\\.", 3);
     int[] values = new int[3];
@@ -289,8 +321,10 @@ public class Version implements Comparable<Version> {
         try {
           values[i] = Integer.parseInt(segment);
         } catch (NumberFormatException e) {
-          return ZERO;
+          return NULL;
         }
+      } else {
+        return NULL;
       }
     }
     if (tokens.length == 3) {
@@ -310,7 +344,7 @@ public class Version implements Comparable<Version> {
       );
     }
 
-    return ZERO;
+    return NULL;
   }
 
   /// Enumeration of the possible precision values a version object can have.
@@ -321,6 +355,8 @@ public class Version implements Comparable<Version> {
   ///
   /// @author Ataxexe
   public enum Precision {
+    /// Used for {@link Version#NULL} values. If a version has this precision, its internal value is <code>0</code>.
+    NONE,
     /// Indicates that only the major segment is used.
     MAJOR,
     /// Indicates that only the major and minor segments are used.
