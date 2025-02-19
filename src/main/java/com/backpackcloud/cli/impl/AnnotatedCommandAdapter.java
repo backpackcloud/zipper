@@ -32,11 +32,11 @@ import com.backpackcloud.cli.ui.Paginator;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.impl.PaginatorImpl;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
-import com.backpackcloud.trugger.factory.Context;
-import com.backpackcloud.trugger.factory.ContextFactory;
-import com.backpackcloud.trugger.reflection.ReflectedMethod;
-import com.backpackcloud.trugger.reflection.Reflection;
-import com.backpackcloud.trugger.reflection.ReflectionPredicates;
+import com.backpackcloud.factory.Context;
+import com.backpackcloud.factory.ContextFactory;
+import com.backpackcloud.reflection.ReflectedMethod;
+import com.backpackcloud.reflection.Reflection;
+import com.backpackcloud.reflection.ReflectionPredicates;
 import io.vertx.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 

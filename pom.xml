@@ -144,16 +144,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.infinispan.protostream</groupId>
-      <artifactId>protostream</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.jline</groupId>
       <artifactId>jline</artifactId>
       <version>${jline.version}</version>
