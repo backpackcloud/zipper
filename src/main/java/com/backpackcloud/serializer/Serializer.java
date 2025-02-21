@@ -25,8 +25,10 @@
 package com.backpackcloud.serializer;
 
 import com.backpackcloud.configuration.Configuration;
+import com.backpackcloud.text.InputValue;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -83,8 +85,6 @@ public interface Serializer {
 
   <E> Serializer addDependency(Class<E> type, E dependency);
 
-  ObjectMapper mapper();
-
   /**
    * Returns the mapper for json data type.
    *
@@ -92,9 +92,7 @@ public interface Serializer {
    */
   static Serializer json() {
     ObjectMapper jsonMapper = new ObjectMapper();
-    jsonMapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule());
-    jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    configure(jsonMapper);
     return new JacksonSerializer(jsonMapper);
   }
 
@@ -105,10 +103,17 @@ public interface Serializer {
    */
   static Serializer yaml() {
     ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-    yamlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    yamlMapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule());
-
+    configure(yamlMapper);
     return new JacksonSerializer(yamlMapper);
+  }
+
+  private static void configure(ObjectMapper mapper) {
+    SimpleModule backpackModule = new SimpleModule();
+    backpackModule.addDeserializer(Configuration.class, new ConfigurationDeserializer());
+    backpackModule.addDeserializer(InputValue.class, new InputValueDeserializer());
+
+    mapper.registerModules(new Jdk8Module(), new JavaTimeModule(), new ParameterNamesModule(), backpackModule);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
 }

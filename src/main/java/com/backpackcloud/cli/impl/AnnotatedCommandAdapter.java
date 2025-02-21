@@ -52,6 +52,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.backpackcloud.reflection.ReflectionPredicates.annotatedWith;
+
 public class AnnotatedCommandAdapter implements Command {
 
   private final AnnotatedCommand command;
@@ -82,10 +84,9 @@ public class AnnotatedCommandAdapter implements Command {
   }
 
   private void initialize() {
-    Reflection.reflect()
+    Reflection.reflect(command)
       .methods()
-      .annotatedWith(Action.class)
-      .from(command)
+      .filter(annotatedWith(Action.class))
       .forEach(method -> {
         Action action = method.getAnnotation(Action.class);
         String actionName = action.value();
@@ -101,10 +102,9 @@ public class AnnotatedCommandAdapter implements Command {
       throw new UnbelievableException("No action mapped for " + command.getClass());
     }
 
-    Reflection.reflect()
+    Reflection.reflect(command)
       .methods()
-      .annotatedWith(Suggestions.class)
-      .from(command)
+      .filter(annotatedWith(Suggestions.class))
       .forEach(method -> {
         String[] actions = method.getAnnotation(Suggestions.class).value();
         if (actions.length == 0) {
@@ -282,11 +282,9 @@ public class AnnotatedCommandAdapter implements Command {
 
       .orElse()
       .use(parameter ->
-        Reflection.reflect()
-          .method("valueOf")
+        Reflection.reflect(parameter.getType())
+          .method("valueOf", String.class)
           .filter(ReflectionPredicates.declared(Modifier.STATIC))
-          .withParameters(String.class)
-          .from(parameter.getType())
           .map(method -> method.invoke(inputIterator.next().asString()))
           .orElse(null)
       );

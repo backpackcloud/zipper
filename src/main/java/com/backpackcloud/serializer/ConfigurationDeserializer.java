@@ -22,14 +22,20 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.configuration;
+package com.backpackcloud.serializer;
 
+import com.backpackcloud.configuration.Configuration;
+import com.backpackcloud.configuration.EnvironmentVariableConfiguration;
+import com.backpackcloud.configuration.FileConfiguration;
+import com.backpackcloud.configuration.RawValueConfiguration;
+import com.backpackcloud.configuration.ResourceConfiguration;
+import com.backpackcloud.configuration.SystemPropertyConfiguration;
+import com.backpackcloud.configuration.UrlConfiguration;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.util.ClassUtil;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +44,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@RegisterForReflection
 public class ConfigurationDeserializer extends JsonDeserializer<Configuration> {
 
   @Override

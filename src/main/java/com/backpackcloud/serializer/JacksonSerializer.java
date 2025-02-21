@@ -26,7 +26,6 @@ package com.backpackcloud.serializer;
 
 import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.configuration.Configuration;
-import com.backpackcloud.configuration.ConfigurationDeserializer;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -65,11 +64,6 @@ public class JacksonSerializer implements Serializer {
   public <E> Serializer addDependency(Class<E> type, E dependency) {
     values.addValue(type, dependency);
     return this;
-  }
-
-  @Override
-  public ObjectMapper mapper() {
-    return objectMapper;
   }
 
   @Override
