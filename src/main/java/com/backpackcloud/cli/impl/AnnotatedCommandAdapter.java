@@ -32,16 +32,14 @@ import com.backpackcloud.cli.ui.Paginator;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.impl.PaginatorImpl;
 import com.backpackcloud.cli.ui.impl.PromptSuggestion;
-import com.backpackcloud.factory.Context;
-import com.backpackcloud.factory.ContextFactory;
-import com.backpackcloud.reflection.ReflectedMethod;
-import com.backpackcloud.reflection.Reflection;
-import com.backpackcloud.reflection.ReflectionPredicates;
+import com.backpackcloud.reflection.Context;
+import com.backpackcloud.reflection.Mirror;
 import io.vertx.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,15 +50,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.backpackcloud.reflection.ReflectionPredicates.annotatedWith;
-
 public class AnnotatedCommandAdapter implements Command {
 
   private final AnnotatedCommand command;
 
-  private final Map<String, ReflectedMethod> actions;
+  private final Map<String, Method> actions;
 
-  private final Map<String, ReflectedMethod> suggestions;
+  private final Map<String, Method> suggestions;
 
   private final UserPreferences preferences;
   private final Terminal terminal;
@@ -84,9 +80,10 @@ public class AnnotatedCommandAdapter implements Command {
   }
 
   private void initialize() {
-    Reflection.reflect(command)
-      .methods()
-      .filter(annotatedWith(Action.class))
+    List<Method> methods = Mirror.reflect(command).methods();
+
+    methods.stream()
+      .filter(method -> method.isAnnotationPresent(Action.class))
       .forEach(method -> {
         Action action = method.getAnnotation(Action.class);
         String actionName = action.value();
@@ -102,9 +99,8 @@ public class AnnotatedCommandAdapter implements Command {
       throw new UnbelievableException("No action mapped for " + command.getClass());
     }
 
-    Reflection.reflect(command)
-      .methods()
-      .filter(annotatedWith(Suggestions.class))
+    methods.stream()
+      .filter(method -> method.isAnnotationPresent(Suggestions.class))
       .forEach(method -> {
         String[] actions = method.getAnnotation(Suggestions.class).value();
         if (actions.length == 0) {
@@ -125,7 +121,7 @@ public class AnnotatedCommandAdapter implements Command {
       if (input.isEmpty()) {
         throw new UnbelievableException("No action given");
       }
-      String actionName = input.iterator().next().asString();
+      String actionName = input.getFirst().asString();
       if (actions.containsKey(actionName)) {
         invokeAction(context, actions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
         eventBus.publish(String.format("command.%s.%s", event, actionName), context);
@@ -136,14 +132,20 @@ public class AnnotatedCommandAdapter implements Command {
     eventBus.publish(String.format("command.%s", event), context);
   }
 
-  private void invokeAction(CommandContext commandContext, ReflectedMethod actionMethod, List<CommandInput> commandInputs) {
-    Object[] args = resolveArgs(commandContext, commandInputs, actionMethod.unwrap());
+  private void invokeAction(CommandContext commandContext, Method actionMethod, List<CommandInput> commandInputs) {
+    Object[] args = resolveArgs(commandContext, commandInputs, actionMethod);
+
+    Object returnValue;
+
+    try {
+      returnValue = actionMethod.invoke(command, args);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new UnbelievableException(e);
+    }
 
     if (actionMethod.isAnnotationPresent(Paginate.class)) {
       Paginate annotation = actionMethod.getAnnotation(Paginate.class);
       PaginatorImpl paginator = new PaginatorImpl(preferences, terminal, commandContext);
-
-      Object returnValue = actionMethod.invoke(args);
 
       if (returnValue instanceof List<?> returnList) {
         paginator.from(returnList)
@@ -159,7 +161,7 @@ public class AnnotatedCommandAdapter implements Command {
         throw new UnbelievableException("Unable to paginate return object, only streams and lists are supported.");
       }
     } else {
-      printReturn(commandContext.writer(), actionMethod.invoke(args));
+      printReturn(commandContext.writer(), returnValue);
     }
   }
 
@@ -190,7 +192,7 @@ public class AnnotatedCommandAdapter implements Command {
           .map(PromptSuggestion::suggest)
           .collect(Collectors.toList());
       }
-      String actionName = input.iterator().next().asString();
+      String actionName = input.getFirst().asString();
       if (suggestions.containsKey(actionName)) {
         return invokeSuggestion(suggestions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
       } else {
@@ -199,14 +201,17 @@ public class AnnotatedCommandAdapter implements Command {
     }
   }
 
-  private List<Suggestion> invokeSuggestion(ReflectedMethod suggestionMethod, List<CommandInput> commandInputs) {
-    Object[] args = resolveArgs(null, commandInputs, suggestionMethod.unwrap());
-    return suggestionMethod.invoke(args);
+  private List<Suggestion> invokeSuggestion(Method suggestionMethod, List<CommandInput> commandInputs) {
+    Object[] args = resolveArgs(null, commandInputs, suggestionMethod);
+    try {
+      return (List<Suggestion>) suggestionMethod.invoke(command, args);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new UnbelievableException(e);
+    }
   }
 
   private Object[] resolveArgs(CommandContext commandContext, List<CommandInput> commandInputs, Executable executable) {
-    ContextFactory contextFactory = new ContextFactory();
-    Context context = contextFactory.context();
+    Context context = new Context();
 
     Iterator<CommandInput> inputIterator = commandInputs.iterator();
     Supplier<String> inputSupplier = () -> {
@@ -281,15 +286,19 @@ public class AnnotatedCommandAdapter implements Command {
       })
 
       .orElse()
-      .use(parameter ->
-        Reflection.reflect(parameter.getType())
-          .method("valueOf", String.class)
-          .filter(ReflectionPredicates.declared(Modifier.STATIC))
-          .map(method -> method.invoke(inputIterator.next().asString()))
-          .orElse(null)
+      .use(parameter -> {
+          try {
+            Method valueOf = parameter.getType().getDeclaredMethod("valueOf", String.class);
+            return valueOf.invoke(null, inputIterator.next().asString());
+          } catch (NoSuchMethodException | IllegalAccessException e) {
+            return null;
+          } catch (InvocationTargetException e) {
+            throw new UnbelievableException(e.getTargetException());
+          }
+        }
       );
 
-    return contextFactory.resolveArgs(executable);
+    return context.resolve(executable.getParameters());
   }
 
   private String resolvePreferenceId(String name) {
