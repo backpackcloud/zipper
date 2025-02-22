@@ -50,6 +50,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.backpackcloud.reflection.Predicates.annotatedWith;
+import static com.backpackcloud.reflection.Predicates.ofType;
+
 public class AnnotatedCommandAdapter implements Command {
 
   private final AnnotatedCommand command;
@@ -223,21 +226,16 @@ public class AnnotatedCommandAdapter implements Command {
 
     if (commandContext != null) {
       context
-        .whenOfType(CommandContext.class)
-        .use(commandContext)
-
-        .whenOfType(Writer.class)
-        .use(commandContext::writer);
+        .when(ofType(CommandContext.class), commandContext)
+        .when(ofType(Writer.class), commandContext::writer);
     }
 
     context
-      .whenOfType(Preference.class)
-      .use(parameter -> preferences.find(resolvePreferenceId(parameter.getName()))
+      .when(ofType(Preference.class), parameter -> preferences.find(resolvePreferenceId(parameter.getName()))
         .or(() -> preferences.find(inputSupplier.get()))
         .orElseThrow(() -> new UnbelievableException("Preference not found for parameter: " + parameter.getName())))
 
-      .whenAnnotatedWith(PreferenceValue.class)
-      .use(parameter -> {
+      .when(annotatedWith(PreferenceValue.class), parameter -> {
         String preferenceId = parameter.getAnnotation(PreferenceValue.class).value();
         if (preferenceId.isBlank()) {
           preferenceId = resolvePreferenceId(parameter.getName());
@@ -247,37 +245,29 @@ public class AnnotatedCommandAdapter implements Command {
           .value();
       })
 
-      .whenAnnotatedWith(ParameterCount.class)
-      .use(commandInputs::size)
+      .when(annotatedWith(ParameterCount.class), commandInputs::size)
 
-      .whenOfType(CommandInput.class)
-      .use(() -> inputIterator.hasNext() ? inputIterator.next() : null)
+      .when(ofType(CommandInput.class), () -> inputIterator.hasNext() ? inputIterator.next() : null)
 
-      .whenAnnotatedWith(RawInput.class)
-      .use(() -> {
+      .when(annotatedWith(RawInput.class), () -> {
         List<String> args = new ArrayList<>();
         inputIterator.forEachRemaining(i -> args.add(i.asString()));
         return String.join(" ", args);
       })
 
-      .whenOfType(String[].class)
-      .use(() -> {
+      .when(ofType(String[].class), () -> {
         List<String> args = new ArrayList<>();
         inputIterator.forEachRemaining(i -> args.add(i.asString()));
         return args.toArray(new String[0]);
       })
 
-      .whenOfType(Paginator.class)
-      .use(() -> new PaginatorImpl(preferences, terminal, commandContext))
+      .when(ofType(Paginator.class), () -> new PaginatorImpl(preferences, terminal, commandContext))
 
-      .whenOfType(String.class)
-      .use(inputSupplier)
+      .when(ofType(String.class), inputSupplier)
 
-      .whenOfType(Integer.class)
-      .use(() -> inputIterator.hasNext() ? inputIterator.next().asInt().orElse(null) : null)
+      .when(ofType(Integer.class), () -> inputIterator.hasNext() ? inputIterator.next().asInt().orElse(null) : null)
 
-      .whenOfType(Enum.class)
-      .use(parameter -> {
+      .when(ofType(Enum.class), parameter -> {
         String name = inputSupplier.get();
         if (name != null) {
           return Enum.valueOf((Class<? extends Enum>) parameter.getType(), resolveEnumName(name));
@@ -285,8 +275,7 @@ public class AnnotatedCommandAdapter implements Command {
         return null;
       })
 
-      .orElse()
-      .use(parameter -> {
+      .orElse(parameter -> {
           try {
             Method valueOf = parameter.getType().getDeclaredMethod("valueOf", String.class);
             return valueOf.invoke(null, inputIterator.next().asString());
