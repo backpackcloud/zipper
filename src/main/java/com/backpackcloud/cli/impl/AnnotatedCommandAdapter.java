@@ -50,8 +50,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.backpackcloud.reflection.Predicates.annotatedWith;
-import static com.backpackcloud.reflection.Predicates.ofType;
+import static com.backpackcloud.reflection.predicates.ParameterPredicates.annotatedWith;
+import static com.backpackcloud.reflection.predicates.ParameterPredicates.ofType;
 
 public class AnnotatedCommandAdapter implements Command {
 
@@ -214,8 +214,6 @@ public class AnnotatedCommandAdapter implements Command {
   }
 
   private Object[] resolveArgs(CommandContext commandContext, List<CommandInput> commandInputs, Executable executable) {
-    Context context = new Context();
-
     Iterator<CommandInput> inputIterator = commandInputs.iterator();
     Supplier<String> inputSupplier = () -> {
       if (inputIterator.hasNext()) {
@@ -223,6 +221,17 @@ public class AnnotatedCommandAdapter implements Command {
       }
       return null;
     };
+
+    Context context = new Context(parameter -> {
+      try {
+        Method valueOf = parameter.getType().getDeclaredMethod("valueOf", String.class);
+        return valueOf.invoke(null, inputIterator.next().asString());
+      } catch (NoSuchMethodException | IllegalAccessException e) {
+        return null;
+      } catch (InvocationTargetException e) {
+        throw new UnbelievableException(e.getTargetException());
+      }
+    });
 
     if (commandContext != null) {
       context
@@ -273,19 +282,7 @@ public class AnnotatedCommandAdapter implements Command {
           return Enum.valueOf((Class<? extends Enum>) parameter.getType(), resolveEnumName(name));
         }
         return null;
-      })
-
-      .orElse(parameter -> {
-          try {
-            Method valueOf = parameter.getType().getDeclaredMethod("valueOf", String.class);
-            return valueOf.invoke(null, inputIterator.next().asString());
-          } catch (NoSuchMethodException | IllegalAccessException e) {
-            return null;
-          } catch (InvocationTargetException e) {
-            throw new UnbelievableException(e.getTargetException());
-          }
-        }
-      );
+      });
 
     return context.resolve(executable.getParameters());
   }
