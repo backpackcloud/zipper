@@ -22,60 +22,63 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.impl;
+package com.backpackcloud.cli.ui.components;
 
-import com.backpackcloud.cli.CommandInput;
+import com.backpackcloud.cli.ui.Suggestion;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class CommandInputImpl implements CommandInput {
+public class PromptSuggestion implements Suggestion {
 
   private final String value;
-  private final List<String> splitValue;
 
-  public CommandInputImpl(String value, List<String> splitValue) {
+  private final String description;
+
+  private final String group;
+
+  private final boolean complete;
+
+  private PromptSuggestion(String value, String description, String group, boolean complete) {
     this.value = value;
-    this.splitValue = splitValue;
-  }
-
-  public CommandInputImpl(List<String> splitValue) {
-    this.value = String.join(" ", splitValue);
-    this.splitValue = splitValue;
+    this.description = description;
+    this.group = group;
+    this.complete = complete;
   }
 
   @Override
-  public boolean isEmpty() {
-    return value.isEmpty();
-  }
-
-  @Override
-  public List<CommandInput> asList() {
-    return splitValue.stream()
-      .map(s -> new CommandInputImpl(s, Collections.singletonList(s)))
-      .collect(Collectors.toList());
-  }
-
-  @Override
-  public String asString() {
+  public String value() {
     return value;
   }
 
   @Override
-  public Optional<Integer> asInt() {
-    try {
-      return Optional.of(Integer.parseInt(value));
-    } catch (NumberFormatException e) {
-      return Optional.empty();
-    }
+  public Optional<String> description() {
+    return Optional.ofNullable(description);
   }
 
   @Override
-  public Iterator<String> iterator() {
-    return Collections.unmodifiableList(splitValue).iterator();
+  public Optional<String> group() {
+    return Optional.ofNullable(group);
+  }
+
+  @Override
+  public boolean isComplete() {
+    return complete;
+  }
+
+  public PromptSuggestion incomplete() {
+    return new PromptSuggestion(value, description, group, false);
+  }
+
+  public PromptSuggestion describedAs(String description) {
+    return new PromptSuggestion(this.value, description, this.group, this.complete);
+  }
+
+  public PromptSuggestion asPartOf(String group) {
+    return new PromptSuggestion(this.value, this.description, group, this.complete);
+  }
+
+  public static PromptSuggestion suggest(String value) {
+    return new PromptSuggestion(value, null, null, true);
   }
 
 }

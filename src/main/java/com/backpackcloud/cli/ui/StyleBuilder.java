@@ -22,17 +22,14 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.ui.impl;
+package com.backpackcloud.cli.ui;
 
-import com.backpackcloud.cli.ui.Color;
-import com.backpackcloud.cli.ui.ColorMap;
-import com.backpackcloud.cli.ui.Stylish;
 import org.jline.utils.AttributedStyle;
 
 import java.util.Optional;
 import java.util.function.Function;
 
-public class StyleBuilder<R> implements Stylish<R> {
+public class StyleBuilder<R> {
 
   private final AttributedStyle initialStyle;
   private final ColorMap colorMap;
@@ -49,82 +46,69 @@ public class StyleBuilder<R> implements Stylish<R> {
     this.returnValueFunction = returnValueFunction;
   }
 
-  @Override
-  public Stylish<R> foreground(String foreground) {
+  public StyleBuilder<R> foreground(String foreground) {
     Optional<Color> color = colorMap.colorOf(foreground);
     color.ifPresent(value -> style = style.foregroundRgb(value.toInt()));
     return this;
   }
 
-  @Override
-  public Stylish<R> background(String background) {
+  public StyleBuilder<R> background(String background) {
     Optional<Color> color = colorMap.colorOf(background);
     color.ifPresent(value -> style = style.backgroundRgb(value.toInt()));
     return this;
   }
 
-  @Override
-  public Stylish<R> bold() {
+  public StyleBuilder<R> bold() {
     style = style.bold();
     return this;
   }
 
-  @Override
-  public Stylish<R> boldOff() {
+  public StyleBuilder<R> boldOff() {
     style = style.boldOff();
     return this;
   }
 
-  @Override
-  public Stylish<R> italic() {
+  public StyleBuilder<R> italic() {
     style = style.italic();
     return this;
   }
 
-  @Override
-  public Stylish<R> italicOff() {
+  public StyleBuilder<R> italicOff() {
     style = style.italicOff();
     return this;
   }
 
-  @Override
-  public Stylish<R> underline() {
+  public StyleBuilder<R> underline() {
     style = style.underline();
     return this;
   }
 
-  @Override
-  public Stylish<R> underlineOff() {
+  public StyleBuilder<R> underlineOff() {
     style = style.underlineOff();
     return this;
   }
 
-  @Override
-  public Stylish<R> blink() {
+  public StyleBuilder<R> blink() {
     style = style.blink();
     return this;
   }
 
-  @Override
-  public Stylish<R> blinkOff() {
+  public StyleBuilder<R> blinkOff() {
     style = style.blinkOff();
     return this;
   }
 
-  @Override
-  public Stylish<R> crossedOut() {
+  public StyleBuilder<R> crossedOut() {
     style = style.crossedOut();
     return this;
   }
 
-  @Override
-  public Stylish<R> crossedOutOff() {
+  public StyleBuilder<R> crossedOutOff() {
     style = style.crossedOutOff();
     return this;
   }
 
-  @Override
-  public Stylish<R> parse(String styleString) {
+  public StyleBuilder<R> parse(String styleString) {
     String[] parts = styleString.split("/");
     String foreground = parts[0];
     String background = parts.length > 1 ? parts[1] : "";
@@ -141,17 +125,15 @@ public class StyleBuilder<R> implements Stylish<R> {
     return this;
   }
 
-  @Override
   public R reset() {
     return returnValueFunction.apply(initialStyle);
   }
 
-  @Override
   public R set() {
     return returnValueFunction.apply(style);
   }
 
-  public static Stylish<AttributedStyle> newSimpleBuilder(ColorMap colorMap) {
+  public static StyleBuilder<AttributedStyle> newSimpleBuilder(ColorMap colorMap) {
     return new StyleBuilder<>(AttributedStyle.DEFAULT, colorMap, Function.identity());
   }
 

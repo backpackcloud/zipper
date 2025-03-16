@@ -24,21 +24,16 @@
 
 package com.backpackcloud.cli;
 
-import com.backpackcloud.cli.ui.Theme;
-import com.backpackcloud.cli.ui.impl.DefaultWriter;
-import org.jline.utils.AttributedString;
-import org.jline.utils.AttributedStyle;
+import java.util.function.Consumer;
 
-public final class Writers {
+public interface CommandObserver {
 
-  private Writers() {
+  void beforeCommand(Runnable action);
 
-  }
+  void afterCommand(Runnable action);
 
-  public static Writer forStringBuilder(StringBuilder stringBuilder, Theme theme) {
-    return new DefaultWriter(theme, AttributedStyle.DEFAULT,
-      AttributedString::new,
-      text -> stringBuilder.append(text.toAnsi()));
-  }
+  void beforeInput(Runnable action);
+
+  void onCommandError(Consumer<Exception> action);
 
 }

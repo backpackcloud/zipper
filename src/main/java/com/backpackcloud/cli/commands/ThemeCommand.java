@@ -34,7 +34,7 @@ import com.backpackcloud.cli.ui.IconMap;
 import com.backpackcloud.cli.ui.StyleMap;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.Theme;
-import com.backpackcloud.cli.ui.impl.PromptSuggestion;
+import com.backpackcloud.cli.ui.components.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.List;

@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Marcelo "Ataxexe" Guimarães
  */
-public interface Command extends Suggester {
+public interface Command {
 
   /**
    * @return the type of this command.

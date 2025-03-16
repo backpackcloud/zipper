@@ -26,27 +26,163 @@ package com.backpackcloud.cli.ui;
 
 import com.backpackcloud.cli.Displayable;
 import com.backpackcloud.cli.Writer;
-import com.backpackcloud.cli.ui.impl.PromptBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStyle;
 
-public interface Prompt {
+public class Prompt {
 
-  PromptSegmentBuilder newSegment();
+  private final Writer writer;
+  private final Terminal terminal;
+  private final Theme theme;
 
-  Prompt closeSegments();
+  private final String tail;
+  private final String separator;
+  private final String head;
 
-  Prompt newLine();
+  private final String foreground;
+  private final String background;
 
-  Writer writer();
+  private boolean isOpened;
 
-  void writeIndicator(String style);
+  public Prompt(Theme theme,
+                Writer writer,
+                Terminal terminal,
+                String tail,
+                String separator,
+                String head,
+                String foreground,
+                String background) {
+    this.theme = theme;
+    this.writer = writer;
+    this.terminal = terminal;
+    this.tail = theme.iconMap().symbolOf(tail);
+    this.separator = theme.iconMap().symbolOf(separator);
+    this.head = theme.iconMap().symbolOf(head);
+    this.foreground = foreground;
+    this.background = background;
+  }
 
-  static Prompt create(Theme theme, Writer writer, String tail, String separator, String head) {
-    return new PromptBuilder(theme, writer, tail, separator, head,
+  public PromptSegmentBuilder newSegment() {
+    if (isOpened) {
+      writer.style()
+        .foreground(foreground)
+        .background(background)
+        .set()
+        .write(separator);
+    } else {
+      isOpened = true;
+      writer.style()
+        .foreground(background)
+        .set().write(tail);
+    }
+
+    writer.style()
+      .foreground(foreground)
+      .background(background)
+      .set().write(" ");
+
+    return new PromptSegmentBuilder() {
+
+      private final AttributedStyle style = StyleBuilder
+        .newSimpleBuilder(theme.colorMap())
+        .foreground(foreground)
+        .background(background)
+        .set();
+
+      @Override
+      public PromptSegmentBuilder add(String text) {
+        writer.withStyle(style).write(text).write(" ");
+        return this;
+      }
+
+      @Override
+      public PromptSegmentBuilder add(int i) {
+        writer.withStyle(style).write(i).write(" ");
+        return this;
+      }
+
+      @Override
+      public PromptSegmentBuilder add(long l) {
+        writer.withStyle(style).write(l).write(" ");
+        return this;
+      }
+
+      @Override
+      public PromptSegmentBuilder add(Displayable object) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // Ignores any style so it appears flat in the segment
+        Writer stringWriter = new Writer(
+          theme,
+          AttributedStyle.DEFAULT,
+          (s, attributedStyle) -> new AttributedString(s, AttributedStyle.DEFAULT),
+          text -> stringBuilder.append(text.toAnsi()),
+          terminal
+        );
+
+        object.toDisplay(stringWriter);
+
+        writer.withStyle(style).write(stringBuilder.toString());
+
+        return this;
+      }
+
+      @Override
+      public PromptSegmentBuilder addIcon(String icon) {
+        writer.withStyle(style).writeIcon(icon).write(" ");
+        return this;
+      }
+
+      @Override
+      public PromptSegmentBuilder addIcon(String icon, String color) {
+        AttributedStyle customStyle = StyleBuilder
+          .newSimpleBuilder(theme.colorMap())
+          .foreground(color)
+          .background(background)
+          .set();
+        writer.withStyle(customStyle).write(theme.iconMap().symbolOf(icon) + " ");
+        return this;
+      }
+
+      @Override
+      public Prompt close() {
+        return Prompt.this;
+      }
+    };
+  }
+
+  public Prompt newLine() {
+    writer.newLine();
+    return this;
+  }
+
+  public Writer writer() {
+    return writer;
+  }
+
+  public void writeIndicator(String style) {
+    writer.withStyle(style).write(theme.iconMap().symbolOf("prompt")).write(" ");
+  }
+
+  public Prompt closeSegments() {
+    if (isOpened) {
+      isOpened = false;
+      writer.withStyle(foreground + "/" + background).write(" ");
+      writer.style()
+        .foreground(background)
+        .set()
+        .write(head);
+    }
+    return this;
+  }
+
+  public static Prompt create(Theme theme, Writer writer, Terminal terminal, String tail, String separator, String head) {
+    return new Prompt(theme, writer, terminal, tail, separator, head,
       "prompt-segment-fg", "prompt-segment-bg"
     );
   }
 
-  interface PromptSegmentBuilder {
+  public interface PromptSegmentBuilder {
 
     PromptSegmentBuilder add(String text);
 

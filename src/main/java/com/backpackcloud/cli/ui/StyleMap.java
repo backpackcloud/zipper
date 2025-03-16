@@ -24,14 +24,28 @@
 
 package com.backpackcloud.cli.ui;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public interface StyleMap {
+public class StyleMap {
 
-  String styleOf(String name);
+  private final Map<String, String> styles;
 
-  void put(String name, String style);
+  public StyleMap(Map<String, String> styles) {
+    this.styles = styles;
+  }
 
-  List<String> styles();
+  public void put(String key, String color) {
+    this.styles.put(key, color);
+  }
+
+  public List<String> styles() {
+    return new ArrayList<>(styles.keySet());
+  }
+
+  public String styleOf(String name) {
+    return styles.get(name);
+  }
 
 }

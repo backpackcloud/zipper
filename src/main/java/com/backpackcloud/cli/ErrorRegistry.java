@@ -24,18 +24,58 @@
 
 package com.backpackcloud.cli;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
-public interface ErrorRegistry extends Registry {
+@ApplicationScoped
+public class ErrorRegistry implements Registry {
 
-  void add(Exception exception);
+  private final List<Exception> errors;
+  private boolean viewed;
 
-  Stream<Exception> stream();
+  public ErrorRegistry() {
+    this(new ArrayList<>());
+  }
 
-  boolean viewed();
+  public ErrorRegistry(List<Exception> errors) {
+    this.errors = errors;
+    this.viewed = true;
+  }
+
+  public boolean viewed() {
+    return viewed;
+  }
+
+  public void add(Exception exception) {
+    viewed = false;
+    errors.add(exception);
+  }
 
   @Override
-  default String name() {
+  public void clear() {
+    viewed = true;
+    errors.clear();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return errors.isEmpty();
+  }
+
+  @Override
+  public int size() {
+    return errors.size();
+  }
+
+  public Stream<Exception> stream() {
+    viewed = true;
+    return errors.stream();
+  }
+
+  public String name() {
     return "errors";
   }
 

@@ -24,11 +24,9 @@
 
 package com.backpackcloud.cli.commands;
 
-import com.backpackcloud.text.Interpolator;
 import com.backpackcloud.cli.CLI;
 import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.CommandContext;
-import com.backpackcloud.cli.CommandInput;
 
 import java.util.List;
 
@@ -61,20 +59,7 @@ public class MacroCommand implements Command {
 
   @Override
   public void execute(CommandContext context) {
-    List<CommandInput> args = context.input().asList();
-    Interpolator interpolator = new Interpolator(s -> {
-      String[] split = s.split(":");
-      int index = Integer.parseInt(split[0]);
-      String defaultValue = split.length > 1 ? split[1] : "";
-      if (args.size() > index) {
-        return args.get(index).asString();
-      } else {
-        return defaultValue;
-      }
-    });
-    commands.stream()
-      .map(interpolator::eval)
-      .forEach(command -> command.ifPresent(cli::execute));
+    commands.forEach(cli::execute);
   }
 
 }

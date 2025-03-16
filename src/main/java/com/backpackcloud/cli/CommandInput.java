@@ -24,28 +24,56 @@
 
 package com.backpackcloud.cli;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Represents a command argument.
  *
  * @author Marcelo "Ataxexe" Guimarães
  */
-public interface CommandInput {
+public class CommandInput {
 
-  /**
-   * @return {@code true} if this argument is empty (no input was given)
-   */
-  boolean isEmpty();
+  private final String value;
+  private final List<String> splitValue;
 
-  List<CommandInput> asList();
+  public CommandInput(String value, List<String> splitValue) {
+    this.value = value;
+    this.splitValue = splitValue;
+  }
 
-  String asString();
+  public CommandInput(List<String> splitValue) {
+    this.value = String.join(" ", splitValue);
+    this.splitValue = splitValue;
+  }
 
-  Optional<Integer> asInt();
+  public boolean isEmpty() {
+    return value.isEmpty();
+  }
 
-  Iterator<String> iterator();
+  public List<CommandInput> asList() {
+    return splitValue.stream()
+      .map(s -> new CommandInput(s, Collections.singletonList(s)))
+      .collect(Collectors.toList());
+  }
+
+  public String asString() {
+    return value;
+  }
+
+  public Optional<Integer> asInt() {
+    try {
+      return Optional.of(Integer.parseInt(value));
+    } catch (NumberFormatException e) {
+      return Optional.empty();
+    }
+  }
+
+  public Iterator<String> iterator() {
+    return Collections.unmodifiableList(splitValue).iterator();
+  }
 
 }

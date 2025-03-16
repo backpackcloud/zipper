@@ -24,75 +24,106 @@
 
 package com.backpackcloud.cli;
 
-import com.backpackcloud.cli.ui.Stylish;
+import com.backpackcloud.cli.ui.Theme;
+import com.backpackcloud.cli.ui.StyleBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 
-/**
- * Interface that defines a component for writing text with colors
- * in the output.
- * <p>
- * Writers can target any kind of outputs. A console out, a file or
- * even a String.
- *
- * @author Marcelo “Ataxexe" Guimarães
- */
-public interface Writer {
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
-  Stylish<Writer> style();
+public class Writer {
 
-  Writer withStyle(AttributedStyle style);
+  private final Theme theme;
+  private final AttributedStyle style;
+  private final BiFunction<String, AttributedStyle, AttributedString> createTextFunction;
+  private final Consumer<AttributedString> delegate;
+  private final Terminal terminal;
 
-  Writer withStyle(String style);
+  public Writer(Theme theme,
+                       AttributedStyle style,
+                       BiFunction<String, AttributedStyle, AttributedString> createTextFunction,
+                       Consumer<AttributedString> delegate,
+                       Terminal terminal) {
+    this.theme = theme;
+    this.style = style;
+    this.createTextFunction = createTextFunction;
+    this.delegate = delegate;
+    this.terminal = terminal;
+  }
 
-  Writer withStyle(String... styles);
+  public StyleBuilder<Writer> style() {
+    return new StyleBuilder<>(
+      AttributedStyle.DEFAULT,
+      theme.colorMap(),
+      newStyle -> new Writer(theme, newStyle, createTextFunction, delegate, terminal)
+    );
+  }
 
-  /**
-   * Writes the given text to the output target.
-   *
-   * @param text the text to write.
-   * @return a reference to this instance.
-   */
-  Writer write(String text);
+  public Writer withStyle(AttributedStyle newStyle) {
+    return new Writer(theme, newStyle, createTextFunction, delegate, terminal);
+  }
 
-  default Writer write(Object object) {
+  public Writer withStyle(String style) {
+    String mappedStyle = theme.styleMap().styleOf(style);
+    return style().parse(mappedStyle != null ? mappedStyle : style).set();
+  }
+
+  public Writer withStyle(String... styles) {
+    return Arrays.stream(styles)
+      .map(theme.styleMap()::styleOf)
+      .filter(Objects::nonNull)
+      .findFirst()
+      .map(style -> style().parse(style).set())
+      .orElse(this);
+  }
+
+  public Writer write(String text) {
+    return writeText(text);
+  }
+
+  public Writer writeIcon(String icon) {
+    return writeText(theme.iconMap().symbolOf(icon));
+  }
+
+  public Writer writeln(String text) {
+    return write(text).newLine();
+  }
+
+  public Writer newLine() {
+    write("\n");
+    terminal.flush();
+    return this;
+  }
+
+  private Writer writeText(String text) {
+    delegate.accept(createTextFunction.apply(text, style));
+    return this;
+  }
+
+  public Writer write(Object object) {
     return write(String.valueOf(object));
   }
 
-  default Writer write(int value) {
+  public Writer write(int value) {
     return write(String.valueOf(value));
   }
 
-  default Writer write(long value) {
+  public Writer write(long value) {
     return write(String.valueOf(value));
   }
 
-  Writer writeIcon(String icon);
-
-  default Writer write(Displayable displayable) {
+  public Writer write(Displayable displayable) {
     displayable.toDisplay(this);
     return this;
   }
 
-  default Writer writeln(Displayable displayable) {
+  public Writer writeln(Displayable displayable) {
     displayable.toDisplay(this);
     return this.newLine();
-  }
-
-  /**
-   * Writes the given text to the output target, followed by a line break.
-   *
-   * @param text the text to write.
-   * @return a reference to this instance.
-   */
-  Writer writeln(String text);
-
-  /**
-   * Writes a line break to the output target.
-   *
-   * @return a reference to this instance.
-   */
-  default Writer newLine() {
-    return write("\n");
   }
 
 }

@@ -24,17 +24,37 @@
 
 package com.backpackcloud.cli.ui;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface ColorMap {
+public class ColorMap {
 
-  Optional<Color> colorOf(String key);
+  private final Map<String, String> colors;
 
-  void put(String key, String color);
+  public ColorMap(Map<String, String> colors) {
+    this.colors = colors;
+  }
 
-  Set<String> colors();
+  public Optional<Color> colorOf(String key) {
+    String value = colors.get(key);
+    if (colors.containsKey(value)) {
+      return colorOf(value);
+    }
+    return Optional.ofNullable(value).map(Color::parse);
+  }
 
-  String valueOf(String key);
+  public void put(String key, String color) {
+    colors.put(key, color);
+  }
+
+  public Set<String> colors() {
+    return new HashSet<>(colors.keySet());
+  }
+
+  public String valueOf(String key) {
+    return colors.get(key);
+  }
 
 }

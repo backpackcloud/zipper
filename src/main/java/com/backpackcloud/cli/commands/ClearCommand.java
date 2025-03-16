@@ -30,7 +30,7 @@ import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Registry;
 import com.backpackcloud.cli.Suggestions;
 import com.backpackcloud.cli.ui.Suggestion;
-import com.backpackcloud.cli.ui.impl.PromptSuggestion;
+import com.backpackcloud.cli.ui.components.PromptSuggestion;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import jakarta.enterprise.inject.Instance;

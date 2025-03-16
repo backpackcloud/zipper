@@ -24,11 +24,11 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.CommandListener;
-import com.backpackcloud.cli.ui.Prompt;
+import com.backpackcloud.cli.CommandObserver;
 import com.backpackcloud.cli.ui.PromptWriter;
-
+import com.backpackcloud.cli.ui.Prompt;
 import jakarta.enterprise.context.ApplicationScoped;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -38,12 +38,12 @@ public class TimerPromptWriter implements PromptWriter {
   private Duration lastCommandDuration = Duration.ZERO;
   private LocalDateTime start = LocalDateTime.now();
 
-  public TimerPromptWriter(CommandListener listener) {
-    listener.beforeCommand(() -> {
+  public TimerPromptWriter(CommandObserver observer) {
+    observer.beforeCommand(() -> {
       start = LocalDateTime.now();
       lastCommandDuration = null;
     });
-    listener.afterCommand(() -> lastCommandDuration = Duration.between(start, LocalDateTime.now()));
+    observer.afterCommand(() -> lastCommandDuration = Duration.between(start, LocalDateTime.now()));
   }
 
   @Override

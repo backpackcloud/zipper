@@ -22,37 +22,32 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.impl.cdi;
+package com.backpackcloud.cli.cdi;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.cli.*;
-import com.backpackcloud.cli.impl.AnnotatedCommandAdapter;
-import com.backpackcloud.cli.impl.BaseCLI;
-import com.backpackcloud.cli.impl.CommandContextImpl;
-import com.backpackcloud.cli.impl.DefaultCommandNotifier;
-import com.backpackcloud.cli.preferences.Preference;
-import com.backpackcloud.cli.preferences.UserPreferences;
-import com.backpackcloud.cli.preferences.impl.UserPreferencesImpl;
+import com.backpackcloud.cli.AnnotatedCommand;
+import com.backpackcloud.cli.CLI;
+import com.backpackcloud.cli.Command;
+import com.backpackcloud.cli.CommandBus;
+import com.backpackcloud.cli.PreferenceValue;
+import com.backpackcloud.cli.Preferences;
+import com.backpackcloud.cli.Segments;
+import com.backpackcloud.cli.commands.AnnotatedCommandAdapter;
 import com.backpackcloud.cli.ui.ColorMap;
 import com.backpackcloud.cli.ui.IconMap;
 import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.StyleMap;
 import com.backpackcloud.cli.ui.Theme;
-import com.backpackcloud.cli.ui.impl.DefaultColorMap;
-import com.backpackcloud.cli.ui.impl.DefaultIconMap;
-import com.backpackcloud.cli.ui.impl.DefaultStyleMap;
-import com.backpackcloud.cli.ui.impl.DefaultTheme;
 import com.backpackcloud.configuration.Configuration;
 import com.backpackcloud.configuration.ConfigurationSupplier;
 import com.backpackcloud.configuration.ResourceConfiguration;
-import com.backpackcloud.serializer.Serializer;
-import com.backpackcloud.serializer.YAML;
+import com.backpackcloud.io.SerialBitter;
+import com.backpackcloud.preferences.Preference;
+import com.backpackcloud.preferences.UserPreferences;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import io.quarkus.vertx.LocalEventBusCodec;
-import io.vertx.core.eventbus.EventBus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Instance;
@@ -75,6 +70,8 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class Producers {
 
+  private final SerialBitter serializer = SerialBitter.YAML();
+
   @Segments
   private class Defaults {
 
@@ -87,15 +84,12 @@ public class Producers {
                        Instance<Command> commands,
                        Instance<AnnotatedCommand> annotatedCommands,
                        Instance<PromptWriter> promptWriters,
-                       EventBus eventBus,
                        Terminal terminal,
-                       CommandNotifier commandNotifier,
+                       CommandBus commandBus,
                        UserPreferences preferences,
                        Theme theme) {
     Map<String, PromptWriter> writers = new HashMap<>();
     promptWriters.forEach(w -> writers.put(w.name(), w));
-
-    eventBus.registerDefaultCodec(CommandContextImpl.class, new LocalEventBusCodec<>());
 
     Annotated annotated = point.getAnnotated();
     Segments segments = annotated.isAnnotationPresent(Segments.class) ?
@@ -115,20 +109,19 @@ public class Producers {
       .collect(Collectors.toCollection(ArrayList::new));
 
     annotatedCommands.stream()
-      .map(command -> new AnnotatedCommandAdapter(command, preferences, terminal, eventBus))
+      .map(command -> new AnnotatedCommandAdapter(command, preferences, terminal))
       .forEach(cliCommands::add);
 
-    return new BaseCLI(
+    return new CLI(
       terminal,
       preferences,
       theme,
       cliCommands,
       leftPromptWriters,
       rightPromptWriters,
-      commandNotifier
+      commandBus
     );
   }
-
 
   @Produces
   public Preference getPreference(InjectionPoint ip, UserPreferences preferences) {
@@ -142,50 +135,36 @@ public class Producers {
   @Singleton
   @Produces
   @DefaultBean
-  public CommandNotifier createCommandNotifier(ErrorRegistry errorRegistry) {
-    return new DefaultCommandNotifier(errorRegistry);
-  }
-
-  @Singleton
-  @Produces
-  @DefaultBean
-  public CommandListener createCommandListener(CommandNotifier notifier) {
-    return notifier.listener();
-  }
-
-  @Singleton
-  @Produces
-  @DefaultBean
   public Theme createTheme(ColorMap colorMap, IconMap iconMap, StyleMap styleMap) {
-    return new DefaultTheme(colorMap, iconMap, styleMap);
+    return new Theme(colorMap, iconMap, styleMap);
   }
 
   @Singleton
   @Produces
   @DefaultBean
-  public ColorMap createColorMap(@YAML Serializer serializer) {
-    return new DefaultColorMap(loadMap(serializer, "colors"));
+  public ColorMap createColorMap() {
+    return new ColorMap(loadMap("colors"));
   }
 
   @Singleton
   @Produces
   @DefaultBean
-  public IconMap createIconMap(@YAML Serializer serializer) {
-    return new DefaultIconMap(loadMap(serializer, "icons"));
+  public IconMap createIconMap() {
+    return new IconMap(loadMap("icons"));
   }
 
   @Singleton
   @Produces
   @DefaultBean
-  public StyleMap createStyleMap(@YAML Serializer serializer, ColorMap colorMap) {
-    Map<String, String> styleMap = loadMap(serializer, "styles");
+  public StyleMap createStyleMap(ColorMap colorMap) {
+    Map<String, String> styleMap = loadMap("styles");
     colorMap.colors().stream()
       .filter(color -> !styleMap.containsKey(color))
       .forEach(color -> styleMap.put(color, colorMap.valueOf(color)));
-    return new DefaultStyleMap(styleMap);
+    return new StyleMap(styleMap);
   }
 
-  private Map<String, String> loadMap(Serializer serializer, String mapName) {
+  private Map<String, String> loadMap(String mapName) {
     Configuration configuration = new ResourceConfiguration("META-INF/zipper/" + mapName + ".yml");
     Map<String, String> map = serializer.deserialize(configuration.read(), HashMap.class);
 
@@ -215,12 +194,20 @@ public class Producers {
   @Singleton
   @Produces
   @DefaultBean
-  public UserPreferences createUserPreferences(@YAML Serializer serializer) {
+  public UserPreferences createUserPreferences() {
     ConfigurationSupplier loader = new ConfigurationSupplier("zipper");
-    UserPreferences preferences = new UserPreferencesImpl();
+    UserPreferences preferences = new UserPreferences();
+
+    preferences.register(Preferences.class);
 
     loader.get().ifSet(conf ->
-      preferences.load(serializer.deserialize(conf.read(), FilePreferences.class).preferences())
+      serializer.deserialize(conf.read(), FilePreferences.class)
+        .preferences()
+        .forEach((id, configuration) -> {
+          preferences
+            .find(id)
+            .ifPresent(preference -> preference.set(configuration.read()));
+        })
     );
 
     return preferences;

@@ -22,19 +22,17 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.impl;
+package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.cli.*;
-import com.backpackcloud.cli.preferences.Preference;
-import com.backpackcloud.cli.preferences.UserPreferences;
 import com.backpackcloud.cli.ui.Paginator;
 import com.backpackcloud.cli.ui.Suggestion;
-import com.backpackcloud.cli.ui.impl.PaginatorImpl;
-import com.backpackcloud.cli.ui.impl.PromptSuggestion;
+import com.backpackcloud.cli.ui.components.PromptSuggestion;
+import com.backpackcloud.preferences.Preference;
+import com.backpackcloud.preferences.UserPreferences;
 import com.backpackcloud.reflection.Context;
 import com.backpackcloud.reflection.Mirror;
-import io.vertx.core.eventbus.EventBus;
 import org.jline.terminal.Terminal;
 
 import java.lang.reflect.Executable;
@@ -66,16 +64,12 @@ public class AnnotatedCommandAdapter implements Command {
 
   private final CommandDefinition definition;
 
-  private final EventBus eventBus;
-
   public AnnotatedCommandAdapter(AnnotatedCommand command,
                                  UserPreferences preferences,
-                                 Terminal terminal,
-                                 EventBus eventBus) {
+                                 Terminal terminal) {
     this.command = command;
     this.preferences = preferences;
     this.terminal = terminal;
-    this.eventBus = eventBus;
     this.actions = new HashMap<>();
     this.suggestions = new HashMap<>();
     this.definition = command.getClass().getAnnotation(CommandDefinition.class);
@@ -127,12 +121,10 @@ public class AnnotatedCommandAdapter implements Command {
       String actionName = input.getFirst().asString();
       if (actions.containsKey(actionName)) {
         invokeAction(context, actions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
-        eventBus.publish(String.format("command.%s.%s", event, actionName), context);
       } else {
         throw new UnbelievableException("Action " + actionName + " not recognized");
       }
     }
-    eventBus.publish(String.format("command.%s", event), context);
   }
 
   private void invokeAction(CommandContext commandContext, Method actionMethod, List<CommandInput> commandInputs) {
@@ -148,7 +140,7 @@ public class AnnotatedCommandAdapter implements Command {
 
     if (actionMethod.isAnnotationPresent(Paginate.class)) {
       Paginate annotation = actionMethod.getAnnotation(Paginate.class);
-      PaginatorImpl paginator = new PaginatorImpl(preferences, terminal, commandContext);
+      Paginator paginator = new Paginator(preferences, terminal, commandContext);
 
       if (returnValue instanceof List<?> returnList) {
         paginator.from(returnList)
@@ -270,7 +262,7 @@ public class AnnotatedCommandAdapter implements Command {
         return args.toArray(new String[0]);
       })
 
-      .when(ofType(Paginator.class), () -> new PaginatorImpl(preferences, terminal, commandContext))
+      .when(ofType(Paginator.class), () -> new Paginator(preferences, terminal, commandContext))
 
       .when(ofType(String.class), inputSupplier)
 

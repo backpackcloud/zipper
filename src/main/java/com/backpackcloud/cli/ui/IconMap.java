@@ -24,14 +24,35 @@
 
 package com.backpackcloud.cli.ui;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-public interface IconMap {
+public class IconMap {
 
-  String symbolOf(String icon);
+  private final Map<String, String> icons;
 
-  Set<String> icons();
+  public IconMap(Map<String, String> icons) {
+    this.icons = icons;
+  }
 
-  void put(String name, String symbol);
+  public String symbolOf(String icon) {
+    if (icons.containsKey(icon)) {
+      String symbol = icons.get(icon);
+      if (icons.containsKey(symbol)) {
+        return symbolOf(symbol);
+      }
+      return symbol;
+    }
+    return "";
+  }
+
+  public Set<String> icons() {
+    return new HashSet<>(icons.keySet());
+  }
+
+  public void put(String name, String symbol) {
+    this.icons.put(name, symbol);
+  }
 
 }

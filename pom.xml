@@ -39,7 +39,7 @@
   <packaging>jar</packaging>
 
   <description>
-    Zipper is a common library that holds base features for the Backpack Cloud projects.
+    Zipper is a common library for the BackpackCloud CLI tools.
   </description>
 
   <url>https://github.com/backpackcloud/zipper</url>

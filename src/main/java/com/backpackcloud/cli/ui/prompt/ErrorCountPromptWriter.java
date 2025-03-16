@@ -25,9 +25,8 @@
 package com.backpackcloud.cli.ui.prompt;
 
 import com.backpackcloud.cli.ErrorRegistry;
-import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
-
+import com.backpackcloud.cli.ui.Prompt;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped

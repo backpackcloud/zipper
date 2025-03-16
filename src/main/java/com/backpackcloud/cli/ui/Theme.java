@@ -24,12 +24,6 @@
 
 package com.backpackcloud.cli.ui;
 
-public interface Theme {
-
-  IconMap iconMap();
-
-  ColorMap colorMap();
-
-  StyleMap styleMap();
+public record Theme(ColorMap colorMap, IconMap iconMap, StyleMap styleMap) {
 
 }

@@ -24,25 +24,42 @@
 
 package com.backpackcloud.cli;
 
+import java.util.List;
+
 /**
  * Defines which context a command was issued.
  *
  * @author Marcelo "Ataxexe" Guimarães
  */
-public interface CommandContext {
+public class CommandContext {
 
-  CLI cli();
+  private final CLI cli;
+  private final List<String> args;
+  private final Writer writer;
+  private final boolean interactive;
 
-  /**
-   * @return the writer to use in order to provide feedback about the command execution.
-   */
-  Writer writer();
+  public CommandContext(CLI cli, List<String> args, Writer writer, boolean interactive) {
+    this.cli = cli;
+    this.args = args;
+    this.writer = writer;
+    this.interactive = interactive;
+  }
 
-  /**
-   * @return the input passed together with the command for extracting the arguments.
-   */
-  CommandInput input();
+  public boolean isInteractive() {
+    return interactive;
+  }
 
-  boolean isInteractive();
+  public CLI cli() {
+    return cli;
+  }
+
+  public CommandInput input() {
+    return new CommandInput(String.join(" ", args), args);
+  }
+
+  public Writer writer() {
+    return writer;
+  }
+
 
 }

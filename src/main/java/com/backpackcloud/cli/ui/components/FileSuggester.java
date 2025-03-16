@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.ui.impl;
+package com.backpackcloud.cli.ui.components;
 
 import com.backpackcloud.cli.ui.Suggestion;
 

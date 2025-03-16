@@ -24,20 +24,222 @@
 
 package com.backpackcloud.cli;
 
+import com.backpackcloud.UnbelievableException;
+import com.backpackcloud.cli.commands.MacroCommand;
+import com.backpackcloud.cli.ui.PromptWriter;
+import com.backpackcloud.cli.ui.Theme;
+import com.backpackcloud.cli.ui.components.CommandCompleter;
+import com.backpackcloud.cli.ui.Prompt;
+import com.backpackcloud.cli.ui.components.PromptHighlighter;
+import com.backpackcloud.preferences.UserPreferences;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.ParsedLine;
+import org.jline.reader.UserInterruptException;
+import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStyle;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public interface CLI {
+public class CLI {
 
-  void start();
+  private final Terminal terminal;
+  private final UserPreferences preferences;
+  private final Theme theme;
 
-  void stop();
+  private final LineReader lineReader;
+  private final Map<String, Command> commands;
 
-  void flush();
+  private final PromptHighlighter highlighter;
 
-  void registerMacro(String name, List<String> commands);
+  private final Collection<PromptWriter> leftPrompt;
+  private final Collection<PromptWriter> rightPrompt;
+  private final CommandBus commandBus;
 
-  void execute(String... commands);
+  private final Writer console;
 
-  void execute(Writer writer, String... commands);
+  private boolean stop;
+
+  public CLI(Terminal terminal,
+             UserPreferences preferences,
+             Theme theme,
+             Collection<Command> commands,
+             Collection<PromptWriter> leftPrompt,
+             Collection<PromptWriter> rightPrompt,
+             CommandBus commandBus) {
+    this.terminal = terminal;
+    this.preferences = preferences;
+    this.theme = theme;
+    this.leftPrompt = leftPrompt;
+    this.rightPrompt = rightPrompt;
+    this.commandBus = commandBus;
+
+    this.commands = new HashMap<>();
+
+    commands.forEach(command -> {
+      this.commands.put(command.name(), command);
+      command.aliases().forEach(alias -> this.commands.put(alias, command));
+    });
+
+    this.highlighter = new PromptHighlighter(preferences, this.commands.keySet(), theme);
+
+    this.lineReader = LineReaderBuilder.builder()
+      .terminal(terminal)
+      .highlighter(highlighter)
+      .history(new DefaultHistory())
+      .completer(new CommandCompleter(this.commands, preferences))
+      .build();
+
+    this.console = new Writer(
+      theme,
+      AttributedStyle.DEFAULT,
+      AttributedString::new,
+      text -> terminal.writer().print(text.toAnsi()),
+      terminal
+    );
+
+    this.lineReader.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true);
+
+    preferences.watch(Preferences.AUTO_SUGGEST, enabled -> {
+      if (enabled) {
+        this.lineReader.setAutosuggestion(LineReader.SuggestionType.COMPLETER);
+      } else {
+        this.lineReader.setAutosuggestion(LineReader.SuggestionType.NONE);
+      }
+    });
+  }
+
+  public void registerMacro(String name, List<String> commands) {
+    this.commands.put(name, new MacroCommand(name, this, commands));
+    this.highlighter.addCommand(name);
+  }
+
+  public void stop() {
+    stop = true;
+  }
+
+  private void flush() {
+    terminal.flush();
+  }
+
+  public void start() {
+    String query;
+    while (!stop) {
+      try {
+        commandBus.notifyReady();
+
+        String left = buildLeftPrompt();
+        String right = buildRightPrompt();
+
+        query = lineReader.readLine(left, right, (Character) null, null).trim();
+
+        execute(query);
+      } catch (UnbelievableException e) {
+        commandBus.notifyError(e);
+        if (e.getMessage() != null) {
+          console.style()
+            .parse("command_error")
+            .bold().italic()
+            .set().write(e.getMessage()).newLine();
+        } else {
+          console.style()
+            .parse("command_error")
+            .bold().italic()
+            .set().write("An error occurred").newLine();
+        }
+      } catch (EndOfFileException e) {
+        // if ctrl+d is pressed, exit cli
+        return;
+      } catch (UserInterruptException e) {
+        // exit cli if there's no input
+        // this would make it easy to just cancel the current prompt and start again
+        // if ctrl+c is pressed without any input, cli will just end
+        if (e.getPartialLine().isBlank()) {
+          return;
+        }
+      }
+    }
+  }
+
+  public void execute(String... commands) {
+    execute(console, commands);
+  }
+
+  public void execute(Writer writer, String... commands) {
+    commandBus.notifyStart();
+    try {
+      for (String command : commands) {
+        if (!command.isEmpty()) {
+          parseAndExecute(writer, lineReader.getParser().parse(command, 0));
+        }
+      }
+    } catch (Exception e) {
+      commandBus.notifyError(e);
+    } finally {
+      commandBus.notifyDone();
+    }
+  }
+
+  private String buildLeftPrompt() {
+    StringBuilder builder = new StringBuilder();
+    Writer writer = stringBuilderWriter(builder);
+    Prompt prompt = Prompt.create(theme, writer, terminal,
+      preferences.supplier(Preferences.LEFT_PROMPT_TAIL).get(),
+      preferences.supplier(Preferences.LEFT_PROMPT_SEPARATOR).get(),
+      preferences.supplier(Preferences.LEFT_PROMPT_HEAD).get()
+    );
+
+    leftPrompt.forEach(promptWriter -> promptWriter.addTo(prompt, PromptWriter.PromptSide.LEFT));
+
+    return builder.toString();
+  }
+
+  private String buildRightPrompt() {
+    StringBuilder builder = new StringBuilder();
+    Writer writer = stringBuilderWriter(builder);
+    Prompt prompt = Prompt.create(theme, writer, terminal,
+      preferences.supplier(Preferences.RIGHT_PROMPT_TAIL).get(),
+      preferences.supplier(Preferences.RIGHT_PROMPT_SEPARATOR).get(),
+      preferences.supplier(Preferences.RIGHT_PROMPT_HEAD).get()
+    );
+
+    rightPrompt.forEach(promptWriter -> promptWriter.addTo(prompt, PromptWriter.PromptSide.RIGHT));
+
+    prompt.closeSegments();
+
+    return builder.toString();
+  }
+
+  private Writer stringBuilderWriter(StringBuilder stringBuilder) {
+    return new Writer(theme, AttributedStyle.DEFAULT,
+      AttributedString::new,
+      text -> stringBuilder.append(text.toAnsi()),
+      terminal);
+  }
+
+  private void parseAndExecute(Writer writer, ParsedLine parsedLine) {
+    List<String> args = new ArrayList<>(parsedLine.words());
+    String commandName = args.get(0);
+    Command command = commands.get(commandName);
+    boolean interactive = true;
+    CommandContext currentContext;
+
+    if (command == null) {
+      throw new UnbelievableException("Unknown command " + commandName);
+    }
+
+    List<String> argsList = args.subList(1, args.size());
+
+    // only allow interaction if cli is taking user inputs
+    currentContext = new CommandContext(this, argsList, writer, interactive);
+    command.execute(currentContext);
+  }
 
 }

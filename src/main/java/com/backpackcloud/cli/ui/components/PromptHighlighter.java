@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.ui.impl;
+package com.backpackcloud.cli.ui.components;
 
-import com.backpackcloud.cli.preferences.UserPreference;
-import com.backpackcloud.cli.preferences.UserPreferences;
+import com.backpackcloud.cli.Preferences;
+import com.backpackcloud.cli.ui.StyleBuilder;
 import com.backpackcloud.cli.ui.Theme;
+import com.backpackcloud.preferences.UserPreferences;
 import org.jline.reader.Highlighter;
 import org.jline.reader.LineReader;
 import org.jline.reader.Parser;
@@ -58,7 +59,7 @@ public class PromptHighlighter implements Highlighter {
 
   @Override
   public AttributedString highlight(LineReader reader, String buffer) {
-    if (userPreferences.isDisabled(UserPreference.HIGHLIGHTER)) {
+    if (userPreferences.isDisabled(Preferences.HIGHLIGHTER)) {
       return new AttributedString(buffer);
     }
     Parser parser = reader.getParser();

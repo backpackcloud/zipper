@@ -24,10 +24,9 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.CommandListener;
-import com.backpackcloud.cli.ui.Prompt;
+import com.backpackcloud.cli.CommandObserver;
 import com.backpackcloud.cli.ui.PromptWriter;
-
+import com.backpackcloud.cli.ui.Prompt;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
@@ -35,9 +34,9 @@ public class PromptCharWriter implements PromptWriter {
 
   private boolean commandError;
 
-  public PromptCharWriter(CommandListener listener) {
-    listener.beforeCommand(() -> commandError = false);
-    listener.onCommandError(c -> commandError = true);
+  public PromptCharWriter(CommandObserver observer) {
+    observer.beforeCommand(() -> commandError = false);
+    observer.onCommandError(c -> commandError = true);
   }
 
   @Override

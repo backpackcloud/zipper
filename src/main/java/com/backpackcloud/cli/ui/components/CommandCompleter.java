@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli.ui.impl;
+package com.backpackcloud.cli.ui.components;
 
 import com.backpackcloud.cli.Command;
-import com.backpackcloud.cli.impl.CommandInputImpl;
-import com.backpackcloud.cli.preferences.UserPreference;
-import com.backpackcloud.cli.preferences.UserPreferences;
+import com.backpackcloud.cli.CommandInput;
+import com.backpackcloud.cli.Preferences;
 import com.backpackcloud.cli.ui.Suggestion;
+import com.backpackcloud.preferences.UserPreferences;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -50,7 +50,7 @@ public class CommandCompleter implements Completer {
 
   @Override
   public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-    if (userPreferences.isEnabled(UserPreference.COMPLETION)) {
+    if (userPreferences.isEnabled(Preferences.COMPLETION)) {
       suggest(line.words()).stream()
         .map(Suggestion::toCandidate)
         .forEach(candidates::add);
@@ -71,7 +71,7 @@ public class CommandCompleter implements Completer {
         .forEach(suggestions::add);
     } else if (commands.containsKey(firstWord)) {
       List<String> args = words.subList(1, words.size());
-      suggestions.addAll(commands.get(firstWord).suggest(new CommandInputImpl(args)));
+      suggestions.addAll(commands.get(firstWord).suggest(new CommandInput(args)));
     }
 
     return suggestions;

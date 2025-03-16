@@ -28,10 +28,11 @@ import com.backpackcloud.cli.Action;
 import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Suggestions;
-import com.backpackcloud.cli.preferences.Preference;
-import com.backpackcloud.cli.preferences.UserPreferences;
+import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.ui.Suggestion;
-import com.backpackcloud.cli.ui.impl.PromptSuggestion;
+import com.backpackcloud.cli.ui.components.PromptSuggestion;
+import com.backpackcloud.preferences.Preference;
+import com.backpackcloud.preferences.UserPreferences;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.List;
@@ -61,8 +62,18 @@ public class PreferencesCommand implements AnnotatedCommand {
   }
 
   @Action
-  public List<Preference<?>> list() {
-    return userPreferences.list();
+  public void list(Writer writer) {
+    userPreferences.list().forEach(preference -> writer
+      .withStyle("preference_name")
+      .write(preference.spec().id()).write(": ")
+
+      .withStyle("preference_" + preference.spec().type().name().toLowerCase())
+      .write(String.valueOf(preference.inputValue()))
+
+      .withStyle("preference_description")
+      .write(String.format(" (%s)", preference.spec().description()))
+      .newLine()
+    );
   }
 
   @Suggestions({"set", "clear"})
@@ -74,7 +85,7 @@ public class PreferencesCommand implements AnnotatedCommand {
             "%s - \"%s\"",
             preferences.spec().description(),
             preferences.inputValue()))
-          .asPartOf(preferences.spec().type().description())
+          .asPartOf(preferences.spec().type().name())
       )
       .collect(Collectors.toList());
   }
