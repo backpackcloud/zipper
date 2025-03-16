@@ -24,6 +24,39 @@
 
 package com.backpackcloud.cli.ui;
 
+import com.backpackcloud.configuration.Configuration;
+import com.backpackcloud.configuration.ResourceConfiguration;
+import com.backpackcloud.io.Deserializer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
 public record Theme(ColorMap colorMap, IconMap iconMap, StyleMap styleMap) {
+
+  public static Theme create(Deserializer deserializer) {
+    Function<String, Map<String, String>> loadMap = name -> {
+      Configuration configuration = new ResourceConfiguration("META-INF/zipper/" + name + ".yml");
+      Map<String, String> map = deserializer.deserialize(configuration.read(), HashMap.class);
+
+      Configuration extraMap = new ResourceConfiguration("META-INF/config/" + name + ".yml");
+      if (extraMap.isSet()) {
+        String content = extraMap.read();
+        if (content != null && !content.isEmpty()) {
+          map.putAll(deserializer.deserialize(extraMap.read(), HashMap.class));
+        }
+      }
+      return map;
+    };
+    ColorMap colorMap = new ColorMap(loadMap.apply("colors"));
+    IconMap iconMap = new IconMap(loadMap.apply("icons"));
+
+    Map<String, String> styleMap = loadMap.apply("styles");
+    colorMap.colors().stream()
+      .filter(color -> !styleMap.containsKey(color))
+      .forEach(color -> styleMap.put(color, colorMap.valueOf(color)));
+
+    return new Theme(colorMap, iconMap, new StyleMap(styleMap));
+  }
 
 }

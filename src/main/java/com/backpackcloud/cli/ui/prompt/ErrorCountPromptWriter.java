@@ -25,22 +25,15 @@
 package com.backpackcloud.cli.ui.prompt;
 
 import com.backpackcloud.cli.ErrorRegistry;
-import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.Prompt;
-import jakarta.enterprise.context.ApplicationScoped;
+import com.backpackcloud.cli.ui.PromptWriter;
 
-@ApplicationScoped
 public class ErrorCountPromptWriter implements PromptWriter {
 
   private final ErrorRegistry registry;
 
   public ErrorCountPromptWriter(ErrorRegistry registry) {
     this.registry = registry;
-  }
-
-  @Override
-  public String name() {
-    return "errors";
   }
 
   @Override

@@ -45,7 +45,6 @@ public interface Command {
    * Returns the name of the command, which the user needs to type to execute it.
    *
    * @return the name of the command.
-   * @see #aliases()
    */
   String name();
 
@@ -53,13 +52,6 @@ public interface Command {
    * @return a brief description of this command.
    */
   String description();
-  
-  /**
-   * @return a list of alternative names this command responds to.
-   */
-  default List<String> aliases() {
-    return Collections.emptyList();
-  }
 
   /**
    * Executes this command based on the given context.

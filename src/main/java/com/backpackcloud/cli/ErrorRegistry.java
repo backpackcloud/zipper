@@ -24,13 +24,10 @@
 
 package com.backpackcloud.cli;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-@ApplicationScoped
 public class ErrorRegistry implements Registry {
 
   private final List<Exception> errors;

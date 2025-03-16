@@ -25,14 +25,12 @@
 package com.backpackcloud.cli.ui.prompt;
 
 import com.backpackcloud.cli.CommandObserver;
-import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.Prompt;
-import jakarta.enterprise.context.ApplicationScoped;
+import com.backpackcloud.cli.ui.PromptWriter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-@ApplicationScoped
 public class TimerPromptWriter implements PromptWriter {
 
   private Duration lastCommandDuration = Duration.ZERO;
@@ -44,11 +42,6 @@ public class TimerPromptWriter implements PromptWriter {
       lastCommandDuration = null;
     });
     observer.afterCommand(() -> lastCommandDuration = Duration.between(start, LocalDateTime.now()));
-  }
-
-  @Override
-  public String name() {
-    return "timer";
   }
 
   @Override

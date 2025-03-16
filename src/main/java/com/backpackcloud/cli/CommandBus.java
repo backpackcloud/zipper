@@ -1,12 +1,9 @@
 package com.backpackcloud.cli;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-@ApplicationScoped
 public class CommandBus implements CommandObserver, CommandNotifier {
 
   private final List<Runnable> startListeners = new ArrayList<>();

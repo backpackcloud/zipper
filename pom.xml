@@ -68,14 +68,12 @@
   </scm>
 
   <properties>
-    <junit.version>5.9.1</junit.version>
+    <fabric.version>1.0.0-SNAPSHOT</fabric.version>
+
     <mockito.version>4.8.0</mockito.version>
     <hamcrest.version>2.2</hamcrest.version>
     <jline.version>3.27.1</jline.version>
-    <quarkus.version>3.16.2</quarkus.version>
-    <jandex.version>1.2.2</jandex.version>
-    <jaxrs-api.version>3.1.0</jaxrs-api.version>
-    <fabric.version>1.0.0-SNAPSHOT</fabric.version>
+    <junit.version>5.9.1</junit.version>
   </properties>
 
   <dependencyManagement>
@@ -87,64 +85,11 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-      <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-universe-bom</artifactId>
-        <version>${quarkus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-arc</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-vertx</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-client</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jdk8</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId>jackson-module-parameter-names</artifactId>
-    </dependency>
-
-    <dependency>
+        <dependency>
       <groupId>com.backpackcloud</groupId>
       <artifactId>fabric</artifactId>
       <version>${fabric.version}</version>
@@ -154,13 +99,6 @@
       <groupId>org.jline</groupId>
       <artifactId>jline</artifactId>
       <version>${jline.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jakarta.ws.rs</groupId>
-      <artifactId>jakarta.ws.rs-api</artifactId>
-      <version>${jaxrs-api.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -182,24 +120,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jboss.jandex</groupId>
-        <artifactId>jandex-maven-plugin</artifactId>
-        <version>${jandex.version}</version>
-        <executions>
-          <execution>
-            <id>make-index</id>
-            <goals>
-              <goal>jandex</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
   <distributionManagement>
     <snapshotRepository>

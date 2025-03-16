@@ -24,9 +24,6 @@
 
 package com.backpackcloud.cli;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Stereotype;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -35,16 +32,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines a command. Annotated classes must implement {@link AnnotatedCommand}.
+ * Defines a command.
  *
  * @author Marcelo Guimarães
  */
 @Documented
-@Stereotype
 @Inherited
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@ApplicationScoped
 public @interface CommandDefinition {
 
   /**
@@ -63,11 +58,6 @@ public @interface CommandDefinition {
    * Defines the type of this command, the UI will use this to group the commands in the suggestions.
    */
   String type() default "Miscellaneous";
-
-  /**
-   * Defines aliases to this command.
-   */
-  String[] aliases() default {};
 
   /**
    * Defines the description of this command, which will be shown in the UI.

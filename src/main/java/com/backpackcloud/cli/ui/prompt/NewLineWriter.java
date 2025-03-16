@@ -24,19 +24,10 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
+import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 
-import com.backpackcloud.cli.ui.Prompt;
-import jakarta.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
 public class NewLineWriter implements PromptWriter {
-
-
-  @Override
-  public String name() {
-    return "new-line";
-  }
 
   @Override
   public void addTo(Prompt prompt, PromptSide side) {

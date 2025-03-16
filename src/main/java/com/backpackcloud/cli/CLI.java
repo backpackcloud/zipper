@@ -25,11 +25,10 @@
 package com.backpackcloud.cli;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.cli.commands.MacroCommand;
+import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.components.CommandCompleter;
-import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.components.PromptHighlighter;
 import com.backpackcloud.preferences.UserPreferences;
 import org.jline.reader.EndOfFileException;
@@ -45,6 +44,7 @@ import org.jline.utils.AttributedStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -70,25 +70,17 @@ public class CLI {
   public CLI(Terminal terminal,
              UserPreferences preferences,
              Theme theme,
-             Collection<Command> commands,
-             Collection<PromptWriter> leftPrompt,
-             Collection<PromptWriter> rightPrompt,
              CommandBus commandBus) {
     this.terminal = terminal;
     this.preferences = preferences;
     this.theme = theme;
-    this.leftPrompt = leftPrompt;
-    this.rightPrompt = rightPrompt;
+    this.leftPrompt = new ArrayList<>();
+    this.rightPrompt = new ArrayList<>();
     this.commandBus = commandBus;
 
     this.commands = new HashMap<>();
 
-    commands.forEach(command -> {
-      this.commands.put(command.name(), command);
-      command.aliases().forEach(alias -> this.commands.put(alias, command));
-    });
-
-    this.highlighter = new PromptHighlighter(preferences, this.commands.keySet(), theme);
+    this.highlighter = new PromptHighlighter(preferences, new HashSet<>(), theme);
 
     this.lineReader = LineReaderBuilder.builder()
       .terminal(terminal)
@@ -116,9 +108,20 @@ public class CLI {
     });
   }
 
-  public void registerMacro(String name, List<String> commands) {
-    this.commands.put(name, new MacroCommand(name, this, commands));
-    this.highlighter.addCommand(name);
+  public void addLeftPrompt(PromptWriter writer) {
+    this.leftPrompt.add(writer);
+  }
+
+  public void addRightPrompt(PromptWriter writer) {
+    this.rightPrompt.add(writer);
+  }
+
+  public void register(Command... commands) {
+    for (Command command : commands) {
+      String name = command.name();
+      this.commands.put(name, command);
+      this.highlighter.addCommand(name);
+    }
   }
 
   public void stop() {

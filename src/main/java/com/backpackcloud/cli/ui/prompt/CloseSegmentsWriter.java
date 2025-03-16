@@ -24,17 +24,10 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.Prompt;
-import jakarta.enterprise.context.ApplicationScoped;
+import com.backpackcloud.cli.ui.PromptWriter;
 
-@ApplicationScoped
 public class CloseSegmentsWriter implements PromptWriter {
-
-  @Override
-  public String name() {
-    return "close";
-  }
 
   @Override
   public void addTo(Prompt prompt, PromptSide side) {

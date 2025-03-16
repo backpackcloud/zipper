@@ -25,11 +25,9 @@
 package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.ErrorRegistry;
 import com.backpackcloud.cli.ui.Paginator;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,8 +35,7 @@ import java.io.StringWriter;
   name = "errors",
   description = "Shows the error registry"
 )
-@RegisterForReflection
-public class ShowErrorRegistryCommand implements AnnotatedCommand {
+public class ShowErrorRegistryCommand {
 
   private final ErrorRegistry registry;
   public ShowErrorRegistryCommand(ErrorRegistry registry) {

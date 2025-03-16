@@ -26,8 +26,6 @@ package com.backpackcloud.cli.ui;
 
 public interface PromptWriter {
 
-  String name();
-
   void addTo(Prompt prompt, PromptSide side);
 
   enum PromptSide {

@@ -53,7 +53,7 @@ import static com.backpackcloud.reflection.predicates.ParameterPredicates.ofType
 
 public class AnnotatedCommandAdapter implements Command {
 
-  private final AnnotatedCommand command;
+  private final Object command;
 
   private final Map<String, Method> actions;
 
@@ -64,9 +64,12 @@ public class AnnotatedCommandAdapter implements Command {
 
   private final CommandDefinition definition;
 
-  public AnnotatedCommandAdapter(AnnotatedCommand command,
+  public AnnotatedCommandAdapter(Object command,
                                  UserPreferences preferences,
                                  Terminal terminal) {
+    if (!command.getClass().isAnnotationPresent(CommandDefinition.class)) {
+      throw new UnbelievableException("Command must be annotated with @CommandDefinition");
+    }
     this.command = command;
     this.preferences = preferences;
     this.terminal = terminal;
@@ -179,7 +182,12 @@ public class AnnotatedCommandAdapter implements Command {
   @Override
   public List<Suggestion> suggest(CommandInput commandInput) {
     if (actions.size() == 1) {
-      return invokeSuggestion(suggestions.values().iterator().next(), commandInput.asList());
+      Iterator<Method> iterator = suggestions.values().iterator();
+      if (iterator.hasNext()) {
+        return invokeSuggestion(iterator.next(), commandInput.asList());
+      } else {
+        return Collections.emptyList();
+      }
     } else {
       List<CommandInput> input = commandInput.asList();
       if (input.size() <= 1) {
@@ -309,11 +317,6 @@ public class AnnotatedCommandAdapter implements Command {
   @Override
   public String description() {
     return definition.description();
-  }
-
-  @Override
-  public List<String> aliases() {
-    return List.of(definition.aliases());
   }
 
 }

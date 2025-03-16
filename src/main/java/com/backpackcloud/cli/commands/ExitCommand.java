@@ -25,17 +25,14 @@
 package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandContext;
 import com.backpackcloud.cli.CommandDefinition;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @CommandDefinition(
   name = "exit",
   description = "Exits the program"
 )
-@RegisterForReflection
-public class ExitCommand implements AnnotatedCommand {
+public class ExitCommand {
 
   @Action
   public void execute(CommandContext context) {

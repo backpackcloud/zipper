@@ -25,7 +25,6 @@
 package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Suggestions;
 import com.backpackcloud.cli.Writer;
@@ -33,7 +32,6 @@ import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
 import com.backpackcloud.preferences.Preference;
 import com.backpackcloud.preferences.UserPreferences;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,8 +40,7 @@ import java.util.stream.Collectors;
   name = "preferences",
   description = "Manages the user preferences"
 )
-@RegisterForReflection
-public class PreferencesCommand implements AnnotatedCommand {
+public class PreferencesCommand {
 
   private final UserPreferences userPreferences;
 

@@ -25,15 +25,12 @@
 package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Registry;
 import com.backpackcloud.cli.Suggestions;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import jakarta.enterprise.inject.Instance;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,12 +42,11 @@ import java.util.stream.Stream;
   name = "clear",
   description = "Clears the given records or everything"
 )
-@RegisterForReflection
-public class ClearCommand implements AnnotatedCommand {
+public class ClearCommand {
 
   private final Map<String, Registry> registries;
 
-  public ClearCommand(Instance<Registry> registries) {
+  public ClearCommand(List<Registry> registries) {
     this.registries = new HashMap<>();
 
     registries.forEach(registry -> this.registries.put(registry.name(), registry));

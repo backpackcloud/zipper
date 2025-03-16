@@ -25,7 +25,6 @@
 package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.AnnotatedCommand;
 import com.backpackcloud.cli.CommandDefinition;
 import com.backpackcloud.cli.Suggestions;
 import com.backpackcloud.cli.Writer;
@@ -35,7 +34,6 @@ import com.backpackcloud.cli.ui.StyleMap;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,8 +42,7 @@ import java.util.stream.Collectors;
   name = "theme",
   description = "Manages the UI theme"
 )
-@RegisterForReflection
-public class ThemeCommand implements AnnotatedCommand {
+public class ThemeCommand {
 
   private final IconMap iconMap;
   private final ColorMap colorMap;

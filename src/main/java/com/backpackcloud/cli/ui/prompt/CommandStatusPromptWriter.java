@@ -25,11 +25,9 @@
 package com.backpackcloud.cli.ui.prompt;
 
 import com.backpackcloud.cli.CommandObserver;
-import com.backpackcloud.cli.ui.PromptWriter;
 import com.backpackcloud.cli.ui.Prompt;
-import jakarta.enterprise.context.ApplicationScoped;
+import com.backpackcloud.cli.ui.PromptWriter;
 
-@ApplicationScoped
 public class CommandStatusPromptWriter implements PromptWriter {
 
   private boolean commandError;
@@ -37,11 +35,6 @@ public class CommandStatusPromptWriter implements PromptWriter {
   public CommandStatusPromptWriter(CommandObserver observer) {
     observer.beforeCommand(() -> commandError = false);
     observer.onCommandError(e -> commandError = true);
-  }
-
-  @Override
-  public String name() {
-    return "status";
   }
 
   @Override
