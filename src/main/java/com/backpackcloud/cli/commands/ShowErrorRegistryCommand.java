@@ -24,8 +24,8 @@
 
 package com.backpackcloud.cli.commands;
 
-import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.CommandDefinition;
+import com.backpackcloud.cli.annotations.Action;
+import com.backpackcloud.cli.annotations.CommandDefinition;
 import com.backpackcloud.cli.ErrorRegistry;
 import com.backpackcloud.cli.ui.Paginator;
 

@@ -24,10 +24,10 @@
 
 package com.backpackcloud.cli.commands;
 
-import com.backpackcloud.cli.Action;
-import com.backpackcloud.cli.CommandDefinition;
+import com.backpackcloud.cli.annotations.Action;
+import com.backpackcloud.cli.annotations.CommandDefinition;
 import com.backpackcloud.cli.Registry;
-import com.backpackcloud.cli.Suggestions;
+import com.backpackcloud.cli.annotations.Suggestions;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.backpackcloud.cli;
+package com.backpackcloud.cli.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -51,15 +51,16 @@ public class CommandCompleter implements Completer {
   @Override
   public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
     if (userPreferences.isEnabled(Preferences.COMPLETION)) {
-      suggest(line.words()).stream()
+      suggest(line).stream()
         .map(Suggestion::toCandidate)
         .forEach(candidates::add);
     }
   }
 
-  public List<Suggestion> suggest(List<String> words) {
+  private List<Suggestion> suggest(ParsedLine parsedLine) {
     List<Suggestion> suggestions = new ArrayList<>();
-    String firstWord = words.get(0);
+    List<String> words = parsedLine.words();
+    String firstWord = words.getFirst();
 
     if (words.size() == 1) {
       commands.entrySet().stream()
@@ -70,8 +71,7 @@ public class CommandCompleter implements Completer {
           .asPartOf(entry.getValue().type()))
         .forEach(suggestions::add);
     } else if (commands.containsKey(firstWord)) {
-      List<String> args = words.subList(1, words.size());
-      suggestions.addAll(commands.get(firstWord).suggest(new CommandInput(args)));
+      suggestions.addAll(commands.get(firstWord).suggest(new CommandInput(parsedLine)));
     }
 
     return suggestions;

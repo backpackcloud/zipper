@@ -26,6 +26,13 @@ package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.cli.*;
+import com.backpackcloud.cli.annotations.Action;
+import com.backpackcloud.cli.annotations.CommandDefinition;
+import com.backpackcloud.cli.annotations.Line;
+import com.backpackcloud.cli.annotations.Paginate;
+import com.backpackcloud.cli.annotations.ParameterCount;
+import com.backpackcloud.cli.annotations.PreferenceValue;
+import com.backpackcloud.cli.annotations.Suggestions;
 import com.backpackcloud.cli.ui.Paginator;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
@@ -33,6 +40,7 @@ import com.backpackcloud.preferences.Preference;
 import com.backpackcloud.preferences.UserPreferences;
 import com.backpackcloud.reflection.Context;
 import com.backpackcloud.reflection.Mirror;
+import com.backpackcloud.text.InputValue;
 import org.jline.terminal.Terminal;
 
 import java.lang.reflect.Executable;
@@ -113,15 +121,14 @@ public class AnnotatedCommandAdapter implements Command {
 
   @Override
   public void execute(CommandContext context) {
-    List<CommandInput> input = context.input().asList();
-    String event = definition.event().isEmpty() ? definition.name() : definition.event();
+    List<InputValue> input = context.input().words();
     if (actions.size() == 1) {
       invokeAction(context, actions.values().iterator().next(), input);
     } else {
       if (input.isEmpty()) {
         throw new UnbelievableException("No action given");
       }
-      String actionName = input.getFirst().asString();
+      String actionName = input.getFirst().get();
       if (actions.containsKey(actionName)) {
         invokeAction(context, actions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
       } else {
@@ -130,8 +137,8 @@ public class AnnotatedCommandAdapter implements Command {
     }
   }
 
-  private void invokeAction(CommandContext commandContext, Method actionMethod, List<CommandInput> commandInputs) {
-    Object[] args = resolveArgs(commandContext, commandInputs, actionMethod);
+  private void invokeAction(CommandContext commandContext, Method actionMethod, List<InputValue> words) {
+    Object[] args = resolveArgs(commandContext, words, actionMethod);
 
     Object returnValue;
 
@@ -184,18 +191,18 @@ public class AnnotatedCommandAdapter implements Command {
     if (actions.size() == 1) {
       Iterator<Method> iterator = suggestions.values().iterator();
       if (iterator.hasNext()) {
-        return invokeSuggestion(iterator.next(), commandInput.asList());
+        return invokeSuggestion(iterator.next(), commandInput.words());
       } else {
         return Collections.emptyList();
       }
     } else {
-      List<CommandInput> input = commandInput.asList();
+      List<InputValue> input = commandInput.words();
       if (input.size() <= 1) {
         return actions.keySet().stream()
           .map(PromptSuggestion::suggest)
           .collect(Collectors.toList());
       }
-      String actionName = input.getFirst().asString();
+      String actionName = input.getFirst().get();
       if (suggestions.containsKey(actionName)) {
         return invokeSuggestion(suggestions.get(actionName), input.size() > 1 ? input.subList(1, input.size()) : Collections.emptyList());
       } else {
@@ -204,7 +211,7 @@ public class AnnotatedCommandAdapter implements Command {
     }
   }
 
-  private List<Suggestion> invokeSuggestion(Method suggestionMethod, List<CommandInput> commandInputs) {
+  private List<Suggestion> invokeSuggestion(Method suggestionMethod, List<InputValue> commandInputs) {
     Object[] args = resolveArgs(null, commandInputs, suggestionMethod);
     try {
       return (List<Suggestion>) suggestionMethod.invoke(command, args);
@@ -213,11 +220,11 @@ public class AnnotatedCommandAdapter implements Command {
     }
   }
 
-  private Object[] resolveArgs(CommandContext commandContext, List<CommandInput> commandInputs, Executable executable) {
-    Iterator<CommandInput> inputIterator = commandInputs.iterator();
+  private Object[] resolveArgs(CommandContext commandContext, List<InputValue> commandInputs, Executable executable) {
+    Iterator<InputValue> inputIterator = commandInputs.iterator();
     Supplier<String> inputSupplier = () -> {
       if (inputIterator.hasNext()) {
-        return inputIterator.next().asString();
+        return inputIterator.next().get();
       }
       return null;
     };
@@ -225,7 +232,7 @@ public class AnnotatedCommandAdapter implements Command {
     Context context = new Context(parameter -> {
       try {
         Method valueOf = parameter.getType().getDeclaredMethod("valueOf", String.class);
-        return valueOf.invoke(null, inputIterator.next().asString());
+        return valueOf.invoke(null, inputIterator.next().get());
       } catch (NoSuchMethodException | IllegalAccessException e) {
         return null;
       } catch (InvocationTargetException e) {
@@ -258,15 +265,15 @@ public class AnnotatedCommandAdapter implements Command {
 
       .when(ofType(CommandInput.class), () -> inputIterator.hasNext() ? inputIterator.next() : null)
 
-      .when(annotatedWith(RawInput.class), () -> {
+      .when(annotatedWith(Line.class), () -> {
         List<String> args = new ArrayList<>();
-        inputIterator.forEachRemaining(i -> args.add(i.asString()));
+        inputIterator.forEachRemaining(i -> args.add(i.get()));
         return String.join(" ", args);
       })
 
       .when(ofType(String[].class), () -> {
         List<String> args = new ArrayList<>();
-        inputIterator.forEachRemaining(i -> args.add(i.asString()));
+        inputIterator.forEachRemaining(i -> args.add(i.get()));
         return args.toArray(new String[0]);
       })
 
@@ -274,15 +281,9 @@ public class AnnotatedCommandAdapter implements Command {
 
       .when(ofType(String.class), inputSupplier)
 
-      .when(ofType(Integer.class), () -> inputIterator.hasNext() ? inputIterator.next().asInt().orElse(null) : null)
+      .when(ofType(Integer.class), () -> inputIterator.hasNext() ? inputIterator.next().asInteger().orElse(null) : null)
 
-      .when(ofType(Enum.class), parameter -> {
-        String name = inputSupplier.get();
-        if (name != null) {
-          return Enum.valueOf((Class<? extends Enum>) parameter.getType(), resolveEnumName(name));
-        }
-        return null;
-      });
+      .when(ofType(Enum.class), parameter -> InputValue.of(inputSupplier).asEnum((Class<? extends Enum>) parameter.getType()).orElse(null));
 
     return context.resolve(executable.getParameters());
   }
@@ -298,10 +299,6 @@ public class AnnotatedCommandAdapter implements Command {
       }
     }
     return result.toString();
-  }
-
-  private String resolveEnumName(String name) {
-    return name.toUpperCase().replaceAll("-", "_");
   }
 
   @Override

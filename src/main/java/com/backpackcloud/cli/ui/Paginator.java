@@ -59,8 +59,6 @@ public class Paginator {
     return from(stream.toList());
   }
 
-  ;
-
   public class PaginatorBuilder<E> {
 
     private final List<E> data;
@@ -101,7 +99,7 @@ public class Paginator {
       int pages = (int) Math.ceil((double) count / pageSize);
 
       Writer writer = context.writer();
-      if (!context.isInteractive() || preferences.isDisabled(Preferences.RESULT_PAGING) || pages == 1) {
+      if (preferences.isDisabled(Preferences.RESULT_PAGING) || pages == 1) {
         data.forEach(item -> consumer.accept(writer, item));
         return;
       }

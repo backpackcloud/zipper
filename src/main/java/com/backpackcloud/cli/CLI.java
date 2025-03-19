@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 public class CLI {
@@ -228,20 +227,15 @@ public class CLI {
   }
 
   private void parseAndExecute(Writer writer, ParsedLine parsedLine) {
-    List<String> args = new ArrayList<>(parsedLine.words());
-    String commandName = args.get(0);
+    String commandName = parsedLine.words().getFirst();
     Command command = commands.get(commandName);
-    boolean interactive = true;
     CommandContext currentContext;
 
     if (command == null) {
       throw new UnbelievableException("Unknown command " + commandName);
     }
 
-    List<String> argsList = args.subList(1, args.size());
-
-    // only allow interaction if cli is taking user inputs
-    currentContext = new CommandContext(this, argsList, writer, interactive);
+    currentContext = new CommandContext(this, parsedLine, writer);
     command.execute(currentContext);
   }
 

@@ -24,11 +24,10 @@
 
 package com.backpackcloud.cli;
 
-import java.util.Collections;
-import java.util.Iterator;
+import com.backpackcloud.text.InputValue;
+import org.jline.reader.ParsedLine;
+
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Represents a command argument.
@@ -37,43 +36,21 @@ import java.util.stream.Collectors;
  */
 public class CommandInput {
 
-  private final String value;
-  private final List<String> splitValue;
+  private final ParsedLine parsedLine;
 
-  public CommandInput(String value, List<String> splitValue) {
-    this.value = value;
-    this.splitValue = splitValue;
+  public CommandInput(ParsedLine parsedLine) {
+    this.parsedLine = parsedLine;
   }
 
-  public CommandInput(List<String> splitValue) {
-    this.value = String.join(" ", splitValue);
-    this.splitValue = splitValue;
+  public InputValue line() {
+    return InputValue.of(parsedLine.line());
   }
 
-  public boolean isEmpty() {
-    return value.isEmpty();
-  }
-
-  public List<CommandInput> asList() {
-    return splitValue.stream()
-      .map(s -> new CommandInput(s, Collections.singletonList(s)))
-      .collect(Collectors.toList());
-  }
-
-  public String asString() {
-    return value;
-  }
-
-  public Optional<Integer> asInt() {
-    try {
-      return Optional.of(Integer.parseInt(value));
-    } catch (NumberFormatException e) {
-      return Optional.empty();
-    }
-  }
-
-  public Iterator<String> iterator() {
-    return Collections.unmodifiableList(splitValue).iterator();
+  public List<InputValue> words() {
+    List<String> words = parsedLine.words();
+    return words.subList(1, words.size()).stream()
+      .map(InputValue::of)
+      .toList();
   }
 
 }

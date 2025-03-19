@@ -24,19 +24,59 @@
 
 package com.backpackcloud.cli.commands;
 
-import com.backpackcloud.cli.annotations.Action;
+import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.CommandContext;
-import com.backpackcloud.cli.annotations.CommandDefinition;
+import com.backpackcloud.cli.Macro;
+import com.backpackcloud.text.InputValue;
 
-@CommandDefinition(
-  name = "exit",
-  description = "Exits the program"
-)
-public class ExitCommand {
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-  @Action
+public class MacroCommand implements Command {
+
+  private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\{(?<parameter>[^}]+)}");
+
+  private final Macro macro;
+
+  public MacroCommand(Macro macro) {
+    this.macro = macro;
+  }
+
+  @Override
+  public String name() {
+    return macro.name();
+  }
+
+  @Override
+  public String type() {
+    return "Macros";
+  }
+
+  @Override
+  public String description() {
+    return macro.description();
+  }
+
+  @Override
   public void execute(CommandContext context) {
-    context.cli().stop();
+    List<InputValue> args = context.input().words();
+    macro.commands().stream()
+      .map(input -> {
+        Matcher matcher = PARAMETER_PATTERN.matcher(input);
+
+        return matcher.replaceAll(result -> {
+          String[] split = result.group("parameter").split(":");
+          int index = Integer.parseInt(split[0]);
+          String defaultValue = split.length > 1 ? split[1] : "";
+          if (args.size() > index) {
+            return args.get(index).get();
+          } else {
+            return defaultValue;
+          }
+        });
+      })
+      .forEach(context.cli()::execute);
   }
 
 }

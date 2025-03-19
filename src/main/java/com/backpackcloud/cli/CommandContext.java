@@ -24,7 +24,7 @@
 
 package com.backpackcloud.cli;
 
-import java.util.List;
+import org.jline.reader.ParsedLine;
 
 /**
  * Defines which context a command was issued.
@@ -34,19 +34,13 @@ import java.util.List;
 public class CommandContext {
 
   private final CLI cli;
-  private final List<String> args;
+  private final ParsedLine parsedLine;
   private final Writer writer;
-  private final boolean interactive;
 
-  public CommandContext(CLI cli, List<String> args, Writer writer, boolean interactive) {
+  public CommandContext(CLI cli, ParsedLine parsedLine, Writer writer) {
     this.cli = cli;
-    this.args = args;
+    this.parsedLine = parsedLine;
     this.writer = writer;
-    this.interactive = interactive;
-  }
-
-  public boolean isInteractive() {
-    return interactive;
   }
 
   public CLI cli() {
@@ -54,7 +48,7 @@ public class CommandContext {
   }
 
   public CommandInput input() {
-    return new CommandInput(String.join(" ", args), args);
+    return new CommandInput(parsedLine);
   }
 
   public Writer writer() {
