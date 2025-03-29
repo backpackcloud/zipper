@@ -30,7 +30,7 @@
 
   <groupId>com.backpackcloud</groupId>
   <artifactId>zipper</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>zipper</name>
@@ -84,7 +84,7 @@
 
     <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
 
-    <fabric.version>1.0.0-SNAPSHOT</fabric.version>
+    <fabric.version>1.0.0</fabric.version>
 
     <mockito.version>4.8.0</mockito.version>
     <hamcrest.version>2.2</hamcrest.version>
