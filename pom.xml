@@ -2,7 +2,7 @@
 <!--
   ~ The MIT License (MIT)
   ~
-  ~ Copyright (c) 2022 Marcelo Guimarães
+  ~ Copyright (c) 2025 Marcelo "Ataxexe" Guimarães
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,10 @@
 
   <groupId>com.backpackcloud</groupId>
   <artifactId>zipper</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
+
+  <name>zipper</name>
 
   <description>
     Zipper is a common library for the BackpackCloud CLI tools.
