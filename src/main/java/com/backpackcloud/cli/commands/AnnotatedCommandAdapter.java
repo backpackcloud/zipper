@@ -283,6 +283,8 @@ public class AnnotatedCommandAdapter implements Command {
 
       .when(ofType(Integer.class), () -> inputIterator.hasNext() ? inputIterator.next().asInteger().orElse(null) : null)
 
+      .when(ofType(InputValue.class), parameter -> InputValue.of(inputIterator))
+
       .when(ofType(Enum.class), parameter -> InputValue.of(inputSupplier).asEnum((Class<? extends Enum>) parameter.getType()).orElse(null));
 
     return context.resolve(executable.getParameters());
