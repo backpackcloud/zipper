@@ -118,7 +118,7 @@ public class CLIBuilder {
     return addComponent(createComponent(componentType), componentType);
   }
 
-  public <T> CLIBuilder addComponent(T component, Class<?>... componentTypes) {
+  public CLIBuilder addComponent(Object component, Class... componentTypes) {
     for (Class type : componentTypes) {
       this.context.when(ofType(type), component);
       this.serialBitter.addDependency(type, component);
@@ -141,7 +141,7 @@ public class CLIBuilder {
     return this;
   }
 
-  public CLIBuilder addCommands(Class<?>... commandClasses) {
+  public CLIBuilder addCommands(Class... commandClasses) {
     for (Class<?> commandClass : commandClasses) {
       addCommand(commandClass);
     }
