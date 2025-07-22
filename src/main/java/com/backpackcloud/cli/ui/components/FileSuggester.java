@@ -48,7 +48,7 @@ public class FileSuggester {
   public List<Suggestion> suggest(String input) {
     String path;
 
-    if (input.isBlank()) {
+    if (input == null || input.isBlank()) {
       path = ".";
     } else {
       path = input;

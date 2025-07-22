@@ -34,7 +34,7 @@ import com.backpackcloud.cli.ErrorRegistry;
 import com.backpackcloud.cli.Macro;
 import com.backpackcloud.cli.Preferences;
 import com.backpackcloud.cli.Registry;
-import com.backpackcloud.cli.commands.AnnotatedCommandAdapter;
+import com.backpackcloud.cli.commands.AnnotatedCommand;
 import com.backpackcloud.cli.commands.ClearCommand;
 import com.backpackcloud.cli.commands.ExitCommand;
 import com.backpackcloud.cli.commands.MacroCommand;
@@ -153,7 +153,7 @@ public class CLIBuilder {
     if (command instanceof Command c) {
       return addCommand(c);
     }
-    return addCommand(new AnnotatedCommandAdapter(command, userPreferences, terminal));
+    return addCommand(new AnnotatedCommand(command, userPreferences, terminal));
   }
 
   public CLIBuilder addCommand(Command command) {
@@ -162,7 +162,7 @@ public class CLIBuilder {
   }
 
   public CLIBuilder addCommand(Object command) {
-    this.commands.add(new AnnotatedCommandAdapter(command, userPreferences, terminal));
+    this.commands.add(new AnnotatedCommand(command, userPreferences, terminal));
     return this;
   }
 
@@ -178,28 +178,28 @@ public class CLIBuilder {
   }
 
   public CLIBuilder addLeftPrompt(Class<? extends PromptWriter>... promptWriterTypes) {
-    for(Class<? extends PromptWriter> promptWriterType: promptWriterTypes){
+    for (Class<? extends PromptWriter> promptWriterType : promptWriterTypes) {
       this.leftPromptWriters.add(createComponent(promptWriterType));
     }
     return this;
   }
 
   public CLIBuilder addLeftPrompt(PromptWriter... promptWriters) {
-    for(PromptWriter promptWriter: promptWriters){
+    for (PromptWriter promptWriter : promptWriters) {
       this.leftPromptWriters.add(promptWriter);
     }
     return this;
   }
 
   public CLIBuilder addRightPrompt(Class<? extends PromptWriter>... promptWriterTypes) {
-    for(Class<? extends PromptWriter> promptWriterType: promptWriterTypes){
+    for (Class<? extends PromptWriter> promptWriterType : promptWriterTypes) {
       this.rightPromptWriters.add(createComponent(promptWriterType));
     }
     return this;
   }
 
   public CLIBuilder addRightPrompt(PromptWriter... promptWriters) {
-    for(PromptWriter promptWriter: promptWriters){
+    for (PromptWriter promptWriter : promptWriters) {
       this.rightPromptWriters.add(promptWriter);
     }
     return this;

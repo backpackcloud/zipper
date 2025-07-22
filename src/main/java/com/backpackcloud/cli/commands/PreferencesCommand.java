@@ -24,10 +24,11 @@
 
 package com.backpackcloud.cli.commands;
 
+import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.annotations.Action;
 import com.backpackcloud.cli.annotations.CommandDefinition;
-import com.backpackcloud.cli.annotations.Suggestions;
-import com.backpackcloud.cli.Writer;
+import com.backpackcloud.cli.annotations.InputParameter;
+import com.backpackcloud.cli.annotations.ParameterSuggestion;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
 import com.backpackcloud.preferences.Preference;
@@ -49,12 +50,12 @@ public class PreferencesCommand {
   }
 
   @Action
-  public void set(Preference<?> preference, String value) {
+  public void set(@InputParameter Preference<?> preference, @InputParameter String value) {
     preference.set(value);
   }
 
   @Action
-  public void clear(Preference<?> preference) {
+  public void clear(@InputParameter Preference<?> preference) {
     preference.reset();
   }
 
@@ -65,7 +66,7 @@ public class PreferencesCommand {
       .write(preference.spec().id()).write(": ")
 
       .withStyle("preference_" + preference.spec().type().name().toLowerCase())
-      .write(String.valueOf(preference.inputValue()))
+      .write(String.valueOf(preference.inputValue().get()))
 
       .withStyle("preference_description")
       .write(String.format(" (%s)", preference.spec().description()))
@@ -73,7 +74,8 @@ public class PreferencesCommand {
     );
   }
 
-  @Suggestions({"set", "clear"})
+  @ParameterSuggestion(action = "set", parameter = "preference")
+  @ParameterSuggestion(action = "clear", parameter = "preference")
   public List<Suggestion> suggestPreferences() {
     return userPreferences.list().stream()
       .map(preferences ->

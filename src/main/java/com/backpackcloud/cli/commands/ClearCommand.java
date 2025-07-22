@@ -24,10 +24,11 @@
 
 package com.backpackcloud.cli.commands;
 
+import com.backpackcloud.cli.Registry;
 import com.backpackcloud.cli.annotations.Action;
 import com.backpackcloud.cli.annotations.CommandDefinition;
-import com.backpackcloud.cli.Registry;
-import com.backpackcloud.cli.annotations.Suggestions;
+import com.backpackcloud.cli.annotations.InputParameter;
+import com.backpackcloud.cli.annotations.ParameterSuggestion;
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.PromptSuggestion;
 
@@ -53,7 +54,7 @@ public class ClearCommand {
   }
 
   @Action
-  public void execute(String... args) {
+  public void execute(@InputParameter String... args) {
     if (args.length == 0) {
       registries.values().forEach(Registry::clear);
     } else {
@@ -64,7 +65,7 @@ public class ClearCommand {
     }
   }
 
-  @Suggestions
+  @ParameterSuggestion
   public List<Suggestion> execute() {
     return registries.keySet().stream()
       .map(PromptSuggestion::suggest)
