@@ -24,12 +24,18 @@
 
 package com.backpackcloud.cli.ui.components;
 
+import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.cli.ui.Suggestion;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileSuggester {
 
@@ -40,40 +46,53 @@ public class FileSuggester {
   private Suggestion createSuggestion(File suggestion) {
     String path = normalize(suggestion.getPath());
     if (suggestion.isDirectory()) {
-      return PromptSuggestion.suggest(path + "/").incomplete();
+      return PromptSuggestion.suggest(path)
+        .asPartOf("Directories")
+        .incomplete();
     }
-    return PromptSuggestion.suggest(path).incomplete();
+    return PromptSuggestion.suggest(path)
+      .describedAs(String.format("%d bytes", suggestion.length()))
+      .asPartOf("Files");
   }
 
   public List<Suggestion> suggest(String input) {
-    String path;
-
-    if (input == null || input.isBlank()) {
-      path = ".";
-    } else {
-      path = input;
-    }
-
-    File file = new File(path);
-    List<Suggestion> result = new ArrayList<>();
-    if (file.exists()) {
-      result.add(PromptSuggestion.suggest(file.getPath()).incomplete());
-
-      if (file.isDirectory()) {
-        Arrays.stream(file.listFiles())
-          .map(this::createSuggestion)
-          .forEach(result::add);
+    try {
+      if (input == null || input.isBlank()) {
+        return collect(Paths.get(""));
+      } else {
+        Path path = Paths.get(input);
+        File file = path.toFile();
+        if (file.exists()) {
+          if (file.isDirectory()) {
+            List<Suggestion> result = new ArrayList<>(collect(path));
+            result.add(createSuggestion(file));
+            return result;
+          } else {
+            Path parent = path.getParent();
+            if (parent != null) {
+              return collect(parent);
+            } else {
+              return suggest(null);
+            }
+          }
+        } else {
+          Path parent = path.getParent();
+          if (parent != null) {
+            return collect(parent);
+          }
+        }
       }
+      return Collections.emptyList();
+    } catch (IOException e) {
+      throw new UnbelievableException(e);
     }
+  }
 
-    File parent = file.getParentFile();
-    if (parent != null) {
-      Arrays.stream(parent.listFiles(p -> p.getPath().startsWith(path)))
-        .map(this::createSuggestion)
-        .forEach(result::add);
-    }
-
-    return result;
+  private List<Suggestion> collect(Path path) throws IOException {
+    return Files.list(path)
+      .map(Path::toFile)
+      .map(this::createSuggestion)
+      .collect(Collectors.toList());
   }
 
 }
