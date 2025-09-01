@@ -46,14 +46,7 @@ public @interface CommandDefinition {
    * Defines the command name which the interface will use to trigger the annotated class.
    */
   String name();
-
-  /**
-   * Defines the event name which will be triggered after this command execution.
-   * <p>
-   * Defaults to {@link #name()}*
-   */
-  String event() default "";
-
+  
   /**
    * Defines the type of this command, the UI will use this to group the commands in the suggestions.
    */
