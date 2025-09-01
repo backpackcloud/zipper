@@ -5,11 +5,12 @@ import com.backpackcloud.cli.Command;
 import com.backpackcloud.cli.CommandContext;
 import com.backpackcloud.cli.CommandInput;
 import com.backpackcloud.cli.Displayable;
+import com.backpackcloud.cli.EventBus;
 import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.annotations.Action;
 import com.backpackcloud.cli.annotations.CommandDefinition;
+import com.backpackcloud.cli.annotations.Event;
 import com.backpackcloud.cli.annotations.InputParameter;
-import com.backpackcloud.cli.annotations.Line;
 import com.backpackcloud.cli.annotations.Paginate;
 import com.backpackcloud.cli.annotations.ParameterCount;
 import com.backpackcloud.cli.annotations.ParameterSuggestion;
@@ -49,6 +50,8 @@ public class AnnotatedCommand implements Command {
 
   private final Object command;
 
+  private final EventBus eventBus;
+
   private final UserPreferences preferences;
   private final Terminal terminal;
 
@@ -56,6 +59,7 @@ public class AnnotatedCommand implements Command {
   private final Map<String, Method> suggestions;
 
   public AnnotatedCommand(Object command,
+                          EventBus eventBus,
                           UserPreferences preferences,
                           Terminal terminal) {
     Class<?> commandClass = command.getClass();
@@ -63,6 +67,7 @@ public class AnnotatedCommand implements Command {
       throw new UnbelievableException("Command is not annotated with @CommandDefinition");
     }
     this.command = command;
+    this.eventBus = eventBus;
     this.preferences = preferences;
     this.terminal = terminal;
     this.definition = commandClass.getAnnotation(CommandDefinition.class);
@@ -111,7 +116,6 @@ public class AnnotatedCommand implements Command {
           }
         }
       });
-
   }
 
   @Override
@@ -197,6 +201,10 @@ public class AnnotatedCommand implements Command {
 
     try {
       returnValue = actionMethod.invoke(command, args);
+      if (actionMethod.isAnnotationPresent(Event.class)) {
+        String eventName = actionMethod.getAnnotation(Event.class).value();
+        eventBus.send(eventName);
+      }
     } catch (IllegalAccessException | InvocationTargetException e) {
       throw new UnbelievableException(e);
     }
@@ -289,12 +297,6 @@ public class AnnotatedCommand implements Command {
       .when(ParameterPredicates.annotatedWith(ParameterCount.class), commandInputs::size)
 
       .when(ofType(CommandInput.class), () -> inputIterator.hasNext() ? inputIterator.next() : null)
-
-      .when(ParameterPredicates.annotatedWith(Line.class), () -> {
-        List<String> args = new ArrayList<>();
-        inputIterator.forEachRemaining(i -> args.add(i.get()));
-        return String.join(" ", args);
-      })
 
       .when(ofType(String[].class), () -> {
         List<String> args = new ArrayList<>();

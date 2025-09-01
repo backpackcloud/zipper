@@ -83,7 +83,7 @@
     <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
     <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
 
-    <fabric.version>1.1.0</fabric.version>
+    <fabric.version>1.2.0</fabric.version>
 
     <mockito.version>4.8.0</mockito.version>
     <hamcrest.version>2.2</hamcrest.version>

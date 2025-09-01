@@ -2,6 +2,7 @@ package com.backpackcloud.zipper.commands;
 
 import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.cli.CommandInput;
+import com.backpackcloud.cli.EventBus;
 import com.backpackcloud.cli.Preferences;
 import com.backpackcloud.cli.commands.AnnotatedCommand;
 import com.backpackcloud.cli.commands.ThemeCommand;
@@ -26,6 +27,7 @@ public class AnnotatedCommandTest {
 
   private final AnnotatedCommand themeCommand = new AnnotatedCommand(
     new ThemeCommand(Theme.create(SerialBitter.YAML())),
+    new EventBus(),
     createUserPreferences(),
     createTerminal()
   );
