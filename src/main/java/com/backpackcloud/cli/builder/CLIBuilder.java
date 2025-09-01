@@ -25,15 +25,7 @@
 package com.backpackcloud.cli.builder;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.cli.CLI;
-import com.backpackcloud.cli.Command;
-import com.backpackcloud.cli.CommandBus;
-import com.backpackcloud.cli.CommandNotifier;
-import com.backpackcloud.cli.CommandObserver;
-import com.backpackcloud.cli.ErrorRegistry;
-import com.backpackcloud.cli.Macro;
-import com.backpackcloud.cli.Preferences;
-import com.backpackcloud.cli.Registry;
+import com.backpackcloud.cli.*;
 import com.backpackcloud.cli.commands.AnnotatedCommand;
 import com.backpackcloud.cli.commands.ClearCommand;
 import com.backpackcloud.cli.commands.ExitCommand;
@@ -82,6 +74,7 @@ public class CLIBuilder {
   private final List<PromptWriter> leftPromptWriters;
   private final List<PromptWriter> rightPromptWriters;
   private final Context context;
+  private final EventBus eventBus;
 
   public CLIBuilder(SerialBitter serialBitter) {
     this.serialBitter = serialBitter;
@@ -94,6 +87,7 @@ public class CLIBuilder {
     this.leftPromptWriters = new ArrayList<>();
     this.rightPromptWriters = new ArrayList<>();
     this.context = new Context();
+    this.eventBus = new EventBus();
 
     this.registries = new ArrayList<>();
     this.registries.add(errorRegistry);
@@ -107,6 +101,7 @@ public class CLIBuilder {
     addComponent(userPreferences, UserPreferences.class);
     addComponent(theme, Theme.class);
     addComponent(errorRegistry, ErrorRegistry.class);
+    addComponent(eventBus, EventBus.class);
     addComponent(
       Preference.class,
       parameter -> userPreferences.find(parameter.getName())
@@ -153,7 +148,7 @@ public class CLIBuilder {
     if (command instanceof Command c) {
       return addCommand(c);
     }
-    return addCommand(new AnnotatedCommand(command, userPreferences, terminal));
+    return addCommand(new AnnotatedCommand(command, eventBus, userPreferences, terminal));
   }
 
   public CLIBuilder addCommand(Command command) {
@@ -162,7 +157,7 @@ public class CLIBuilder {
   }
 
   public CLIBuilder addCommand(Object command) {
-    this.commands.add(new AnnotatedCommand(command, userPreferences, terminal));
+    this.commands.add(new AnnotatedCommand(command, eventBus, userPreferences, terminal));
     return this;
   }
 
@@ -215,6 +210,13 @@ public class CLIBuilder {
     return this;
   }
 
+  public CLIBuilder addDefaultRightPrompts() {
+    addRightPrompt(CommandStatusPromptWriter.class);
+    addRightPrompt(ErrorCountPromptWriter.class);
+    addRightPrompt(TimerPromptWriter.class);
+    return this;
+  }
+
   private <E> E createComponent(Class<E> componentType) {
     List<Constructor> constructors = Mirror.reflect(componentType).constructors();
     if (constructors.size() != 1) {
@@ -223,7 +225,9 @@ public class CLIBuilder {
     Constructor<?> constructor = constructors.getFirst();
     Object[] args = this.context.resolve(constructor);
     try {
-      return (E) constructor.newInstance(args);
+      E component = (E) constructor.newInstance(args);
+      eventBus.scan(component);
+      return component;
     } catch (InstantiationException | IllegalAccessException e) {
       throw new UnbelievableException(e);
     } catch (InvocationTargetException e) {
@@ -258,9 +262,7 @@ public class CLIBuilder {
   }
 
   private void initializeRightPrompt() {
-    addRightPrompt(CommandStatusPromptWriter.class);
-    addRightPrompt(ErrorCountPromptWriter.class);
-    addRightPrompt(TimerPromptWriter.class);
+    addDefaultRightPrompts();
   }
 
   public CLI build() {
