@@ -26,7 +26,11 @@ package com.backpackcloud.cli.ui.components;
 
 import com.backpackcloud.cli.ui.Suggestion;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PromptSuggestion implements Suggestion {
 
@@ -77,8 +81,38 @@ public class PromptSuggestion implements Suggestion {
     return new PromptSuggestion(this.value, this.description, group, this.complete);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof PromptSuggestion that)) return false;
+    return complete == that.complete && Objects.equals(value, that.value)
+      && Objects.equals(description, that.description) && Objects.equals(group, that.group);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value, description, group, complete);
+  }
+
+  @Override
+  public String toString() {
+    return "PromptSuggestion{" +
+      "value='" + value + '\'' +
+      ", description='" + description + '\'' +
+      ", group='" + group + '\'' +
+      ", complete=" + complete +
+      '}';
+  }
+
   public static PromptSuggestion suggest(String value) {
     return new PromptSuggestion(value, null, null, true);
+  }
+
+  public static List<Suggestion> suggest(Class<? extends Enum> enumClass) {
+    return Stream.of(enumClass.getEnumConstants())
+      .map(Enum::name)
+      .map(name -> name.toLowerCase().replaceAll("_", "-"))
+      .map(PromptSuggestion::suggest)
+      .collect(Collectors.toList());
   }
 
 }
