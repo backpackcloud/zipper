@@ -24,8 +24,8 @@
 
 package com.backpackcloud.cli;
 
-import com.backpackcloud.cli.ui.Theme;
 import com.backpackcloud.cli.ui.StyleBuilder;
+import com.backpackcloud.cli.ui.Theme;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
@@ -44,10 +44,10 @@ public class Writer {
   private final Terminal terminal;
 
   public Writer(Theme theme,
-                       AttributedStyle style,
-                       BiFunction<String, AttributedStyle, AttributedString> createTextFunction,
-                       Consumer<AttributedString> delegate,
-                       Terminal terminal) {
+                AttributedStyle style,
+                BiFunction<String, AttributedStyle, AttributedString> createTextFunction,
+                Consumer<AttributedString> delegate,
+                Terminal terminal) {
     this.theme = theme;
     this.style = style;
     this.createTextFunction = createTextFunction;
@@ -87,6 +87,15 @@ public class Writer {
 
   public Writer writeIcon(String icon) {
     return writeText(theme.iconMap().symbolOf(icon));
+  }
+
+  public Writer writeIcon(String... icons) {
+    return Arrays.stream(icons)
+      .map(theme.iconMap()::symbolOf)
+      .filter(s -> !s.isBlank())
+      .findFirst()
+      .map(this::writeText)
+      .orElse(this);
   }
 
   public Writer writeln(String text) {
