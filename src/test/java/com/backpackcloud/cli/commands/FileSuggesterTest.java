@@ -1,4 +1,4 @@
-package com.backpackcloud.zipper.commands;
+package com.backpackcloud.cli.commands;
 
 import com.backpackcloud.cli.ui.Suggestion;
 import com.backpackcloud.cli.ui.components.FileSuggester;
