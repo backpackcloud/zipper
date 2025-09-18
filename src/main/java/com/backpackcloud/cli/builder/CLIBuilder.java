@@ -109,6 +109,11 @@ public class CLIBuilder {
     );
   }
 
+  public CLIBuilder register(Module module) {
+    module.configure(this);
+    return this;
+  }
+
   public CLIBuilder addComponent(Class<?> componentType) {
     return addComponent(createComponent(componentType), componentType);
   }
