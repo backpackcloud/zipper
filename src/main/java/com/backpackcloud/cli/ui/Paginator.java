@@ -27,8 +27,8 @@ package com.backpackcloud.cli.ui;
 import com.backpackcloud.UnbelievableException;
 import com.backpackcloud.cli.CommandContext;
 import com.backpackcloud.cli.Displayable;
-import com.backpackcloud.cli.Writer;
 import com.backpackcloud.cli.Preferences;
+import com.backpackcloud.cli.Writer;
 import com.backpackcloud.preferences.UserPreferences;
 import org.jline.terminal.Terminal;
 
@@ -83,7 +83,7 @@ public class Paginator {
     }
 
     public PaginatorBuilder<E> print(BiConsumer<Writer, E> printConsumer) {
-      this.consumer = printConsumer;
+      this.consumer = printConsumer.andThen(((writer, e) -> writer.newLine()));
       return this;
     }
 
