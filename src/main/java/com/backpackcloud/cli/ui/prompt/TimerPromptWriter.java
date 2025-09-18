@@ -24,7 +24,8 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.CommandObserver;
+import com.backpackcloud.cli.CLI;
+import com.backpackcloud.cli.annotations.Observe;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 
@@ -36,12 +37,15 @@ public class TimerPromptWriter implements PromptWriter {
   private Duration lastCommandDuration = Duration.ZERO;
   private LocalDateTime start = LocalDateTime.now();
 
-  public TimerPromptWriter(CommandObserver observer) {
-    observer.beforeCommand(() -> {
-      start = LocalDateTime.now();
-      lastCommandDuration = null;
-    });
-    observer.afterCommand(() -> lastCommandDuration = Duration.between(start, LocalDateTime.now()));
+  @Observe(CLI.EVENT_COMMAND_BEGIN)
+  public void resetError() {
+    start = LocalDateTime.now();
+    lastCommandDuration = null;
+  }
+
+  @Observe(CLI.EVENT_COMMAND_END)
+  public void onCommandError() {
+    lastCommandDuration = Duration.between(start, LocalDateTime.now());
   }
 
   @Override

@@ -24,7 +24,8 @@
 
 package com.backpackcloud.cli.ui.prompt;
 
-import com.backpackcloud.cli.CommandObserver;
+import com.backpackcloud.cli.CLI;
+import com.backpackcloud.cli.annotations.Observe;
 import com.backpackcloud.cli.ui.Prompt;
 import com.backpackcloud.cli.ui.PromptWriter;
 
@@ -32,9 +33,14 @@ public class CommandStatusPromptWriter implements PromptWriter {
 
   private boolean commandError;
 
-  public CommandStatusPromptWriter(CommandObserver observer) {
-    observer.beforeCommand(() -> commandError = false);
-    observer.onCommandError(e -> commandError = true);
+  @Observe(CLI.EVENT_COMMAND_BEGIN)
+  public void resetError() {
+    commandError = false;
+  }
+
+  @Observe(CLI.EVENT_COMMAND_ERROR)
+  public void onCommandError() {
+    commandError = true;
   }
 
   @Override

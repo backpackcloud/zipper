@@ -49,6 +49,10 @@ import java.util.Map;
 
 public class CLI {
 
+  public static final String EVENT_COMMAND_BEGIN = "command-begin";
+  public static final String EVENT_COMMAND_END = "command-end";
+  public static final String EVENT_COMMAND_ERROR = "command-error";
+
   private final Terminal terminal;
   private final UserPreferences preferences;
   private final Theme theme;
@@ -60,7 +64,7 @@ public class CLI {
 
   private final Collection<PromptWriter> leftPrompt;
   private final Collection<PromptWriter> rightPrompt;
-  private final CommandBus commandBus;
+  private final EventBus eventBus;
 
   private final Writer console;
 
@@ -69,13 +73,13 @@ public class CLI {
   public CLI(Terminal terminal,
              UserPreferences preferences,
              Theme theme,
-             CommandBus commandBus) {
+             EventBus eventBus) {
     this.terminal = terminal;
     this.preferences = preferences;
     this.theme = theme;
     this.leftPrompt = new ArrayList<>();
     this.rightPrompt = new ArrayList<>();
-    this.commandBus = commandBus;
+    this.eventBus = eventBus;
 
     this.commands = new HashMap<>();
 
@@ -108,10 +112,12 @@ public class CLI {
   }
 
   public void addLeftPrompt(PromptWriter writer) {
+    this.eventBus.scan(writer);
     this.leftPrompt.add(writer);
   }
 
   public void addRightPrompt(PromptWriter writer) {
+    this.eventBus.scan(writer);
     this.rightPrompt.add(writer);
   }
 
@@ -120,6 +126,7 @@ public class CLI {
       String name = command.name();
       this.commands.put(name, command);
       this.highlighter.addCommand(name);
+      this.eventBus.scan(command);
     }
   }
 
@@ -135,8 +142,6 @@ public class CLI {
     String query;
     while (!stop) {
       try {
-        commandBus.notifyReady();
-
         String left = buildLeftPrompt();
         String right = buildRightPrompt();
 
@@ -144,7 +149,7 @@ public class CLI {
 
         execute(query);
       } catch (UnbelievableException e) {
-        commandBus.notifyError(e);
+        eventBus.send(EVENT_COMMAND_ERROR, EventBus.param("error", e));
         if (e.getMessage() != null) {
           console.style()
             .parse("command_error")
@@ -175,7 +180,7 @@ public class CLI {
   }
 
   public void execute(Writer writer, String... commands) {
-    commandBus.notifyStart();
+    eventBus.send(EVENT_COMMAND_BEGIN);
     try {
       for (String command : commands) {
         if (!command.isEmpty()) {
@@ -183,9 +188,9 @@ public class CLI {
         }
       }
     } catch (Exception e) {
-      commandBus.notifyError(e);
+      eventBus.send(EVENT_COMMAND_ERROR, EventBus.param("error", e));
     } finally {
-      commandBus.notifyDone();
+      eventBus.send(EVENT_COMMAND_END);
     }
   }
 

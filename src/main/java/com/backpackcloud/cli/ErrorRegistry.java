@@ -24,6 +24,8 @@
 
 package com.backpackcloud.cli;
 
+import com.backpackcloud.cli.annotations.Observe;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -46,9 +48,10 @@ public class ErrorRegistry implements Registry {
     return viewed;
   }
 
-  public void add(Exception exception) {
+  @Observe(CLI.EVENT_COMMAND_ERROR)
+  public void add(Exception error) {
     viewed = false;
-    errors.add(exception);
+    errors.add(error);
   }
 
   @Override

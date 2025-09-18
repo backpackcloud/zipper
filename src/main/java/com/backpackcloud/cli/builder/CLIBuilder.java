@@ -25,7 +25,14 @@
 package com.backpackcloud.cli.builder;
 
 import com.backpackcloud.UnbelievableException;
-import com.backpackcloud.cli.*;
+import com.backpackcloud.cli.CLI;
+import com.backpackcloud.cli.Command;
+import com.backpackcloud.cli.ErrorRegistry;
+import com.backpackcloud.cli.EventBus;
+import com.backpackcloud.cli.Macro;
+import com.backpackcloud.cli.Module;
+import com.backpackcloud.cli.Preferences;
+import com.backpackcloud.cli.Registry;
 import com.backpackcloud.cli.commands.AnnotatedCommand;
 import com.backpackcloud.cli.commands.ClearCommand;
 import com.backpackcloud.cli.commands.ExitCommand;
@@ -46,13 +53,10 @@ import com.backpackcloud.preferences.Preference;
 import com.backpackcloud.preferences.PreferenceSpec;
 import com.backpackcloud.preferences.UserPreferences;
 import com.backpackcloud.reflection.Context;
-import com.backpackcloud.reflection.Mirror;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +72,6 @@ public class CLIBuilder {
   private final UserPreferences userPreferences;
   private final Theme theme;
   private final ErrorRegistry errorRegistry;
-  private final CommandBus commandBus;
   private final List<Registry> registries;
   private final List<Command> commands;
   private final List<PromptWriter> leftPromptWriters;
@@ -82,7 +85,6 @@ public class CLIBuilder {
     this.userPreferences = createUserPreferences();
     this.theme = Theme.create(serialBitter);
     this.errorRegistry = new ErrorRegistry();
-    this.commandBus = new CommandBus(errorRegistry);
     this.commands = new ArrayList<>();
     this.leftPromptWriters = new ArrayList<>();
     this.rightPromptWriters = new ArrayList<>();
@@ -97,7 +99,6 @@ public class CLIBuilder {
 
   private void initializeContext() {
     addComponent(serialBitter, SerialBitter.class, Serializer.class, Deserializer.class);
-    addComponent(commandBus, CommandBus.class, CommandObserver.class, CommandNotifier.class);
     addComponent(userPreferences, UserPreferences.class);
     addComponent(theme, Theme.class);
     addComponent(errorRegistry, ErrorRegistry.class);
@@ -109,13 +110,19 @@ public class CLIBuilder {
     );
   }
 
+  public CLIBuilder setPreference(String preferenceName, String preferenceValue) {
+    this.userPreferences.find(preferenceName)
+      .ifPresent(preference -> preference.set(preferenceValue));
+    return this;
+  }
+
   public CLIBuilder register(Module module) {
     module.configure(this);
     return this;
   }
 
   public CLIBuilder addComponent(Class<?> componentType) {
-    return addComponent(createComponent(componentType), componentType);
+    return addComponent(create(componentType), componentType);
   }
 
   public CLIBuilder addComponent(Object component, Class... componentTypes) {
@@ -127,6 +134,8 @@ public class CLIBuilder {
     if (component instanceof Registry registry) {
       this.registries.add(registry);
     }
+
+    this.eventBus.scan(component);
 
     return this;
   }
@@ -149,7 +158,7 @@ public class CLIBuilder {
   }
 
   public CLIBuilder addCommand(Class<?> commandClass) {
-    Object command = createComponent(commandClass);
+    Object command = create(commandClass);
     if (command instanceof Command c) {
       return addCommand(c);
     }
@@ -179,7 +188,7 @@ public class CLIBuilder {
 
   public CLIBuilder addLeftPrompt(Class<? extends PromptWriter>... promptWriterTypes) {
     for (Class<? extends PromptWriter> promptWriterType : promptWriterTypes) {
-      this.leftPromptWriters.add(createComponent(promptWriterType));
+      addLeftPrompt(create(promptWriterType));
     }
     return this;
   }
@@ -193,9 +202,14 @@ public class CLIBuilder {
 
   public CLIBuilder addRightPrompt(Class<? extends PromptWriter>... promptWriterTypes) {
     for (Class<? extends PromptWriter> promptWriterType : promptWriterTypes) {
-      this.rightPromptWriters.add(createComponent(promptWriterType));
+      addRightPrompt(create(promptWriterType));
     }
     return this;
+  }
+
+  private <T> T create(Class<T> type) {
+    T instance = this.context.create(type);
+    return instance;
   }
 
   public CLIBuilder addRightPrompt(PromptWriter... promptWriters) {
@@ -210,7 +224,7 @@ public class CLIBuilder {
     return this;
   }
 
-  public CLIBuilder registerPreferences(PreferenceSpec... specs) {
+  public CLIBuilder register(PreferenceSpec... specs) {
     this.userPreferences.register(specs);
     return this;
   }
@@ -220,24 +234,6 @@ public class CLIBuilder {
     addRightPrompt(ErrorCountPromptWriter.class);
     addRightPrompt(TimerPromptWriter.class);
     return this;
-  }
-
-  private <E> E createComponent(Class<E> componentType) {
-    List<Constructor> constructors = Mirror.reflect(componentType).constructors();
-    if (constructors.size() != 1) {
-      throw new UnbelievableException("CLI component should have one public constructor");
-    }
-    Constructor<?> constructor = constructors.getFirst();
-    Object[] args = this.context.resolve(constructor);
-    try {
-      E component = (E) constructor.newInstance(args);
-      eventBus.scan(component);
-      return component;
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new UnbelievableException(e);
-    } catch (InvocationTargetException e) {
-      throw new UnbelievableException(e.getTargetException());
-    }
   }
 
   private UserPreferences createUserPreferences() {
@@ -275,7 +271,7 @@ public class CLIBuilder {
       terminal,
       userPreferences,
       theme,
-      commandBus
+      eventBus
     );
     initializeCommands();
     commands.forEach(cli::register);
