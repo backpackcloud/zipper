@@ -282,7 +282,7 @@ public class AnnotatedCommand implements Command {
     context
       .when(ofType(Preference.class), parameter -> preferences.find(resolvePreferenceId(parameter.getName()))
         .or(() -> preferences.find(inputSupplier.get()))
-        .orElseThrow(() -> new UnbelievableException("Preference not found for parameter: " + parameter.getName())))
+        .orElse(null))
 
       .when(ParameterPredicates.annotatedWith(PreferenceValue.class), parameter -> {
         String preferenceId = parameter.getAnnotation(PreferenceValue.class).value();
@@ -290,8 +290,8 @@ public class AnnotatedCommand implements Command {
           preferenceId = resolvePreferenceId(parameter.getName());
         }
         return preferences.find(preferenceId)
-          .orElseThrow(() -> new UnbelievableException("Preference not found for parameter: " + parameter.getName()))
-          .value();
+          .map(Preference::value)
+          .orElse(null);
       })
 
       .when(ParameterPredicates.annotatedWith(ParameterCount.class), commandInputs::size)
